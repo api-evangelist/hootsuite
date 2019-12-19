@@ -1,0 +1,111 @@
+{
+    "name": "Hootsuite",
+    "description": "Enhance your social media management with Hootsuite, the leading social media dashboard. Manage multiple networks and profiles and measure your campaign results.",
+    "image": "http:\/\/kinlane-productions.s3.amazonaws.com\/screen-capture-api\/1602-hootsuite.jpg",
+    "tags": [
+        "api provider",
+        "api service provider",
+        "have api",
+        "social",
+        "webhook implementations"
+    ],
+    "created": "2019-12-19",
+    "modified": "2019-12-19",
+    "url": "https:\/\/raw.githubusercontent.com\/api-evangelist\/hootsuite\/master\/apis.json",
+    "specificationVersion": "0.14",
+    "apis": [
+        {
+            "name": "Hootsuite",
+            "description": null,
+            "image": "http:\/\/kinlane-productions.s3.amazonaws.com\/screen-capture-api\/1602-hootsuite.jpg",
+            "humanURL": "http:\/\/hootsuite.com",
+            "baseURL": "",
+            "tags": [],
+            "properties": [
+                {
+                    "type": "x-openapi",
+                    "url": "https:\/\/raw.githubusercontent.com\/api-evangelist\/1forge\/master\/hootsuite-openapi.json"
+                },
+                {
+                    "type": "x-postman-collecction",
+                    "url": "https:\/\/raw.githubusercontent.com\/api-evangelist\/1forge\/master\/hootsuite-postman-collection.json"
+                }
+            ]
+        }
+    ],
+    "include": [],
+    "x-common": [
+        {
+            "type": "Base",
+            "url": "https:\/\/d2l6uygi1pgnys.cloudfront.net\/jsapi\/"
+        },
+        {
+            "type": "Blog",
+            "url": "http:\/\/blog.hootsuite.com"
+        },
+        {
+            "type": "Blog RSS",
+            "url": "http:\/\/blog.hootsuite.com\/feed\/"
+        },
+        {
+            "type": "Crunchbase",
+            "url": "http:\/\/www.crunchbase.com\/company\/hootsuite"
+        },
+        {
+            "type": "Crunchbase",
+            "url": "https:\/\/crunchbase.com\/organization\/hootsuite"
+        },
+        {
+            "type": "Developers",
+            "url": "https:\/\/hootsuite.com\/developers\/app-directory"
+        },
+        {
+            "type": "Email",
+            "url": "media@hootsuite.com"
+        },
+        {
+            "type": "Email",
+            "url": "legal@hootsuite.com"
+        },
+        {
+            "type": "Email",
+            "url": "privacy@hootsuite.com"
+        },
+        {
+            "type": "Email",
+            "url": "hootsuite-dpa@hootsuite.com"
+        },
+        {
+            "type": "Email",
+            "url": "security@hootsuite.com"
+        },
+        {
+            "type": "Email",
+            "url": "app.directory@hootsuite.com"
+        },
+        {
+            "type": "Email",
+            "url": "apis@hootsuite.com"
+        },
+        {
+            "type": "Email",
+            "url": "partnersupport@hootsuite.com"
+        },
+        {
+            "type": "Github",
+            "url": "https:\/\/github.com\/hootsuite"
+        },
+        {
+            "type": "Twitter",
+            "url": "https:\/\/twitter.com\/#!\/HootSuite"
+        },
+        {
+            "type": "Webhooks",
+            "url": "https:\/\/developer.hootsuite.com\/docs\/webhooks-overview"
+        },
+        {
+            "type": "Website",
+            "url": "http:\/\/hootsuite.com"
+        }
+    ]
+}
