@@ -1,0 +1,76 @@
+aid: hootsuite
+name: Hootsuite
+description: >-
+  Hootsuite is a social media management platform that lets organizations
+  schedule posts, monitor conversations, run paid campaigns, and analyze
+  performance across LinkedIn, X (Twitter), Facebook, Instagram, TikTok,
+  YouTube, and Pinterest from a single dashboard. The platform serves
+  marketers, agencies, and enterprises with collaboration, approval, and
+  governance workflows. The Hootsuite REST API uses OAuth 2.0 and provides
+  programmatic access to social profiles, messages, scheduling, and
+  analytics through the platform.hootsuite.com endpoint.
+type: Index
+image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+tags:
+  - Social Media
+  - Social Media Management
+  - Marketing
+  - Content Scheduling
+  - Analytics
+  - Engagement
+url: >-
+  https://raw.githubusercontent.com/api-evangelist/hootsuite/refs/heads/main/apis.yml
+created: '2026-05-11'
+modified: '2026-05-11'
+specificationVersion: '0.19'
+apis:
+  - aid: hootsuite:rest-api
+    name: Hootsuite REST API
+    description: >-
+      REST API for managing social media profiles, scheduling messages,
+      reading and posting to connected networks, and pulling analytics
+      across Hootsuite-managed accounts. Authentication uses OAuth 2.0
+      authorization code flow with refresh-token support.
+    humanURL: https://developer.hootsuite.com/docs/api
+    baseURL: https://platform.hootsuite.com/v1
+    tags:
+      - Social Media
+      - Messages
+      - Scheduling
+      - Profiles
+      - Analytics
+      - OAuth 2.0
+    properties:
+      - type: Documentation
+        url: https://developer.hootsuite.com/docs/api
+      - type: Getting Started
+        url: https://developer.hootsuite.com/docs/getting-started-with-the-rest-api
+      - type: Authentication
+        url: https://developer.hootsuite.com/docs/api-authentication
+      - type: OAuth 2.0
+        url: https://developer.hootsuite.com/docs/enabling-oauth-20
+      - type: API Reference
+        url: https://platform.hootsuite.com/docs/api/index.html
+
+common:
+  - type: Website
+    url: https://www.hootsuite.com
+  - type: Developer Portal
+    url: https://developer.hootsuite.com
+  - type: Documentation
+    url: https://developer.hootsuite.com/docs/api
+  - type: Sign Up
+    url: https://hootsuite.com/plans
+  - type: Pricing
+    url: https://hootsuite.com/plans
+  - type: Login
+    url: https://hootsuite.com/login
+  - type: Support
+    url: https://help.hootsuite.com
+  - type: Blog
+    url: https://blog.hootsuite.com
+  - type: GitHub Organization
+    url: https://github.com/hootsuite
+maintainers:
+  - FN: Kin Lane
+    email: kin@apievangelist.com
