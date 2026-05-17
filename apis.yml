@@ -43,13 +43,13 @@ apis:
     properties:
       - type: Documentation
         url: https://developer.hootsuite.com/docs/api
-      - type: Getting Started
+      - type: GettingStarted
         url: https://developer.hootsuite.com/docs/getting-started-with-the-rest-api
       - type: Authentication
         url: https://developer.hootsuite.com/docs/api-authentication
       - type: OAuth 2.0
         url: https://developer.hootsuite.com/docs/enabling-oauth-20
-      - type: API Reference
+      - type: APIReference
         url: https://platform.hootsuite.com/docs/api/index.html
 
 common:
@@ -59,7 +59,7 @@ common:
     url: https://developer.hootsuite.com
   - type: Documentation
     url: https://developer.hootsuite.com/docs/api
-  - type: Sign Up
+  - type: SignUp
     url: https://hootsuite.com/plans
   - type: Pricing
     url: https://hootsuite.com/plans
@@ -69,7 +69,7 @@ common:
     url: https://help.hootsuite.com
   - type: Blog
     url: https://blog.hootsuite.com
-  - type: GitHub Organization
+  - type: GitHubOrganization
     url: https://github.com/hootsuite
 maintainers:
   - FN: Kin Lane
