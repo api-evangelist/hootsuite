@@ -53,6 +53,8 @@ apis:
         url: https://platform.hootsuite.com/docs/api/index.html
 
 common:
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/hootsuite
   - type: Website
     url: https://www.hootsuite.com
   - type: Developer Portal
