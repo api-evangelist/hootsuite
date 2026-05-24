@@ -73,6 +73,8 @@ common:
     url: https://blog.hootsuite.com
   - type: GitHubOrganization
     url: https://github.com/hootsuite
+  - type: LLMsTxt
+    url: https://developer.hootsuite.com/llms.txt
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
