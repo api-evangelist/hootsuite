@@ -1,0 +1,1103 @@
+"""
+Hootsuite GraphQL Schema
+Conceptual schema representing the Hootsuite social media management platform.
+REST API base URL: https://platform.hootsuite.com/v1
+Authentication: OAuth 2.0 (Bearer token)
+"""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Enumerations
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""Status of a message in its lifecycle."""
+enum MessageStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHING
+  SENT
+  FAILED
+  PENDING_REVIEW
+  REJECTED
+}
+
+"""Type of content in a message."""
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  LINK
+  CAROUSEL
+  STORY
+  REEL
+}
+
+"""Status of a content review."""
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
+}
+
+"""Supported social networks."""
+enum SocialNetwork {
+  TWITTER
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
+  TIKTOK
+  YOUTUBE
+  PINTEREST
+  GOOGLE_MY_BUSINESS
+}
+
+"""Type of social media profile."""
+enum ProfileType {
+  PERSONAL
+  PAGE
+  GROUP
+  BUSINESS
+  CREATOR
+}
+
+"""Member role within an organization."""
+enum MemberRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  RESTRICTED_EDITOR
+  ANALYST
+  VIEWER
+}
+
+"""Status of an invitation."""
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+"""Type of media attachment."""
+enum MediaType {
+  IMAGE
+  VIDEO
+  GIF
+  DOCUMENT
+}
+
+"""Status of a bulk publish operation."""
+enum BulkPublishStatus {
+  QUEUED
+  IN_PROGRESS
+  COMPLETED
+  PARTIAL_FAILURE
+  FAILED
+}
+
+"""Assignment status for an inbox thread."""
+enum AssignmentStatus {
+  UNASSIGNED
+  ASSIGNED
+  RESOLVED
+  CLOSED
+}
+
+"""Type of a webhook event."""
+enum WebhookEvent {
+  MESSAGE_SENT
+  MESSAGE_FAILED
+  MESSAGE_APPROVED
+  MESSAGE_REJECTED
+  THREAD_ASSIGNED
+  THREAD_RESOLVED
+  PROFILE_CONNECTED
+  PROFILE_DISCONNECTED
+}
+
+"""Sentiment classification for stream content."""
+enum Sentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+  UNKNOWN
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scalar Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""ISO 8601 date-time string."""
+scalar DateTime
+
+"""Opaque identifier."""
+scalar ID
+
+"""Arbitrary JSON payload."""
+scalar JSON
+
+"""URL string."""
+scalar URL
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Messaging Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""A social media message managed through Hootsuite."""
+type Message {
+  id: ID!
+  text: String
+  status: MessageStatus!
+  messageType: MessageType!
+  scheduledTime: DateTime
+  publishedTime: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  profiles: [SocialNetworkProfile!]!
+  media: [MessageMedia!]
+  details: MessageDetails
+  review: MessageReview
+  campaign: Campaign
+  createdBy: Member
+}
+
+"""Extended metadata for a message."""
+type MessageDetails {
+  messageId: ID!
+  platformMessageId: String
+  shortLinks: [String!]
+  geolocation: String
+  tags: [String!]
+  networkSpecificData: JSON
+  failureReason: String
+  retryCount: Int
+}
+
+"""A message queued for future publication."""
+type ScheduledMessage {
+  id: ID!
+  message: Message!
+  scheduledTime: DateTime!
+  timezone: String
+  isRecurring: Boolean!
+  recurrencePattern: String
+  queuePosition: Int
+  approvalRequired: Boolean!
+}
+
+"""A message that has been published to a social network."""
+type SentMessage {
+  id: ID!
+  message: Message!
+  publishedTime: DateTime!
+  platformPostId: String!
+  network: SocialNetwork!
+  profile: SocialNetworkProfile!
+  analytics: PostAnalytics
+  permalink: URL
+}
+
+"""A review record for a message pending approval."""
+type MessageReview {
+  id: ID!
+  messageId: ID!
+  status: ReviewStatus!
+  reviewFlow: ReviewFlow
+  submittedAt: DateTime!
+  reviewedAt: DateTime
+  reviewer: Member
+  comments: String
+  history: [ReviewHistoryEntry!]
+}
+
+"""Historical record of a review action."""
+type ReviewHistoryEntry {
+  id: ID!
+  action: ReviewStatus!
+  actor: Member!
+  comment: String
+  timestamp: DateTime!
+}
+
+"""Approval workflow configuration."""
+type ReviewFlow {
+  id: ID!
+  name: String!
+  description: String
+  steps: [ReviewStep!]!
+  isActive: Boolean!
+  organization: Organization!
+  teams: [Team!]
+}
+
+"""A single step in a review workflow."""
+type ReviewStep {
+  stepNumber: Int!
+  approvers: [Member!]!
+  requireAll: Boolean!
+  deadline: Int
+}
+
+"""Media attachment associated with a message."""
+type MessageMedia {
+  id: ID!
+  type: MediaType!
+  url: URL!
+  thumbnailUrl: URL
+  altText: String
+  fileSize: Int
+  width: Int
+  height: Int
+  duration: Int
+  mimeType: String
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Social Network and Profile Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""A connected social media profile or account."""
+type SocialNetworkProfile {
+  id: ID!
+  network: SocialNetwork!
+  profileType: ProfileType!
+  displayName: String!
+  username: String
+  avatarUrl: URL
+  isActive: Boolean!
+  connectedAt: DateTime!
+  details: ProfileDetails
+  auth: ProfileAuth
+  analytics: ProfileAnalytics
+  organization: Organization!
+  teams: [Team!]
+}
+
+"""Extended profile information from the social network."""
+type ProfileDetails {
+  profileId: ID!
+  bio: String
+  website: URL
+  followerCount: Int
+  followingCount: Int
+  postCount: Int
+  verifiedStatus: Boolean
+  pageCategory: String
+  countryCode: String
+  language: String
+  networkProfileUrl: URL
+  networkSpecificData: JSON
+}
+
+"""OAuth credential state for a connected profile."""
+type ProfileAuth {
+  profileId: ID!
+  isValid: Boolean!
+  expiresAt: DateTime
+  scopes: [String!]!
+  lastRefreshedAt: DateTime
+  requiresReauth: Boolean!
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stream and Monitoring Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""A real-time social monitoring stream."""
+type Stream {
+  id: ID!
+  name: String!
+  network: SocialNetwork!
+  profile: SocialNetworkProfile
+  details: StreamDetails!
+  keywords: [StreamKeyword!]
+  filters: [StreamFilter!]
+  isActive: Boolean!
+  createdAt: DateTime!
+}
+
+"""Configuration for a monitoring stream."""
+type StreamDetails {
+  streamId: ID!
+  streamType: String!
+  description: String
+  refreshInterval: Int
+  maxResults: Int
+  includeRetweets: Boolean
+  includeReplies: Boolean
+}
+
+"""A keyword or hashtag tracked in a stream."""
+type StreamKeyword {
+  id: ID!
+  term: String!
+  isHashtag: Boolean!
+  isCaseSensitive: Boolean!
+  addedAt: DateTime!
+}
+
+"""Filter criteria for a stream."""
+type StreamFilter {
+  id: ID!
+  filterType: String!
+  value: String!
+  language: String
+  location: String
+  sentiment: Sentiment
+  isExclusion: Boolean!
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Publishing and Draft Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""A request to publish content to one or more profiles."""
+type PublishingRequest {
+  id: ID!
+  content: ContentDetails!
+  profiles: [SocialNetworkProfile!]!
+  scheduledTime: DateTime
+  status: MessageStatus!
+  createdAt: DateTime!
+  messages: [Message!]!
+}
+
+"""Content body and formatting for a post."""
+type ContentDetails {
+  text: String!
+  media: [MessageMedia!]
+  links: [String!]
+  hashtags: [String!]
+  mentions: [String!]
+  firstComment: String
+  networkOverrides: JSON
+}
+
+"""Batch operation to schedule multiple messages."""
+type BulkPublish {
+  id: ID!
+  status: BulkPublishStatus!
+  totalCount: Int!
+  successCount: Int!
+  failureCount: Int!
+  messages: [Message!]!
+  startedAt: DateTime!
+  completedAt: DateTime
+  errors: [BulkPublishError!]
+}
+
+"""Error detail from a bulk publish operation."""
+type BulkPublishError {
+  messageId: ID
+  profileId: ID
+  errorCode: String!
+  errorMessage: String!
+}
+
+"""An unsaved or work-in-progress message."""
+type Draft {
+  id: ID!
+  text: String
+  media: [MessageMedia!]
+  profiles: [SocialNetworkProfile!]
+  details: DraftDetails!
+  createdBy: Member!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Extended draft metadata."""
+type DraftDetails {
+  draftId: ID!
+  title: String
+  versionNumber: Int!
+  isTemplate: Boolean!
+  tags: [String!]
+  notes: String
+  lastEditedBy: Member
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Team and Organization Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""A Hootsuite user within an organization."""
+type Member {
+  id: ID!
+  email: String!
+  fullName: String!
+  displayName: String
+  avatarUrl: URL
+  role: MemberRole!
+  isActive: Boolean!
+  joinedAt: DateTime!
+  organization: Organization!
+  teams: [Team!]
+  permissions: [Permission!]
+  details: MemberDetails
+}
+
+"""Extended member profile information."""
+type MemberDetails {
+  memberId: ID!
+  jobTitle: String
+  department: String
+  timezone: String
+  language: String
+  lastLoginAt: DateTime
+  notificationPreferences: JSON
+  ssoEnabled: Boolean
+}
+
+"""Granular permission grant for a member."""
+type Permission {
+  id: ID!
+  memberId: ID!
+  resource: String!
+  action: String!
+  scope: String
+  grantedAt: DateTime!
+  grantedBy: Member
+}
+
+"""A Hootsuite account organization."""
+type Organization {
+  id: ID!
+  name: String!
+  slug: String
+  plan: OrganizationPlan!
+  members: [Member!]!
+  teams: [Team!]!
+  profiles: [SocialNetworkProfile!]!
+  createdAt: DateTime!
+  settings: JSON
+}
+
+"""Plan details for an organization."""
+type OrganizationPlan {
+  id: ID!
+  name: String!
+  tier: String!
+  maxMembers: Int
+  maxProfiles: Int
+  maxScheduledMessages: Int
+  analyticsHistoryDays: Int
+  features: [String!]!
+  renewalDate: DateTime
+  isTrial: Boolean!
+}
+
+"""A sub-group within an organization."""
+type Team {
+  id: ID!
+  name: String!
+  description: String
+  organization: Organization!
+  members: [TeamMember!]!
+  profiles: [SocialNetworkProfile!]!
+  reviewFlows: [ReviewFlow!]
+  createdAt: DateTime!
+  isActive: Boolean!
+}
+
+"""Association between a member and a team."""
+type TeamMember {
+  id: ID!
+  member: Member!
+  team: Team!
+  role: MemberRole!
+  addedAt: DateTime!
+  addedBy: Member
+}
+
+"""Pending invitation to join an organization or team."""
+type Invitation {
+  id: ID!
+  email: String!
+  role: MemberRole!
+  status: InvitationStatus!
+  organization: Organization!
+  team: Team
+  sentAt: DateTime!
+  expiresAt: DateTime!
+  sentBy: Member!
+  acceptedAt: DateTime
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Analytics and Reporting Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""Top-level analytics object for a query period."""
+type Analytics {
+  id: ID!
+  startDate: DateTime!
+  endDate: DateTime!
+  profiles: [ProfileAnalytics!]!
+  aggregate: Metrics!
+  filter: AnalyticsFilter
+  generatedAt: DateTime!
+}
+
+"""Aggregate metrics for a social profile over a period."""
+type ProfileAnalytics {
+  id: ID!
+  profile: SocialNetworkProfile!
+  startDate: DateTime!
+  endDate: DateTime!
+  metrics: Metrics!
+  posts: [PostAnalytics!]
+  audienceGrowth: Int
+  audienceGrowthRate: Float
+  topPosts: [PostAnalytics!]
+}
+
+"""Engagement and reach metrics for a single post."""
+type PostAnalytics {
+  id: ID!
+  message: Message
+  platformPostId: String
+  network: SocialNetwork!
+  publishedAt: DateTime!
+  impressions: Int
+  reach: Int
+  engagements: Int
+  engagementRate: Float
+  clicks: Int
+  likes: Int
+  comments: Int
+  shares: Int
+  saves: Int
+  videoViews: Int
+  videoCompletionRate: Float
+}
+
+"""Compiled engagement and audience interaction report."""
+type EngagementReport {
+  id: ID!
+  name: String!
+  organization: Organization!
+  profiles: [SocialNetworkProfile!]!
+  startDate: DateTime!
+  endDate: DateTime!
+  metrics: Metrics!
+  topContent: [PostAnalytics!]!
+  audienceData: JSON
+  generatedAt: DateTime!
+}
+
+"""Raw numeric metric values."""
+type Metrics {
+  impressions: Int
+  reach: Int
+  engagements: Int
+  engagementRate: Float
+  clicks: Int
+  likes: Int
+  comments: Int
+  shares: Int
+  saves: Int
+  videoViews: Int
+  followerGrowth: Int
+  profileVisits: Int
+  linkClicks: Int
+  mentionsCount: Int
+}
+
+"""Filter parameters for analytics queries."""
+type AnalyticsFilter {
+  networks: [SocialNetwork!]
+  profileIds: [ID!]
+  messageTypes: [MessageType!]
+  teamIds: [ID!]
+  campaignIds: [ID!]
+  tags: [String!]
+  timezone: String
+}
+
+"""A saved or scheduled analytics report."""
+type Report {
+  id: ID!
+  name: String!
+  organization: Organization!
+  details: ReportDetails!
+  lastGeneratedAt: DateTime
+  data: EngagementReport
+}
+
+"""Configuration and scheduling details for a report."""
+type ReportDetails {
+  reportId: ID!
+  description: String
+  reportType: String!
+  scheduleFrequency: String
+  recipients: [String!]
+  exportFormat: String
+  isScheduled: Boolean!
+  nextRunAt: DateTime
+  filters: AnalyticsFilter
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Inbox and Assignment Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""Assignment of an inbox thread to a team member."""
+type Assignment {
+  id: ID!
+  thread: InboxThread!
+  assignee: Member!
+  assignedBy: Member!
+  assignedAt: DateTime!
+  status: AssignmentStatus!
+  dueAt: DateTime
+  notes: String
+  resolvedAt: DateTime
+}
+
+"""A conversation thread in the Hootsuite inbox."""
+type InboxThread {
+  id: ID!
+  profile: SocialNetworkProfile!
+  network: SocialNetwork!
+  subject: String
+  messages: [ThreadMessage!]!
+  assignment: Assignment
+  status: AssignmentStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  tags: [String!]
+  sentiment: Sentiment
+  isRead: Boolean!
+}
+
+"""An individual message within an inbox thread."""
+type ThreadMessage {
+  id: ID!
+  thread: InboxThread!
+  authorName: String!
+  authorHandle: String
+  authorAvatarUrl: URL
+  body: String!
+  attachments: [MessageAttachment!]
+  publishedAt: DateTime!
+  isFromBrand: Boolean!
+  platformMessageId: String
+}
+
+"""Attachment on a thread message."""
+type MessageAttachment {
+  id: ID!
+  type: MediaType!
+  url: URL!
+  thumbnailUrl: URL
+  filename: String
+  fileSize: Int
+  mimeType: String
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Campaign and Content Library Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""A grouped set of messages for a marketing campaign."""
+type Campaign {
+  id: ID!
+  name: String!
+  organization: Organization!
+  details: CampaignDetails!
+  messages: [Message!]!
+  analytics: Analytics
+  createdBy: Member!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Details and configuration for a campaign."""
+type CampaignDetails {
+  campaignId: ID!
+  description: String
+  startDate: DateTime
+  endDate: DateTime
+  goals: [String!]
+  budget: Float
+  currency: String
+  tags: [String!]
+  profiles: [SocialNetworkProfile!]!
+  status: String!
+  externalId: String
+}
+
+"""Organization-level library of reusable media and content."""
+type ContentLibrary {
+  id: ID!
+  organization: Organization!
+  items: [LibraryItem!]!
+  totalCount: Int!
+  storageUsedBytes: Int
+  storageLimitBytes: Int
+}
+
+"""An individual asset in the content library."""
+type LibraryItem {
+  id: ID!
+  library: ContentLibrary!
+  name: String!
+  type: MediaType!
+  url: URL!
+  thumbnailUrl: URL
+  altText: String
+  tags: [String!]
+  uploadedBy: Member!
+  uploadedAt: DateTime!
+  fileSize: Int
+  mimeType: String
+  usageCount: Int!
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Approval Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""An approval decision on a message."""
+type Approval {
+  id: ID!
+  message: Message!
+  flow: ApprovalFlow!
+  status: ReviewStatus!
+  currentStep: Int!
+  approver: Member
+  decidedAt: DateTime
+  comment: String
+  history: [ReviewHistoryEntry!]!
+}
+
+"""Multi-step approval workflow configuration."""
+type ApprovalFlow {
+  id: ID!
+  name: String!
+  description: String
+  organization: Organization!
+  teams: [Team!]
+  steps: [ReviewStep!]!
+  isActive: Boolean!
+  isDefault: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Auth and Integration Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""An API key for programmatic access."""
+type APIKey {
+  id: ID!
+  name: String!
+  keyPrefix: String!
+  organization: Organization!
+  createdBy: Member!
+  createdAt: DateTime!
+  lastUsedAt: DateTime
+  expiresAt: DateTime
+  isActive: Boolean!
+  scopes: [String!]!
+}
+
+"""OAuth 2.0 token information."""
+type Token {
+  accessToken: String!
+  tokenType: String!
+  expiresIn: Int!
+  refreshToken: String
+  scope: String!
+  issuedAt: DateTime!
+}
+
+"""Webhook subscription for platform events."""
+type Webhook {
+  id: ID!
+  url: URL!
+  events: [WebhookEvent!]!
+  organization: Organization!
+  isActive: Boolean!
+  secret: String
+  createdAt: DateTime!
+  lastTriggeredAt: DateTime
+  failureCount: Int!
+  headers: JSON
+}
+
+"""Result of a webhook delivery attempt."""
+type WebhookDelivery {
+  id: ID!
+  webhook: Webhook!
+  event: WebhookEvent!
+  payload: JSON!
+  responseCode: Int
+  responseBody: String
+  deliveredAt: DateTime!
+  success: Boolean!
+  durationMs: Int
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Input Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""Input for creating or updating a message."""
+input PostMessage {
+  text: String!
+  profileIds: [ID!]!
+  scheduledTime: DateTime
+  mediaIds: [ID!]
+  tags: [String!]
+  campaignId: ID
+  requireApproval: Boolean
+  timezone: String
+  networkOverrides: JSON
+}
+
+"""Input for analytics queries."""
+input AnalyticsFilterInput {
+  profileIds: [ID!]!
+  startDate: DateTime!
+  endDate: DateTime!
+  networks: [SocialNetwork!]
+  teamIds: [ID!]
+  campaignIds: [ID!]
+  timezone: String
+}
+
+"""Input for inviting a new member."""
+input InviteMemberInput {
+  email: String!
+  role: MemberRole!
+  teamId: ID
+  personalMessage: String
+}
+
+"""Input for creating a webhook."""
+input CreateWebhookInput {
+  url: URL!
+  events: [WebhookEvent!]!
+  secret: String
+  headers: JSON
+  isActive: Boolean
+}
+
+"""Pagination input."""
+input PaginationInput {
+  first: Int
+  after: String
+  last: Int
+  before: String
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Connection / Pagination Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""Page info for cursor-based pagination."""
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+"""Paginated list of messages."""
+type MessageConnection {
+  edges: [MessageEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+"""Edge wrapping a Message node."""
+type MessageEdge {
+  node: Message!
+  cursor: String!
+}
+
+"""Paginated list of inbox threads."""
+type InboxThreadConnection {
+  edges: [InboxThreadEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+"""Edge wrapping an InboxThread node."""
+type InboxThreadEdge {
+  node: InboxThread!
+  cursor: String!
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Root Types
+# ─────────────────────────────────────────────────────────────────────────────
+
+type Query {
+  """Retrieve a single message by ID."""
+  message(id: ID!): Message
+
+  """List messages with optional status and schedule filters."""
+  messages(
+    status: MessageStatus
+    profileIds: [ID!]
+    pagination: PaginationInput
+  ): MessageConnection!
+
+  """List scheduled messages for connected profiles."""
+  scheduledMessages(profileIds: [ID!], pagination: PaginationInput): [ScheduledMessage!]!
+
+  """Retrieve published messages with analytics."""
+  sentMessages(profileIds: [ID!], startDate: DateTime, endDate: DateTime, pagination: PaginationInput): [SentMessage!]!
+
+  """Retrieve a single social network profile by ID."""
+  profile(id: ID!): SocialNetworkProfile
+
+  """List all connected social network profiles."""
+  profiles(network: SocialNetwork, teamId: ID): [SocialNetworkProfile!]!
+
+  """List monitoring streams."""
+  streams(network: SocialNetwork): [Stream!]!
+
+  """List members of the organization."""
+  members(teamId: ID, role: MemberRole): [Member!]!
+
+  """Retrieve a single member by ID."""
+  member(id: ID!): Member
+
+  """Fetch analytics for profiles over a date range."""
+  analytics(filter: AnalyticsFilterInput!): Analytics!
+
+  """List inbox conversation threads."""
+  inboxThreads(
+    profileIds: [ID!]
+    status: AssignmentStatus
+    network: SocialNetwork
+    pagination: PaginationInput
+  ): InboxThreadConnection!
+
+  """Retrieve a single inbox thread by ID."""
+  inboxThread(id: ID!): InboxThread
+
+  """List marketing campaigns."""
+  campaigns(isActive: Boolean): [Campaign!]!
+
+  """Retrieve a single campaign by ID."""
+  campaign(id: ID!): Campaign
+
+  """Browse the organization content library."""
+  contentLibrary: ContentLibrary
+
+  """List drafts in the organization."""
+  drafts: [Draft!]!
+
+  """List saved reports."""
+  reports: [Report!]!
+
+  """List registered webhooks."""
+  webhooks: [Webhook!]!
+
+  """List pending invitations."""
+  invitations(status: InvitationStatus): [Invitation!]!
+
+  """Retrieve the current organization."""
+  organization: Organization!
+
+  """List teams within the organization."""
+  teams: [Team!]!
+
+  """Retrieve a single team by ID."""
+  team(id: ID!): Team
+
+  """List approval flows."""
+  approvalFlows: [ApprovalFlow!]!
+
+  """List API keys for the organization."""
+  apiKeys: [APIKey!]!
+}
+
+type Mutation {
+  """Compose and schedule a message."""
+  createMessage(input: PostMessage!): Message!
+
+  """Modify a scheduled or draft message."""
+  updateMessage(id: ID!, input: PostMessage!): Message!
+
+  """Remove a scheduled or draft message."""
+  deleteMessage(id: ID!): Boolean!
+
+  """Immediately publish a message to connected profiles."""
+  publishMessage(id: ID!): SentMessage!
+
+  """Save a new draft message."""
+  createDraft(input: PostMessage!): Draft!
+
+  """Update an existing draft."""
+  updateDraft(id: ID!, input: PostMessage!): Draft!
+
+  """Delete a draft."""
+  deleteDraft(id: ID!): Boolean!
+
+  """Approve a pending message in a review flow."""
+  approveMessage(messageId: ID!, comment: String): Approval!
+
+  """Reject a pending message with feedback."""
+  rejectMessage(messageId: ID!, comment: String!): Approval!
+
+  """Request changes on a pending message."""
+  requestChanges(messageId: ID!, comment: String!): Approval!
+
+  """Assign an inbox thread to a member."""
+  assignThread(threadId: ID!, memberId: ID!, notes: String): Assignment!
+
+  """Resolve an assigned inbox thread."""
+  resolveThread(threadId: ID!): Assignment!
+
+  """Reply to a thread message."""
+  replyToThread(threadId: ID!, body: String!, mediaIds: [ID!]): ThreadMessage!
+
+  """Register a new webhook endpoint."""
+  createWebhook(input: CreateWebhookInput!): Webhook!
+
+  """Update an existing webhook."""
+  updateWebhook(id: ID!, input: CreateWebhookInput!): Webhook!
+
+  """Remove a webhook subscription."""
+  deleteWebhook(id: ID!): Boolean!
+
+  """Send an organization or team invitation."""
+  inviteMember(input: InviteMemberInput!): Invitation!
+
+  """Revoke a pending invitation."""
+  revokeInvitation(id: ID!): Boolean!
+
+  """Update a member's role."""
+  updateMemberRole(memberId: ID!, role: MemberRole!): Member!
+
+  """Remove a member from the organization."""
+  removeMember(memberId: ID!): Boolean!
+
+  """Schedule a bulk publish operation."""
+  bulkPublish(profileIds: [ID!]!, messages: [PostMessage!]!): BulkPublish!
+
+  """Create a new marketing campaign."""
+  createCampaign(name: String!, description: String, startDate: DateTime, endDate: DateTime, profileIds: [ID!]!): Campaign!
+
+  """Add a message to a campaign."""
+  addMessageToCampaign(messageId: ID!, campaignId: ID!): Campaign!
+
+  """Create an approval workflow."""
+  createApprovalFlow(name: String!, steps: JSON!): ApprovalFlow!
+
+  """Create an API key."""
+  createAPIKey(name: String!, scopes: [String!]!): APIKey!
+
+  """Revoke an API key."""
+  revokeAPIKey(id: ID!): Boolean!
+
+  """Upload media to the content library."""
+  uploadMediaToLibrary(name: String!, url: URL!, altText: String, tags: [String!]): LibraryItem!
+}
