@@ -1,0 +1,221 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hootsuite Platform API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "authorization_code",
+      "authorizationUrl": "https://platform.hootsuite.com/oauth2/auth",
+      "accessTokenUrl": "https://platform.hootsuite.com/oauth2/token",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "List scheduled and sent outbound messages",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://platform.hootsuite.com/v1/messages"
+      },
+      "docs": "List scheduled and sent outbound messages"
+    },
+    {
+      "info": {
+        "name": "Schedule a message",
+        "type": "http"
+      },
+      "http": {
+        "method": "POST",
+        "url": "https://platform.hootsuite.com/v1/messages"
+      },
+      "docs": "Schedule a message"
+    },
+    {
+      "info": {
+        "name": "Retrieve a specific message",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://platform.hootsuite.com/v1/messages/:messageId",
+        "params": [
+          {
+            "name": "messageId",
+            "value": "",
+            "type": "path"
+          }
+        ]
+      },
+      "docs": "Retrieve a specific message"
+    },
+    {
+      "info": {
+        "name": "Delete a message",
+        "type": "http"
+      },
+      "http": {
+        "method": "DELETE",
+        "url": "https://platform.hootsuite.com/v1/messages/:messageId",
+        "params": [
+          {
+            "name": "messageId",
+            "value": "",
+            "type": "path"
+          }
+        ]
+      },
+      "docs": "Delete a message"
+    },
+    {
+      "info": {
+        "name": "Approve a message awaiting review",
+        "type": "http"
+      },
+      "http": {
+        "method": "POST",
+        "url": "https://platform.hootsuite.com/v1/messages/:messageId/approve",
+        "params": [
+          {
+            "name": "messageId",
+            "value": "",
+            "type": "path"
+          }
+        ]
+      },
+      "docs": "Approve a message awaiting review"
+    },
+    {
+      "info": {
+        "name": "Reject a message awaiting review",
+        "type": "http"
+      },
+      "http": {
+        "method": "POST",
+        "url": "https://platform.hootsuite.com/v1/messages/:messageId/reject",
+        "params": [
+          {
+            "name": "messageId",
+            "value": "",
+            "type": "path"
+          }
+        ]
+      },
+      "docs": "Reject a message awaiting review"
+    },
+    {
+      "info": {
+        "name": "Get a message's review history",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://platform.hootsuite.com/v1/messages/:messageId/history",
+        "params": [
+          {
+            "name": "messageId",
+            "value": "",
+            "type": "path"
+          }
+        ]
+      },
+      "docs": "Get a message's review history"
+    },
+    {
+      "info": {
+        "name": "Create a media upload URL",
+        "type": "http"
+      },
+      "http": {
+        "method": "POST",
+        "url": "https://platform.hootsuite.com/v1/media"
+      },
+      "docs": "Create a media upload URL"
+    },
+    {
+      "info": {
+        "name": "Retrieve media upload status",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://platform.hootsuite.com/v1/media/:mediaId",
+        "params": [
+          {
+            "name": "mediaId",
+            "value": "",
+            "type": "path"
+          }
+        ]
+      },
+      "docs": "Retrieve media upload status"
+    },
+    {
+      "info": {
+        "name": "Retrieve all social profiles",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://platform.hootsuite.com/v1/socialProfiles"
+      },
+      "docs": "Retrieve all social profiles"
+    },
+    {
+      "info": {
+        "name": "Retrieve a specific social profile",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://platform.hootsuite.com/v1/socialProfiles/:socialProfileId",
+        "params": [
+          {
+            "name": "socialProfileId",
+            "value": "",
+            "type": "path"
+          }
+        ]
+      },
+      "docs": "Retrieve a specific social profile"
+    },
+    {
+      "info": {
+        "name": "Retrieve the teams associated with a social profile",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://platform.hootsuite.com/v1/socialProfiles/:socialProfileId/teams",
+        "params": [
+          {
+            "name": "socialProfileId",
+            "value": "",
+            "type": "path"
+          }
+        ]
+      },
+      "docs": "Retrieve the teams associated with a social profile"
+    },
+    {
+      "info": {
+        "name": "Retrieve the authenticated member's profile",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://platform.hootsuite.com/v1/me"
+      },
+      "docs": "Retrieve the authenticated member's profile"
+    }
+  ],
+  "bundled": true
+}
