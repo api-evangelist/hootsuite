@@ -8,7 +8,7 @@ description: Hootsuite is a social media management platform that lets organizat
   OAuth 2.0 and provides programmatic access to social profiles, messages, scheduling,
   and analytics through the platform.hootsuite.com endpoint.
 type: Index
-image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
 tags:
 - Social Media
 - Social Media Management
