@@ -54,11 +54,11 @@ common:
   url: https://www.linkedin.com/company/hootsuite
 - type: Website
   url: https://www.hootsuite.com
-- type: Developer Portal
+- type: DeveloperPortal
   url: https://developer.hootsuite.com
 - type: Documentation
   url: https://developer.hootsuite.com/docs/api
-- type: SignUp
+- type: Signup
   url: https://hootsuite.com/plans
 - type: Pricing
   url: https://hootsuite.com/plans
@@ -70,7 +70,7 @@ common:
   url: https://blog.hootsuite.com
 - type: GitHubOrganization
   url: https://github.com/hootsuite
-- type: LLMsTxt
+- type: LlmsText
   url: https://developer.hootsuite.com/llms.txt
 maintainers:
 - FN: Kin Lane
