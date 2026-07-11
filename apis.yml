@@ -50,6 +50,8 @@ apis:
   - url: graphql/hootsuite-graphql.md
     type: GraphQL
 common:
+- type: OAuthScopes
+  url: scopes/hootsuite-scopes.yml
 - type: LinkedIn
   url: https://www.linkedin.com/company/hootsuite
 - type: Website

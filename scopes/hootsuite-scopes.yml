@@ -1,0 +1,17 @@
+generated: '2026-07-11'
+method: derived
+source: openapi/hootsuite-openapi.yml
+schemes:
+- name: OAuth2
+  source: openapi/hootsuite-openapi.yml
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: https://platform.hootsuite.com/oauth2/auth
+    tokenUrl: https://platform.hootsuite.com/oauth2/token
+scopes:
+- scope: offline
+  description: Issue a refresh token alongside the access token
+  flows:
+  - authorizationCode
+  sources:
+  - openapi/hootsuite-openapi.yml
