@@ -50,6 +50,12 @@ apis:
   - url: graphql/hootsuite-graphql.md
     type: GraphQL
 common:
+- type: VulnerabilityDisclosure
+  url: security/hootsuite-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/hootsuite-domain-security.yml
+- type: Authentication
+  url: authentication/hootsuite-authentication.yml
 - type: OAuthScopes
   url: scopes/hootsuite-scopes.yml
 - type: LinkedIn
