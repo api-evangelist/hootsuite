@@ -50,6 +50,8 @@ apis:
   - url: graphql/hootsuite-graphql.md
     type: GraphQL
 common:
+- type: AgenticAccess
+  url: agentic-access/hootsuite-agentic-access.yml
 - type: VulnerabilityDisclosure
   url: security/hootsuite-vulnerability-disclosure.yml
 - type: DomainSecurity
