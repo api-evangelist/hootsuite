@@ -1,0 +1,79 @@
+openapi: 3.1.0
+info:
+  title: Hootsuite Platform Me SocialProfiles API
+  description: 'REST API for the Hootsuite social media management platform. Provides
+
+    programmatic access to messages, scheduling, approvals, media uploads,
+
+    and social profiles connected to a Hootsuite account. Authentication
+
+    is OAuth 2.0 (authorization-code grant with refresh tokens) and the
+
+    `member_app` / `organization_app` grant scopes determine whether
+
+    requests act on behalf of a single member or the organization.
+
+    '
+  version: '1.0'
+  contact:
+    name: Hootsuite Developer Portal
+    url: https://developer.hootsuite.com/docs/api
+servers:
+- url: https://platform.hootsuite.com/v1
+  description: Hootsuite Platform API
+security:
+- OAuth2:
+  - offline
+tags:
+- name: SocialProfiles
+paths:
+  /socialProfiles:
+    get:
+      summary: Retrieve all social profiles
+      operationId: listSocialProfiles
+      responses:
+        '200':
+          description: OK
+      tags:
+      - SocialProfiles
+  /socialProfiles/{socialProfileId}:
+    parameters:
+    - name: socialProfileId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Retrieve a specific social profile
+      operationId: getSocialProfile
+      responses:
+        '200':
+          description: OK
+      tags:
+      - SocialProfiles
+  /socialProfiles/{socialProfileId}/teams:
+    parameters:
+    - name: socialProfileId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Retrieve the teams associated with a social profile
+      operationId: getSocialProfileTeams
+      responses:
+        '200':
+          description: OK
+      tags:
+      - SocialProfiles
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://platform.hootsuite.com/oauth2/auth
+          tokenUrl: https://platform.hootsuite.com/oauth2/token
+          refreshUrl: https://platform.hootsuite.com/oauth2/token
+          scopes:
+            offline: Issue a refresh token alongside the access token
