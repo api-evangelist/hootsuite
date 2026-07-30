@@ -8,7 +8,19 @@ description: Hootsuite is a social media management platform that lets organizat
   OAuth 2.0 and provides programmatic access to social profiles, messages, scheduling,
   and analytics through the platform.hootsuite.com endpoint.
 type: Index
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/hootsuite.png
 tags:
 - Social Media
 - Social Media Management
@@ -23,10 +35,10 @@ specificationVersion: '0.19'
 apis:
 - aid: hootsuite:rest-api
   name: Hootsuite REST API
-  description: REST API for managing social media profiles, scheduling messages, reading
-    and posting to connected networks, and pulling analytics across Hootsuite-managed
-    accounts. Authentication uses OAuth 2.0 authorization code flow with refresh-token
-    support.
+  description: >-
+    REST API for managing social media profiles, scheduling messages, reading and posting to connected
+    networks, and pulling analytics across Hootsuite-managed accounts. Authentication uses OAuth 2.0 authorization
+    code flow with refresh-token support.
   humanURL: https://developer.hootsuite.com/docs/api
   baseURL: https://platform.hootsuite.com/v1
   tags:
@@ -49,6 +61,46 @@ apis:
     url: https://platform.hootsuite.com/docs/api/index.html
   - url: graphql/hootsuite-graphql.md
     type: GraphQL
+- aid: hootsuite:hootsuite-me-api
+  name: Hootsuite Me API
+  description: The Me API from Hootsuite — 1 operation(s) for me.
+  humanURL: https://developer.hootsuite.com/docs/api
+  baseURL: https://platform.hootsuite.com/v1
+  tags:
+  - Me
+  properties:
+  - type: OpenAPI
+    url: openapi/hootsuite-me-api-openapi.yml
+- aid: hootsuite:hootsuite-media-api
+  name: Hootsuite Media API
+  description: The Media API from Hootsuite — 2 operation(s) for media.
+  humanURL: https://developer.hootsuite.com/docs/api
+  baseURL: https://platform.hootsuite.com/v1
+  tags:
+  - Media
+  properties:
+  - type: OpenAPI
+    url: openapi/hootsuite-media-api-openapi.yml
+- aid: hootsuite:hootsuite-messages-api
+  name: Hootsuite Messages API
+  description: The Messages API from Hootsuite — 5 operation(s) for messages.
+  humanURL: https://developer.hootsuite.com/docs/api
+  baseURL: https://platform.hootsuite.com/v1
+  tags:
+  - Messages
+  properties:
+  - type: OpenAPI
+    url: openapi/hootsuite-messages-api-openapi.yml
+- aid: hootsuite:hootsuite-socialprofiles-api
+  name: Hootsuite SocialProfiles API
+  description: The SocialProfiles API from Hootsuite — 3 operation(s) for socialprofiles.
+  humanURL: https://developer.hootsuite.com/docs/api
+  baseURL: https://platform.hootsuite.com/v1
+  tags:
+  - SocialProfiles
+  properties:
+  - type: OpenAPI
+    url: openapi/hootsuite-socialprofiles-api-openapi.yml
 common:
 - type: AgenticAccess
   url: agentic-access/hootsuite-agentic-access.yml
