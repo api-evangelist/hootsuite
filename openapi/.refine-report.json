@@ -1,0 +1,20 @@
+{
+  "provider": "hootsuite",
+  "sources": [
+    "hootsuite-me-api-openapi.yml",
+    "hootsuite-media-api-openapi.yml",
+    "hootsuite-messages-api-openapi.yml",
+    "hootsuite-socialprofiles-api-openapi.yml"
+  ],
+  "outputs": [
+    "hootsuite-me-api-openapi.yml",
+    "hootsuite-media-api-openapi.yml",
+    "hootsuite-messages-api-openapi.yml",
+    "hootsuite-socialprofiles-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
