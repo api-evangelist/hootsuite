@@ -4,22 +4,31 @@ description: Hootsuite is a social media management platform that lets organizat
   schedule posts, monitor conversations, run paid campaigns, and analyze performance
   across LinkedIn, X (Twitter), Facebook, Instagram, TikTok, YouTube, and Pinterest
   from a single dashboard. The platform serves marketers, agencies, and enterprises
-  with collaboration, approval, and governance workflows. The Hootsuite REST API uses
-  OAuth 2.0 and provides programmatic access to social profiles, messages, scheduling,
-  and analytics through the platform.hootsuite.com endpoint.
+  with collaboration, approval, and governance workflows. Hootsuite publishes four
+  first-party machine-readable API contracts on platform.hootsuite.com — a 48-operation
+  REST API for messages, media, social profiles, members, teams and SCIM 2.0 provisioning;
+  an Analytics API for organic and paid metrics; the Inbox 2.0 (Sparkcentral) API for
+  CRM, virtual agents, queues and proactive messaging; and the Amplify employee-advocacy
+  API — all authenticated with OAuth 2.0. It also serves an RFC 9727 API catalog, RFC 8414
+  authorization server metadata and RFC 9728 protected resource metadata.
 type: Index
 accessModel:
-  pricing: unknown
+  pricing: freemium-api
   onboarding: self-serve
-  trial: false
+  trial: true
   try_now: false
-  public: false
-  label: Self-serve signup
-  confidence: medium
+  public: true
+  label: Free API with approved developer account
+  confidence: high
   source:
-  - authentication
-  generated: '2026-07-22'
-  method: derived
+  - https://developer.hootsuite.com/docs/faq
+  - https://hootsuite.com/plans
+  generated: '2026-08-13'
+  method: searched
+  note: >-
+    Hootsuite states the REST API endpoints and the SDK are free for anyone with approved
+    developer access; the platform subscription is seat-priced separately. The Ow.ly URL
+    shortener API and organization apps for prescreen components are Enterprise-only.
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/hootsuite.png
 tags:
 - Social Media
@@ -28,83 +37,168 @@ tags:
 - Content Scheduling
 - Analytics
 - Engagement
+- Social Listening
+- Employee Advocacy
+- Customer Service
+- SCIM
+- OAuth 2.0
+- Webhooks
 url: https://raw.githubusercontent.com/api-evangelist/hootsuite/refs/heads/main/apis.yml
 created: '2026-05-11'
-modified: '2026-05-11'
+modified: '2026-08-13'
 specificationVersion: '0.19'
 apis:
 - aid: hootsuite:rest-api
   name: Hootsuite REST API
   description: >-
-    REST API for managing social media profiles, scheduling messages, reading and posting to connected
-    networks, and pulling analytics across Hootsuite-managed accounts. Authentication uses OAuth 2.0 authorization
-    code flow with refresh-token support.
-  humanURL: https://developer.hootsuite.com/docs/api
+    The Hootsuite platform REST API — 48 operations covering OAuth 2.0 authentication, the
+    authenticated member, media upload, message scheduling and the prescreen approval
+    workflow, comments, social profiles, members, organizations, teams, and SCIM 2.0 user and
+    group provisioning. Responses use a data/errors envelope; errors carry a 97-code numeric
+    registry Hootsuite publishes inside the specification itself.
+  humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
   tags:
   - Social Media
   - Messages
   - Scheduling
+  - Approvals
   - Profiles
-  - Analytics
+  - Members
+  - Teams
+  - SCIM
   - OAuth 2.0
   properties:
+  - type: OpenAPI
+    url: openapi/hootsuite-rest-api-openapi.yml
+  - type: Overlay
+    url: overlays/hootsuite-rest-api-overlay.yaml
   - type: Documentation
-    url: https://developer.hootsuite.com/docs/api
+    url: https://developer.hootsuite.com/docs/api-overview
+  - type: APIReference
+    url: https://apidocs.hootsuite.com/docs/api/index.html
   - type: GettingStarted
     url: https://developer.hootsuite.com/docs/getting-started-with-the-rest-api
   - type: Authentication
     url: https://developer.hootsuite.com/docs/api-authentication
   - type: OAuth 2.0
     url: https://developer.hootsuite.com/docs/enabling-oauth-20
+  - type: Postman
+    url: https://app.getpostman.com/run-collection/eeda0fcdf55ea26bd0ec
+  - type: Webhooks
+    url: asyncapi/hootsuite-webhooks.yml
+  - type: RateLimits
+    url: rate-limits/hootsuite-rate-limits.yml
+  - type: ErrorCatalog
+    url: errors/hootsuite-problem-types.yml
+  - type: DataModel
+    url: data-model/hootsuite-data-model.yml
+- aid: hootsuite:analytics-api
+  name: Hootsuite Analytics REST API
+  description: >-
+    Organic and paid social analytics — published posts with lifetime metrics, daily profile
+    metrics, and campaign / ad-set / ad entities and daily metrics for Facebook and Twitter ad
+    accounts. Gated by the analytics:read OAuth scope, which must first be enabled on the app
+    in the developer portal. Batches are capped at 10 profiles or 10 ad accounts per request.
+  humanURL: https://developer.hootsuite.com/docs/analytics-overview
+  baseURL: https://platform.hootsuite.com/v1/analytics
+  tags:
+  - Analytics
+  - Metrics
+  - Advertising
+  - Paid Social
+  - Reporting
+  properties:
+  - type: OpenAPI
+    url: openapi/hootsuite-analytics-api-openapi.yml
+  - type: Overlay
+    url: overlays/hootsuite-analytics-api-overlay.yaml
+  - type: Documentation
+    url: https://developer.hootsuite.com/docs/analytics-overview
   - type: APIReference
-    url: https://platform.hootsuite.com/docs/api/index.html
-  - url: graphql/hootsuite-graphql.md
-    type: GraphQL
-- aid: hootsuite:hootsuite-me-api
-  name: Hootsuite Me API
-  description: The Me API from Hootsuite — 1 operation(s) for me.
-  humanURL: https://developer.hootsuite.com/docs/api
-  baseURL: https://platform.hootsuite.com/v1
+    url: https://apidocs.hootsuite.com/docs/api/analytics/index.html
+  - type: GettingStarted
+    url: https://developer.hootsuite.com/docs/using-the-api
+  - type: OAuthScopes
+    url: scopes/hootsuite-scopes.yml
+- aid: hootsuite:inbox-api
+  name: Hootsuite Inbox 2.0 API
+  description: >-
+    The Inbox 2.0 (formerly Sparkcentral) customer-conversation API — CRM contact attribute
+    write-back, the Virtual Agent API for bot-driven conversations and attachments, real-time
+    reporting metrics, user presence, queue metrics and proactive messaging. Published as
+    OpenAPI 3.1 with six native webhook definitions signed with X-Hootsuite-Signature.
+  humanURL: https://developer.hootsuite.com/docs/inbox-overview
+  baseURL: https://platform.hootsuite.com/inbox/v1
   tags:
-  - Me
+  - Customer Service
+  - Messaging
+  - Virtual Agents
+  - CRM
+  - Real-time Metrics
+  - Webhooks
   properties:
   - type: OpenAPI
-    url: openapi/hootsuite-me-api-openapi.yml
-- aid: hootsuite:hootsuite-media-api
-  name: Hootsuite Media API
-  description: The Media API from Hootsuite — 2 operation(s) for media.
-  humanURL: https://developer.hootsuite.com/docs/api
-  baseURL: https://platform.hootsuite.com/v1
+    url: openapi/hootsuite-inbox-api-openapi.yml
+  - type: Overlay
+    url: overlays/hootsuite-inbox-api-overlay.yaml
+  - type: Documentation
+    url: https://developer.hootsuite.com/docs/inbox-overview
+  - type: APIReference
+    url: https://apidocs.hootsuite.com/docs/api/inbox/index.html
+  - type: Webhooks
+    url: asyncapi/hootsuite-webhooks.yml
+- aid: hootsuite:amplify-api
+  name: Hootsuite Amplify REST API
+  description: >-
+    The Amplify employee-advocacy API — publish content directly into Amplify, read the
+    authenticated member and their organizations, manage advocacy topics, and deobfuscate
+    UTM parameters on shared links. Six operations. The published Swagger declares no
+    security scheme even though the API is authenticated.
+  humanURL: https://developer.hootsuite.com/docs/amplify-overview
+  baseURL: https://platform.hootsuite.com/amplify/v1
   tags:
-  - Media
+  - Employee Advocacy
+  - Content Distribution
+  - Marketing
   properties:
   - type: OpenAPI
-    url: openapi/hootsuite-media-api-openapi.yml
-- aid: hootsuite:hootsuite-messages-api
-  name: Hootsuite Messages API
-  description: The Messages API from Hootsuite — 5 operation(s) for messages.
-  humanURL: https://developer.hootsuite.com/docs/api
-  baseURL: https://platform.hootsuite.com/v1
+    url: openapi/hootsuite-amplify-api-openapi.yml
+  - type: Overlay
+    url: overlays/hootsuite-amplify-api-overlay.yaml
+  - type: Documentation
+    url: https://developer.hootsuite.com/docs/amplify-overview
+  - type: APIReference
+    url: https://amplify.hootsuite.com/api-docs
+- aid: hootsuite:mcp
+  name: Hootsuite Developer Documentation MCP
+  description: >-
+    A remote Model Context Protocol endpoint served from Hootsuite's own ReadMe-hosted
+    developer documentation site. Reachable and real, but gated — initialize and tools/list
+    both return HTTP 401 "Authorization required" with no WWW-Authenticate challenge and no
+    OAuth protected-resource metadata to negotiate against, so the tool list could not be
+    read anonymously. It is a documentation server, not a wrapper over the platform APIs.
+  humanURL: https://developer.hootsuite.com
+  baseURL: https://developer.hootsuite.com/mcp
   tags:
-  - Messages
+  - MCP
+  - Documentation
+  - Agents
   properties:
-  - type: OpenAPI
-    url: openapi/hootsuite-messages-api-openapi.yml
-- aid: hootsuite:hootsuite-socialprofiles-api
-  name: Hootsuite SocialProfiles API
-  description: The SocialProfiles API from Hootsuite — 3 operation(s) for socialprofiles.
-  humanURL: https://developer.hootsuite.com/docs/api
-  baseURL: https://platform.hootsuite.com/v1
-  tags:
-  - SocialProfiles
-  properties:
-  - type: OpenAPI
-    url: openapi/hootsuite-socialprofiles-api-openapi.yml
+  - type: MCPServer
+    url: mcp/hootsuite-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/hootsuite-tool-crosswalk.yml
 common:
+- type: WellKnown
+  url: well-known/hootsuite-well-known.yml
+- type: APICatalog
+  url: well-known/hootsuite-api-catalog.json
 - type: AgenticAccess
   url: agentic-access/hootsuite-agentic-access.yml
 - type: VulnerabilityDisclosure
+  url: security/hootsuite-vulnerability-disclosure.yml
+- type: Security
   url: security/hootsuite-vulnerability-disclosure.yml
 - type: DomainSecurity
   url: security/hootsuite-domain-security.yml
@@ -112,6 +206,48 @@ common:
   url: authentication/hootsuite-authentication.yml
 - type: OAuthScopes
   url: scopes/hootsuite-scopes.yml
+- type: Conventions
+  url: conventions/hootsuite-conventions.yml
+- type: Conformance
+  url: conformance/hootsuite-conformance.yml
+- type: Compliance
+  url: conformance/hootsuite-conformance.yml
+- type: ErrorCatalog
+  url: errors/hootsuite-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/hootsuite-lifecycle.yml
+- type: Deprecation
+  url: lifecycle/hootsuite-lifecycle.yml
+- type: StatusPage
+  url: https://status.hootsuite.com
+- type: ChangeLog
+  url: changelog/hootsuite-changelog.yml
+- type: DataModel
+  url: data-model/hootsuite-data-model.yml
+- type: RateLimits
+  url: rate-limits/hootsuite-rate-limits.yml
+- type: Plans
+  url: plans/hootsuite-plans-pricing.yml
+- type: Packages
+  url: packages/hootsuite-packages.yml
+- type: SDKs
+  url: packages/hootsuite-packages.yml
+- type: Components
+  url: components/hootsuite-components.yml
+- type: Webhooks
+  url: asyncapi/hootsuite-webhooks.yml
+- type: MCPServer
+  url: mcp/hootsuite-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/hootsuite-tool-crosswalk.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/hootsuite-llms.txt
+- type: LlmsText
+  url: https://developer.hootsuite.com/llms.txt
+- type: Postman
+  url: https://app.getpostman.com/run-collection/eeda0fcdf55ea26bd0ec
 - type: LinkedIn
   url: https://www.linkedin.com/company/hootsuite
 - type: Website
@@ -119,7 +255,11 @@ common:
 - type: DeveloperPortal
   url: https://developer.hootsuite.com
 - type: Documentation
-  url: https://developer.hootsuite.com/docs/api
+  url: https://developer.hootsuite.com/docs/api-overview
+- type: APIReference
+  url: https://apidocs.hootsuite.com/docs/api/index.html
+- type: GettingStarted
+  url: https://developer.hootsuite.com/docs/getting-started-with-the-rest-api
 - type: Signup
   url: https://hootsuite.com/plans
 - type: Pricing
@@ -132,8 +272,15 @@ common:
   url: https://blog.hootsuite.com
 - type: GitHubOrganization
   url: https://github.com/hootsuite
-- type: LlmsText
-  url: https://developer.hootsuite.com/llms.txt
+- type: TermsOfService
+  url: https://hootsuite.com/legal/api-terms-of-service
+- type: PrivacyPolicy
+  url: https://www.hootsuite.com/legal/privacy
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-08-13'
+  status: enriched
+  artifacts_added: 35
+  pass: local-v1
