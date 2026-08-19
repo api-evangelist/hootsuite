@@ -1,0 +1,117 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  https://developer.hootsuite.com/changelog/iframe-sdk-41,
+  https://developer.hootsuite.com/changelog/assignments-manager-deprecation,
+  https://developer.hootsuite.com/changelog/changes-to-facebook-metrics,
+  https://status.hootsuite.com, https://hootsuite.com/legal/api-terms-of-service
+docs:
+- https://developer.hootsuite.com/changelog
+- https://developer.hootsuite.com/docs/updates-to-api-terms-of-service
+description: >-
+  Hootsuite's lifecycle posture is announcement-driven rather than protocol-driven. It runs a dated
+  developer changelog and an Atlassian Statuspage, and it has publicly deprecated named features
+  with dates. It does NOT publish a formal versioning or deprecation policy document, and it does
+  not emit RFC 8594 Sunset or Deprecation response headers on any operation in any of its four
+  OpenAPI documents.
+versioning:
+  policy_published: false
+  style: uri-path
+  current_versions:
+    rest-api: v1
+    analytics-api: v1
+    inbox-api: v1 (plus /inbox/v2/ on the CRM contact-attributes endpoint)
+    amplify-api: v1
+    scim: v2
+    iframe-sdk: '4.1'
+  note: >-
+    No document states how Hootsuite versions, what constitutes a breaking change, or how long a
+    prior version is supported. Version history is only observable for the iFrame SDK, which
+    publishes a dated deprecation table.
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  openapi_deprecated_operations: 0
+  note: >-
+    Zero operations across the REST, Analytics, Inbox 2.0 and Amplify specifications carry
+    `deprecated: true`. Deprecations are announced in the changelog and by email instead, with no
+    machine-readable signal an agent could act on.
+  announced_deprecations:
+  - item: iFrame SDK v0.6
+    status: deprecated
+    date: '2015-03-05'
+    source: https://developer.hootsuite.com/changelog/iframe-sdk-41
+  - item: iFrame SDK v2.0
+    status: deprecated
+    date: '2018-01-30'
+    source: https://developer.hootsuite.com/changelog/iframe-sdk-41
+  - item: iFrame SDK v4.0
+    status: deprecated
+    date: '2021-11-02'
+    source: https://developer.hootsuite.com/changelog/iframe-sdk-41
+  - item: Assignments Manager SDK function
+    status: deprecated
+    date: '2022-12-31'
+    note: >-
+      Hootsuite asked developers to stop calling the Assignments Manager SDK function before the
+      end of 2022 as it moved to a new social support system in early 2023.
+    source: https://developer.hootsuite.com/changelog/assignments-manager-deprecation
+  - item: A set of Facebook profile and post metrics in the Analytics API
+    status: deprecated
+    date: '2026-06-03'
+    note: >-
+      Driven by upstream Facebook API changes. Historical data is still returned for dates before
+      2026-06-03; the metrics should not be used going forward.
+    source: https://developer.hootsuite.com/changelog/changes-to-facebook-metrics
+  - item: Posting to Facebook Groups
+    status: removed
+    note: Surfaced as error code 40024, "Posting to Facebook Groups is no longer supported".
+    source: https://apidocs.hootsuite.com/docs/api/swagger.yaml
+  unsupported_networks:
+    note: >-
+      Hootsuite documents that TikTok, YouTube and Bluesky are NOT supported by the publishing API,
+      and that Instagram Business profiles cannot be posted to via REST (Instagram Personal only).
+      These are standing capability gaps, not deprecations, but they change what an agent can do.
+    source: https://developer.hootsuite.com/docs/api-overview
+status_page:
+  url: https://status.hootsuite.com
+  platform: Atlassian Statuspage
+  page_id: 4cs9l3ql31j9
+  api: https://status.hootsuite.com/api/v2/summary.json
+  feeds:
+  - https://status.hootsuite.com/history.atom
+  - https://status.hootsuite.com/history.rss
+  subscribe:
+  - email
+  - sms
+  - slack
+  - microsoft-teams
+  - webhook
+  components:
+  - Hootsuite Web Application
+  - Hootsuite Mobile Application
+  - Sparkcentral Web Application
+  - Talkwalker Web Application
+  note: >-
+    The status page covers the four end-user applications. There is no component representing the
+    public REST / Analytics / Inbox / Amplify APIs, so an API consumer cannot subscribe to the
+    availability of the surface they actually call.
+  probed: '2026-08-13'
+  http_status: 200
+sla:
+  published: false
+  note: >-
+    No uptime percentage or availability commitment is published on the status page or in the
+    public API terms. Enterprise agreements are not public.
+changelog:
+  url: https://developer.hootsuite.com/changelog
+  detail: changelog/hootsuite-changelog.yml
+terms:
+  api_terms: https://hootsuite.com/legal/api-terms-of-service
+  developer_api_terms: https://hootsuite.com/legal/dev-api-terms
+  note: >-
+    The Inbox 2.0 and Analytics OpenAPI documents both carry
+    info.license = "Hootsuite Developer Terms and API License Agreement" pointing at
+    https://hootsuite.com/legal/dev-api-terms. Hootsuite has amended these terms with a stated
+    effective date before (2022-10-31) and announced it in the changelog.

@@ -1,0 +1,1120 @@
+x-provenance:
+  generated: '2026-08-13'
+  method: searched
+  source: https://apidocs.hootsuite.com/docs/api/analytics/openapi/openapi.yaml
+  note: >-
+    Verbatim first-party OpenAPI 3.0 for the Hootsuite Analytics REST API (organic post/profile
+    metrics plus paid campaign/ad-set/ad metrics). Reached from the analytics reference linked in
+    https://developer.hootsuite.com/docs/using-the-api.
+  ownership: >-
+    servers[] https://platform.hootsuite.com, info.title "Hootsuite Analytics REST API",
+    contact dev.support@hootsuite.com.
+openapi: 3.0.0
+security:
+  - OAuth2:
+      - analytics:read
+servers:
+  - url: https://platform.hootsuite.com
+    description: Hootsuite Platform
+info:
+  description: |
+    The Hootsuite Analytics REST API
+  version: '1.0'
+  title: Hootsuite Analytics REST API
+  x-spec-id: analytics-public-api
+  x-sdk-id: analytics-public-api
+  x-sdk-name: analytics_public_api
+  contact:
+    email: dev.support@hootsuite.com
+  license:
+    name: Hootsuite Developer Terms and API License Agreement
+    url: https://hootsuite.com/legal/dev-api-terms
+tags:
+  - name: analytics-api
+    description: Hootsuite Analytics API
+paths:
+  /v1/analytics/posts:
+    post:
+      operationId: listPosts
+      summary: List Posts and Metrics
+      description: |
+        Fetch posts that have been published on this Social Network, including lifetime metrics for each post.
+        `profileId` is a required filter, the others are optional. `lastModified` may start at most 30 days in the past.  `reportingPeriod` may start at most 2 years in the past.
+        When filtering by `reportingPeriod`, the creation date of the post is used.
+      tags:
+        - analytics-api
+      parameters:
+        - $ref: '#/components/parameters/DatatypeParameter'
+        - $ref: '#/components/parameters/NetworkIdParameter'
+        - $ref: '#/components/parameters/CursorParameter'
+        - $ref: '#/components/parameters/LimitParameter'
+      requestBody:
+        description: Filters for listing posts
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListPostsRequest'
+      responses:
+        '200':
+          description: Posts returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPostsResponse'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /v1/analytics/profiles:
+    post:
+      operationId: listProfilesMetrics
+      summary: List Profiles and Metrics
+      description: |
+        Fetch daily analytics metrics for profiles on this social network.
+        `profileId` is a required filter, the others are optional. `lastModified` may start at most 30 days in the past.  `reportingPeriod` may start at most 2 years in the past.
+      tags:
+        - analytics-api
+      parameters:
+        - $ref: '#/components/parameters/DatatypeParameter'
+        - $ref: '#/components/parameters/NetworkIdParameter'
+        - $ref: '#/components/parameters/CursorParameter'
+        - $ref: '#/components/parameters/LimitParameter'
+      requestBody:
+        description: Filters for listing profiles metrics
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListProfilesMetricsRequest'
+      responses:
+        '200':
+          description: Profiles metrics returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListProfilesMetricsResponse'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /v1/analytics/paid/{adEntityCollection}:
+    post:
+      operationId: listPaid
+      summary: List Paid campaigns, ad sets, or ads
+      description: |
+        Returns paid entities for the collection given in the path (`campaigns`, `adsets`, or `ads`). Use query parameters for ad account type, pagination, and datatype; use the request body for filters (ad accounts, time range, etc.)
+        note: In this API, 'adsets' and related response fields map to Facebook ad sets and Twitter ad groups ('adgroups').
+      tags:
+        - analytics-api
+      parameters:
+        - $ref: '#/components/parameters/AdEntityCollectionParameter'
+        - $ref: '#/components/parameters/DatatypeParameter'
+        - $ref: '#/components/parameters/AdAccountTypeParameter'
+        - $ref: '#/components/parameters/CursorParameter'
+        - $ref: '#/components/parameters/LimitParameter'
+      requestBody:
+        description: Filters for the selected paid entity collection.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListPaidRequest'
+      responses:
+        '200':
+          description: data successfully returned for the selected paid entity collection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPaidResponse'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /v1/analytics/paid/{adEntityCollection}/metrics:
+    post:
+      operationId: listPaidMetrics
+      summary: List Metrics for paid campaigns, ad sets, or ads
+      description: |
+        Fetch daily metrics for the collection given in the path (`campaigns`,`adsets`, or `ads`) on the ad account  in the request body.
+        Use query parameters for ad account type, limit and pagination, and use the request body for filters (ad accounts, time range, etc.) note: In this API, 'adsets' and related response fields map to Facebook ad sets and Twitter ad groups ('adgroups').
+      tags:
+        - analytics-api
+      parameters:
+        - $ref: '#/components/parameters/AdEntityCollectionParameter'
+        - $ref: '#/components/parameters/DatatypeParameter'
+        - $ref: '#/components/parameters/AdAccountTypeParameter'
+        - $ref: '#/components/parameters/CursorParameter'
+        - $ref: '#/components/parameters/LimitParameter'
+      requestBody:
+        description: Filters for listing paid metrics
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListPaidMetricsRequest'
+      responses:
+        '200':
+          description: Paid metrics returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPaidMetricsResponse'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://platform.hootsuite.com/oauth2/auth
+          tokenUrl: https://platform.hootsuite.com/oauth2/token
+          scopes:
+            offline: Request refresh tokens
+            analytics:read: Request analytics API access
+  schemas:
+    DatatypeEnum:
+      type: string
+      description: API code for this datatype
+      enum:
+        - ORGANIC
+        - PAID
+    NetworkTypeEnum:
+      type: string
+      description: API code for this Social Network
+      enum:
+        - FACEBOOKPAGE
+        - TWITTER
+        - INSTAGRAMBUSINESS
+        - TIKTOKBUSINESS
+        - YOUTUBECHANNEL
+        - PINTEREST
+        - THREADS
+    EqFilter:
+      type: string
+      description: Filter by exact match.
+      example: abc123
+    InFilter:
+      type: array
+      description: Options to filter against, at least 1 must match.
+      items:
+        type: string
+        example: abc123
+      minItems: 1
+      maxItems: 10
+    DataFieldFilters:
+      type: object
+      description: Filter by a data field, at least one filter must be specified.
+      properties:
+        eq:
+          $ref: '#/components/schemas/EqFilter'
+        in:
+          $ref: '#/components/schemas/InFilter'
+    TimespanFilter:
+      type: object
+      description: Timespan to filter against, inclusive. At least one of `since` or `until` must be provided.
+      properties:
+        since:
+          type: string
+          format: date
+          example: '2025-01-01'
+          description: Start of query, if omitted defaults to 1 year ago
+        until:
+          type: string
+          format: date
+          example: '2025-02-28'
+          description: End of query, if omitted defaults to now
+    TimeFieldFilters:
+      type: object
+      description: Filter by a time field, at least one filter must be specified.
+      properties:
+        timespan:
+          $ref: '#/components/schemas/TimespanFilter'
+    RequestFilters:
+      type: object
+      required:
+        - profileId
+      properties:
+        profileId:
+          $ref: '#/components/schemas/DataFieldFilters'
+        lastModified:
+          $ref: '#/components/schemas/TimeFieldFilters'
+        reportingPeriod:
+          $ref: '#/components/schemas/TimeFieldFilters'
+    ListPostsRequest:
+      type: object
+      required:
+        - filters
+      properties:
+        filters:
+          $ref: '#/components/schemas/RequestFilters'
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: URI reference identifying the problem type.
+        title:
+          type: string
+          description: Short, human-readable summary of the problem.
+          example: invalid-argument
+        status:
+          type: integer
+          format: int32
+          description: HTTP status code for this occurrence of the problem.
+          example: 422
+        detail:
+          type: string
+          description: Detailed explanation of the error.
+          example: An invalid argument was provided.
+        instance:
+          type: string
+          format: uri
+          description: URI reference to the specific occurrence of the problem.
+      required:
+        - title
+        - status
+      additionalProperties: true
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        photo:
+          type: string
+        url:
+          type: string
+        displayName:
+          type: string
+        location:
+          type: string
+    LabeledType:
+      type: object
+      required:
+        - id
+        - label
+      properties:
+        label:
+          type: string
+        id:
+          type: string
+    LinkPublic:
+      type: object
+      description: Link from the post. UTM is excluded (not populated since beginning of 2024).
+      properties:
+        extendedUrl:
+          type: string
+        thumbnailUrl:
+          type: string
+    MediaPublic:
+      type: object
+      description: Media item. Do not include thumbnail_url when high_resolution_thumbnail_url is present.
+      properties:
+        mimeType:
+          type: string
+          enum:
+            - MEDIA_UNKNOWN
+            - MEDIA_PHOTO
+            - MEDIA_VIDEO
+            - MEDIA_ANIMATED_GIF
+            - MEDIA_TEXT
+            - MEDIA_LINK
+            - MEDIA_SWF
+            - MEDIA_MUSIC
+            - MEDIA_OFFER
+            - MEDIA_ALBUM
+            - MEDIA_EVENT
+            - MEDIA_NOTE
+            - MEDIA_AUDIO
+        thumbnailUrl:
+          type: string
+          description: Omit when high_resolution_thumbnail_url is present.
+        url:
+          type: string
+        liveVideo:
+          type: boolean
+        length:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+        highResolutionThumbnailUrl:
+          type: string
+    AttachmentType:
+      type: string
+      enum:
+        - ATTACHMENT_UNKNOWN
+        - ATTACHMENT_PHOTO
+        - ATTACHMENT_VIDEO
+        - ATTACHMENT_LINK
+        - ATTACHMENT_EVENT
+        - ATTACHMENT_ALBUM
+        - ATTACHMENT_ANIMATED_GIF
+    MetricsPublic:
+      type: object
+      description: |
+        All social network and Owly metrics in a single map.
+        Keys are metric names (e.g. "likes", "comments", "post_views", "clicks").
+        Values are numeric (float64). For metric definitions, see the Help Center documentation.
+      additionalProperties:
+        type: number
+        format: double
+    PostMetadata:
+      type: object
+      description: |
+        Platform-specific metadata in a single object. Keys and values depend on social_profile_type.
+        Examples: is_popular, object_type, is_boosted_post, is_eligible_for_promotion (Facebook);
+        in_reply_to_status_id, in_reply_to_user_id (Twitter); embed_url, video_duration (TikTok).
+        Excluded from source data: in_reply_to_link, quote_to_post_id, user_mentions (Twitter); board_id (Pinterest).
+      additionalProperties: true
+    Post:
+      type: object
+      required:
+        - createdAt
+        - profileId
+        - externalProfileId
+        - sourceLink
+        - externalId
+      properties:
+        createdAt:
+          type: string
+          format: datetime
+          description: timestamp when the post was published.
+        lastRefreshed:
+          type: string
+          format: datetime
+          description: timestamp when post data was last refreshed.
+        profileId:
+          type: string
+          description: Hootsuite identifier of the social profile for this post.
+          example: '12345678'
+        externalProfileId:
+          type: string
+          description: Identifier of the social profile on the social network this post is associated with.
+        sourceLink:
+          type: string
+          description: URL of the post on the social network.
+        externalId:
+          type: string
+          description: Post ID from the social network.
+        createdMember:
+          $ref: '#/components/schemas/Author'
+        campaign:
+          $ref: '#/components/schemas/LabeledType'
+        detectedViralAt:
+          type: string
+          format: datetime
+          description: timestamp when the post was detected as viral.
+        isViral:
+          type: boolean
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/LabeledType'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkPublic'
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaPublic'
+        attachmentTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentType'
+        title:
+          type: string
+          description: Post title.
+        content:
+          type: string
+          description: Post content.
+        metrics:
+          $ref: '#/components/schemas/MetricsPublic'
+        postType:
+          type: string
+          description: Post type from the social network (e.g. FACEBOOK_VIDEO, TWITTER_RETWEET, INSTAGRAM_REEL).
+        metadata:
+          $ref: '#/components/schemas/PostMetadata'
+        source:
+          $ref: '#/components/schemas/Author'
+        autoTags:
+          type: array
+          items:
+            $ref: '#/components/schemas/LabeledType'
+    Cursor:
+      type: object
+      required:
+        - cursor
+      properties:
+        cursor:
+          type: string
+          description: Cursor for the next/prev page of data, if available
+          example: aWQ9NTAK
+    CollectionInfo:
+      type: object
+      properties:
+        next:
+          $ref: '#/components/schemas/Cursor'
+        prev:
+          $ref: '#/components/schemas/Cursor'
+    Metadata:
+      type: object
+      required:
+        - collectionInfo
+      properties:
+        collectionInfo:
+          $ref: '#/components/schemas/CollectionInfo'
+    ListPostsResponse:
+      type: object
+      required:
+        - data
+        - metadata
+      properties:
+        data:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Post'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    ListProfilesMetricsRequest:
+      type: object
+      required:
+        - filters
+      properties:
+        filters:
+          $ref: '#/components/schemas/RequestFilters'
+    BreakdownDimension:
+      type: object
+      required:
+        - breakdownId
+        - values
+      properties:
+        breakdownId:
+          type: string
+        values:
+          type: object
+          description: |
+            Per-breakdown dimensions (e.g. by type, by country). Each item has a breakdown id and a map of dimension value -> metric value.
+          additionalProperties:
+            type: number
+            format: double
+    PageMetric:
+      type: object
+      required:
+        - total
+      properties:
+        total:
+          type: number
+          description: total value for the metric
+          format: double
+        breakdownDimensions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreakdownDimension'
+    PageMetricsOverview:
+      type: object
+      description: |
+        All page level metrics in a single object. Keys are metric names (e.g. "page_reactions", "total_followers").
+        Values are numeric (float64). For metric definitions, see the Help Center documentation.
+      additionalProperties:
+        $ref: '#/components/schemas/PageMetric'
+    ProfileMetricsEntry:
+      type: object
+      required:
+        - profileId
+        - externalProfileId
+        - date
+        - metrics
+      properties:
+        profileId:
+          type: string
+          description: Hootsuite identifier of this social profile.
+          example: '12345678'
+        externalProfileId:
+          type: string
+          description: Identifier of the social profile on the social network.
+        date:
+          type: string
+          format: date
+          description: date of the metrics
+        metrics:
+          $ref: '#/components/schemas/PageMetricsOverview'
+    ListProfilesMetricsResponse:
+      type: object
+      required:
+        - data
+        - metadata
+      properties:
+        data:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/ProfileMetricsEntry'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    AdEntityCollectionEnum:
+      type: string
+      description: Plural collection name used in the URL path. Determines whether the response contains campaigns, ad sets, or ads
+      enum:
+        - campaigns
+        - adsets
+        - ads
+    AdAccountTypeEnum:
+      type: string
+      description: Ad account network type
+      enum:
+        - FACEBOOK
+        - TWITTER
+    AdAccountFilter:
+      type: object
+      required:
+        - adAccountId
+        - organizationId
+      description: filter by adAccountId and organizationId
+      properties:
+        adAccountId:
+          type: string
+        organizationId:
+          type: string
+    AdRequestFilters:
+      type: object
+      required:
+        - adAccounts
+      properties:
+        adAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdAccountFilter'
+        lastModified:
+          $ref: '#/components/schemas/TimeFieldFilters'
+        reportingPeriod:
+          $ref: '#/components/schemas/TimeFieldFilters'
+    ListPaidRequest:
+      type: object
+      required:
+        - filters
+      properties:
+        filters:
+          $ref: '#/components/schemas/AdRequestFilters'
+    Budget:
+      type: object
+      description: Budget configuration, when available.
+      required:
+        - daily
+        - lifetime
+      properties:
+        daily:
+          type: number
+          format: double
+        lifetime:
+          type: number
+          format: double
+    Lifecycle:
+      type: object
+      description: Schedule window (start and end time), when available.
+      properties:
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+    AdMetadata:
+      type: object
+      description: |
+        Platform-specific metadata in a single object. Keys and values depend on ad_account_type.
+      additionalProperties: true
+    Campaign:
+      type: object
+      description: Paid campaign entity returned from ad platform integrations.
+      required:
+        - adAccountId
+        - organizationId
+        - externalCampaignId
+        - campaignStatus
+        - name
+        - objective
+        - adAccountType
+        - currency
+        - externalAdAccountId
+        - marketingMetadata
+      properties:
+        adAccountId:
+          type: string
+          description: Internal identifier of the ad account.
+        organizationId:
+          type: string
+          description: Hootsuite orgnization Id.
+        externalCampaignId:
+          type: string
+          description: Campaign identifier from the external ad platform.
+        campaignStatus:
+          type: string
+          description: Current campaign status reported by the external ad platform.
+        name:
+          type: string
+          description: Campaign name.
+        objective:
+          type: string
+          description: Marketing objective configured for the campaign.
+        adAccountType:
+          $ref: '#/components/schemas/AdAccountTypeEnum'
+        currency:
+          type: string
+          description: Currency code used for campaign spending and budgets (for example, USD).
+        externalAdAccountId:
+          type: string
+          description: Account identifier from the external ad platform.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the campaign was created in the external platform.
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the campaign was last updated in the external platform.
+        hsCollectedAt:
+          type: string
+          format: date-time
+          description: Timestamp when Hootsuite last collected this campaign record.
+        budget:
+          $ref: '#/components/schemas/Budget'
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
+        marketingMetadata:
+          $ref: '#/components/schemas/AdMetadata'
+    AdSet:
+      type: object
+      description: Paid ad set entity returned from ad platform integrations.
+      required:
+        - adAccountId
+        - organizationId
+        - externalAdsetId
+        - adSetStatus
+        - name
+        - objective
+        - adAccountType
+        - currency
+        - externalAdAccountId
+        - externalCampaignId
+        - campaignName
+        - marketingMetadata
+      properties:
+        adAccountId:
+          type: string
+          description: Internal identifier of the ad account.
+        organizationId:
+          type: string
+          description: Hootsuite orgnization Id.
+        externalAdsetId:
+          type: string
+          description: Ad set identifier from the external ad platform.
+        adSetStatus:
+          type: string
+          description: Current ad set status reported by the external ad platform.
+        name:
+          type: string
+          description: Ad group name.
+        objective:
+          type: string
+          description: Marketing objective associated with this ad set.
+        adAccountType:
+          $ref: '#/components/schemas/AdAccountTypeEnum'
+        currency:
+          type: string
+          description: Currency code used for spending and budget values (for example, USD).
+        externalAdAccountId:
+          type: string
+          description: Account identifier from the external ad platform.
+        externalCampaignId:
+          type: string
+          description: Parent campaign identifier from the external ad platform.
+        campaignName:
+          type: string
+          description: Name of the parent campaign.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the ad set was created in the external platform.
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the ad set was last updated in the external platform.
+        hsCollectedAt:
+          type: string
+          format: date-time
+          description: Timestamp when Hootsuite last collected this ad set record.
+        budget:
+          $ref: '#/components/schemas/Budget'
+        lifecycle:
+          $ref: '#/components/schemas/Lifecycle'
+        marketingMetadata:
+          $ref: '#/components/schemas/AdMetadata'
+    AdMedia:
+      type: object
+      description: Thumbnail and media URLs for the ad, when available.
+      required:
+        - thumbnailUrl
+        - url
+      properties:
+        thumbnailUrl:
+          type: string
+        url:
+          type: string
+    UTM:
+      type: object
+      description: UTM objects associated with the ad.
+      required:
+        - campaign
+        - content
+        - medium
+        - source
+        - term
+      properties:
+        campaign:
+          type: string
+        content:
+          type: string
+        medium:
+          type: string
+        source:
+          type: string
+        term:
+          type: string
+    AdLink:
+      type: object
+      description: Link objects associated with the ad.
+      required:
+        - extendedUrl
+      properties:
+        extendedUrl:
+          type: string
+        utm:
+          $ref: '#/components/schemas/UTM'
+    Ad:
+      type: object
+      required:
+        - adAccountId
+        - organizationId
+        - name
+        - objective
+        - adAccountType
+        - currency
+        - externalAdAccountId
+        - body
+        - externalAdId
+        - adType
+        - adStatus
+        - adManagerUrl
+        - campaignName
+        - adsetName
+        - targetUrl
+        - externalAdsetId
+        - externalCampaignId
+        - externalCreativeId
+        - tags
+        - autoTags
+        - attachedUrls
+      properties:
+        adAccountId:
+          type: string
+          description: Internal identifier of the ad account.
+        organizationId:
+          type: string
+          description: Hootsuite orgnization Id.
+        name:
+          type: string
+          description: Ad name.
+        objective:
+          type: string
+          description: Marketing objective associated with this ad.
+        adAccountType:
+          $ref: '#/components/schemas/AdAccountTypeEnum'
+        currency:
+          type: string
+          description: Currency code used for spending and budget values (for example, USD).
+        externalAdAccountId:
+          type: string
+          description: Account identifier from the external ad platform.
+        body:
+          type: string
+          description: Primary ad text or message body.
+        externalAdId:
+          type: string
+          description: Ad identifier from the external ad platform.
+        adType:
+          type: string
+          description: Ad format/type reported by the external ad platform.
+        adStatus:
+          type: string
+          description: Current ad status reported by the external ad platform.
+        adManagerUrl:
+          type: string
+          description: URL to open/manage this ad in the external ad manager.
+        campaignName:
+          type: string
+          description: Name of the parent campaign.
+        adsetName:
+          type: string
+          description: Name of the parent ad set.
+        targetUrl:
+          type: string
+          description: Destination URL the ad points to.
+        externalAdsetId:
+          type: string
+          description: Ad set identifier from the external ad platform.
+        externalCampaignId:
+          type: string
+          description: Campaign identifier from the external ad platform.
+        externalCreativeId:
+          type: string
+          description: Creative identifier associated with this ad in the external platform.
+        tags:
+          type: array
+          description: User-assigned marketing tags attached to the ad.
+          items:
+            type: string
+        autoTags:
+          type: array
+          description: Automatically generated tags attached to the ad.
+          items:
+            type: string
+        thumbnail:
+          $ref: '#/components/schemas/AdMedia'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdLink'
+        attachedUrls:
+          type: array
+          description: Raw attached URLs associated with the ad content.
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the ad was created in the external platform.
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the ad was last updated in the external platform.
+        hsCollectedAt:
+          type: string
+          format: date-time
+          description: Timestamp when Hootsuite last collected this ad record.
+        marketingMetadata:
+          $ref: '#/components/schemas/AdMetadata'
+    ListPaidResponse:
+      type: object
+      description: Response payload for listing paid entities (campaigns, ad sets, or ads).
+      required:
+        - data
+        - metadata
+      properties:
+        data:
+          type: array
+          maxItems: 100
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Campaign'
+              - $ref: '#/components/schemas/AdSet'
+              - $ref: '#/components/schemas/Ad'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    ListPaidMetricsRequest:
+      type: object
+      required:
+        - filters
+      properties:
+        filters:
+          $ref: '#/components/schemas/AdRequestFilters'
+    CampaignContentDailyMetrics:
+      type: object
+      description: Daily metrics snapshot for a paid campaign.
+      required:
+        - adAccountId
+        - organizationId
+        - externalCampaignId
+        - adAccountType
+        - externalAdAccountId
+        - date
+        - metrics
+      properties:
+        adAccountId:
+          type: string
+          description: Internal identifier of the ad account.
+        adAccountType:
+          $ref: '#/components/schemas/AdAccountTypeEnum'
+        organizationId:
+          type: string
+          description: Hootsuite organization Id
+        externalCampaignId:
+          type: string
+          description: Campaign identifier from the external ad platform.
+        externalAdAccountId:
+          type: string
+          description: Account identifier from the external ad platform.
+        date:
+          type: string
+          format: date
+          description: Reporting date for this metrics record.
+        metrics:
+          $ref: '#/components/schemas/MetricsPublic'
+    AdsetContentDailyMetrics:
+      type: object
+      description: Daily metrics snapshot for a paid ad set.
+      required:
+        - adAccountId
+        - organizationId
+        - externalAdsetId
+        - externalCampaignId
+        - adAccountType
+        - externalAdAccountId
+        - date
+        - metrics
+      properties:
+        adAccountId:
+          type: string
+          description: Internal identifier of the ad account.
+        adAccountType:
+          $ref: '#/components/schemas/AdAccountTypeEnum'
+        organizationId:
+          type: string
+          description: Internal identifier of the owning organization.
+        externalAdsetId:
+          type: string
+          description: Ad set identifier from the external ad platform.
+        externalCampaignId:
+          type: string
+          description: Parent campaign identifier from the external ad platform.
+        externalAdAccountId:
+          type: string
+          description: Account identifier from the external ad platform.
+        date:
+          type: string
+          format: date
+          description: Reporting date for this metrics record.
+        metrics:
+          $ref: '#/components/schemas/MetricsPublic'
+    AdContentDailyMetrics:
+      type: object
+      description: Daily metrics snapshot for a paid ad.
+      required:
+        - adAccountId
+        - organizationId
+        - externalAdId
+        - externalAdsetId
+        - externalCampaignId
+        - adAccountType
+        - externalAdAccountId
+        - date
+        - metrics
+      properties:
+        adAccountId:
+          type: string
+          description: Internal identifier of the ad account.
+        adAccountType:
+          $ref: '#/components/schemas/AdAccountTypeEnum'
+        organizationId:
+          type: string
+          description: Hootsuite Organization Id
+        externalAdId:
+          type: string
+          description: Ad identifier from the external ad platform.
+        externalAdsetId:
+          type: string
+          description: Parent ad set identifier from the external ad platform.
+        externalCampaignId:
+          type: string
+          description: Parent campaign identifier from the external ad platform.
+        externalAdAccountId:
+          type: string
+          description: Account identifier from the external ad platform.
+        date:
+          type: string
+          format: date
+          description: Reporting date for this metrics record.
+        metrics:
+          $ref: '#/components/schemas/MetricsPublic'
+    ListPaidMetricsResponse:
+      type: object
+      required:
+        - data
+        - metadata
+      properties:
+        data:
+          type: array
+          maxItems: 100
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/CampaignContentDailyMetrics'
+              - $ref: '#/components/schemas/AdsetContentDailyMetrics'
+              - $ref: '#/components/schemas/AdContentDailyMetrics'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+  parameters:
+    DatatypeParameter:
+      in: query
+      name: datatype
+      description: The datatype to retrieve analytics for.
+      schema:
+        $ref: '#/components/schemas/DatatypeEnum'
+      example: ORGANIC
+    NetworkIdParameter:
+      in: query
+      name: networkId
+      description: The network type to retrieve analytics for.
+      schema:
+        $ref: '#/components/schemas/NetworkTypeEnum'
+      example: FACEBOOKPAGE
+    CursorParameter:
+      in: query
+      name: cursor
+      description: Cursor for pagination, provided by a previous call.
+      schema:
+        type: string
+    LimitParameter:
+      in: query
+      name: limit
+      description: Number of results to return in this page of data.
+      schema:
+        type: integer
+        format: int
+        default: 10
+        minimum: 1
+        maximum: 100
+      example: 10
+    AdEntityCollectionParameter:
+      in: path
+      name: adEntityCollection
+      description: |
+        Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.
+      required: true
+      schema:
+        $ref: '#/components/schemas/AdEntityCollectionEnum'
+      example: ads
+    AdAccountTypeParameter:
+      in: query
+      name: adAccountType
+      description: The ad account type to retrieve analytics for.
+      schema:
+        $ref: '#/components/schemas/AdAccountTypeEnum'
+      example: FACEBOOK
+externalDocs:
+  url: https://developer.hootsuite.com/docs/analytics-overview

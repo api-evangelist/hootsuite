@@ -1,20 +1,35 @@
 {
   "provider": "hootsuite",
   "sources": [
-    "hootsuite-me-api-openapi.yml",
-    "hootsuite-media-api-openapi.yml",
-    "hootsuite-messages-api-openapi.yml",
-    "hootsuite-socialprofiles-api-openapi.yml"
+    "_original/hootsuite-rest-api-swagger.yaml",
+    "_original/hootsuite-analytics-api-openapi.yaml",
+    "_original/hootsuite-inbox-api-openapi.yaml",
+    "_original/hootsuite-amplify-api-swagger.json"
   ],
   "outputs": [
+    "hootsuite-rest-api-openapi.yml",
+    "hootsuite-analytics-api-openapi.yml",
+    "hootsuite-inbox-api-openapi.yml",
+    "hootsuite-amplify-api-openapi.yml"
+  ],
+  "archived": [
     "hootsuite-me-api-openapi.yml",
     "hootsuite-media-api-openapi.yml",
     "hootsuite-messages-api-openapi.yml",
-    "hootsuite-socialprofiles-api-openapi.yml"
+    "hootsuite-socialprofiles-api-openapi.yml",
+    "_original/hootsuite-openapi.yml"
   ],
-  "archived": [],
   "errors": [],
-  "warnings": [],
-  "notes": [],
+  "warnings": [
+    "Not yet split by tag. The four working copies are whole first-party specifications harvested 2026-08-13; a later refine-openapis run should split them (REST 10 tags, Inbox 7 tags with operations, Analytics 1 tag, Amplify 1 tag)."
+  ],
+  "notes": [
+    "2026-08-13 enrichment pass: the previous contents of this directory were a 13-operation hand-scaffolded spec and four tag splits derived from it. Its operationIds (listMessages, createMessage, listSocialProfiles, getCurrentMember, createMediaUpload) do not exist in any Hootsuite contract, and it carried no schemas and no real responses. It was removed and replaced with four real first-party specifications totalling 76 operations.",
+    "REST API: https://apidocs.hootsuite.com/docs/api/swagger.yaml (Swagger 2.0, 48 ops, 89 definitions), found via the ReDoc spec-url at https://platform.hootsuite.com/docs/api/index.html and confirmed by Hootsuite's RFC 9727 API catalog.",
+    "Inbox 2.0 API: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml (OpenAPI 3.1, 18 ops, 6 webhooks), found in the RFC 9727 API catalog.",
+    "Analytics API: https://apidocs.hootsuite.com/docs/api/analytics/openapi/openapi.yaml (OpenAPI 3.0, 4 ops, 48 schemas), reached from https://developer.hootsuite.com/docs/using-the-api.",
+    "Amplify API: https://amplify.hootsuite.com/api-docs/static/swagger.json (Swagger 2.0, 6 ops, 23 definitions), reached from https://developer.hootsuite.com/docs/api-overview.",
+    "The two Swagger 2.0 documents were converted to OpenAPI 3.0 with swagger2openapi 7 for the working copies; the verbatim originals are kept in _original/."
+  ],
   "skipped": []
 }

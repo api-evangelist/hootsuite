@@ -1,0 +1,1454 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hootsuite REST API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "authorization_code",
+      "authorizationUrl": "https://platform.hootsuite.com/oauth2/auth",
+      "accessTokenUrl": "https://platform.hootsuite.com/oauth2/token",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Authentication",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "OAuth2 Authorize",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/oauth2/auth",
+            "params": [
+              {
+                "name": "response_type",
+                "value": "",
+                "type": "query",
+                "description": "The response type requested."
+              },
+              {
+                "name": "client_id",
+                "value": "",
+                "type": "query",
+                "description": "Your client ID found in the Hootsuite Developer Portal."
+              },
+              {
+                "name": "scope",
+                "value": "",
+                "type": "query",
+                "description": "The required token scopes. Include \"offline\" if you need a refresh token or \"analytics:read\" for analytics API access. Multiple scopes must be separated by spaces."
+              },
+              {
+                "name": "redirect_uri",
+                "value": "",
+                "type": "query",
+                "description": "The URI to redirect to after authentication."
+              },
+              {
+                "name": "state",
+                "value": "",
+                "type": "query",
+                "description": "An opaque value used by the client to maintain state between the request and callback. See [rfc6749#section-4.1.1](https://tools.ietf.org/html/rfc6749#section-4.1.1) for more context.\n\nNote: this param is required and must be at least 8 characters long.\n"
+              }
+            ]
+          },
+          "docs": "[OAuth2 Authorize](https://tools.ietf.org/html/rfc6749#section-3.1) endpoint."
+        },
+        {
+          "info": {
+            "name": "OAuth2 Token",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/oauth2/token",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "form-urlencoded",
+              "data": [
+                {
+                  "name": "grant_type",
+                  "value": ""
+                },
+                {
+                  "name": "code",
+                  "value": ""
+                },
+                {
+                  "name": "redirect_uri",
+                  "value": ""
+                },
+                {
+                  "name": "member_id",
+                  "value": ""
+                },
+                {
+                  "name": "organization_id",
+                  "value": ""
+                },
+                {
+                  "name": "refresh_token",
+                  "value": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "basic",
+              "username": "{{username}}",
+              "password": "{{password}}"
+            }
+          },
+          "docs": "[OAuth2 Token](https://tools.ietf.org/html/rfc6749#section-3.2) endpoint. The required parameters depend on the grant type requested:\n\n|Required Parameter|Grant Type|\n|---|---|\n|code|authorization_code|\n|redirect_uri|authorization_code|\n|member_id|member_app|\n|organization_id|organization_app|\n|refresh_token|refresh_token|\n\nThis endpoint requires that you pass in your client credentials using the HTTP Basic authentication scheme as per outlined in the [spec](https://tools.ietf.org/html/rfc6749#s"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Messages",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve outbound messages",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/messages",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "startTime",
+                "value": "2020-01-01T00:00:00Z",
+                "type": "query",
+                "description": "The start date range of messages to be returned. In [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format."
+              },
+              {
+                "name": "endTime",
+                "value": "2020-01-15T17:55:01Z",
+                "type": "query",
+                "description": "The end date range of messages to be returned. In [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format. Must not be later than 4 weeks from startTime."
+              },
+              {
+                "name": "state",
+                "value": "SCHEDULED",
+                "type": "query",
+                "description": "A filter to return messages with in the matching state. Allowed values are PENDING_APPROVAL, REJECTED, SENT, SCHEDULED and SEND_FAILED_PERMANENTLY."
+              },
+              {
+                "name": "socialProfileIds",
+                "value": "115185509",
+                "type": "query",
+                "description": "A filter to return messages for certain social profiles."
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of messages to be returned in the response. Defaults to 50 if not specified. Maximum allowable limit is 100."
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Cursor to a specific page in the result set. Defaults to the first page."
+              },
+              {
+                "name": "includeUnscheduledReviewMsgs",
+                "value": "",
+                "type": "query",
+                "description": "Flag to retrieve unscheduled (Send Now) review messages on top of scheduled ones retrieved from time range query."
+              }
+            ]
+          },
+          "docs": "Outbound messages are messages that are scheduled or were previously sent. This endpoint returns outbound messages sorted by increasing scheduled send time. Messages pending approval, including those created by and/or actionable by the given user, will also be returned via this API.\n\nMessages returned can be filtered by social profile or the current state of the message. If more than 50 results are returned a cursor will be automatically created to paginate the results.\n\nQuery Parameters must be"
+        },
+        {
+          "info": {
+            "name": "Schedule messages",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/messages",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Schedules a message to send on one or more social profiles (except Pinterest). Returns an array of uniquely identifiable messages (one per social profile requested).<br/><br/>Scheduling a message to Pinterest can not be bundled with any other social profiles."
+        },
+        {
+          "info": {
+            "name": "Retrieve message",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/messages/:messageId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "messageId",
+                "value": "4138476039",
+                "type": "path",
+                "description": "The message ID."
+              }
+            ]
+          },
+          "docs": "Retrieves a message. A message is always associated with a single social profile. Messages might be unavailable for a brief time during upload to social networks.\n"
+        },
+        {
+          "info": {
+            "name": "Delete message",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://platform.hootsuite.com/v1/messages/:messageId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "messageId",
+                "value": "4138476039",
+                "type": "path",
+                "description": "The message ID."
+              }
+            ]
+          },
+          "docs": "Deletes a message. A message is always associated with a single social profile."
+        },
+        {
+          "info": {
+            "name": "Approve message",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/messages/:messageId/approve",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "messageId",
+                "value": "4138476039",
+                "type": "path",
+                "description": "The message ID."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Approve a message."
+        },
+        {
+          "info": {
+            "name": "Reject message",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/messages/:messageId/reject",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "messageId",
+                "value": "4138476039",
+                "type": "path",
+                "description": "The message ID."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Reject a message."
+        },
+        {
+          "info": {
+            "name": "Get message review history",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/messages/:messageId/history",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "messageId",
+                "value": "4138476039",
+                "type": "path",
+                "description": "The message ID."
+              }
+            ]
+          },
+          "docs": "Gets a message's prescreening review history."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Comments",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/comments/:commentId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "commentId",
+                "value": "4138476039",
+                "type": "path",
+                "description": "The comment ID."
+              }
+            ]
+          },
+          "docs": "Retrieves a comment if it's been through the approvals workflow.\n"
+        },
+        {
+          "info": {
+            "name": "Approve comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/comments/:commentId/approve",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "commentId",
+                "value": "4138476039",
+                "type": "path",
+                "description": "The comment ID."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Approve a comment."
+        },
+        {
+          "info": {
+            "name": "Reject comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/comments/:commentId/reject",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "commentId",
+                "value": "4138476039",
+                "type": "path",
+                "description": "The comment ID."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Reject a comment."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Media",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create media upload url",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/media",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates an Amazon S3 upload URL that can be used to transfer media to Hootsuite which ensures the media is available when a scheduled message is sent to the social network.\nHootsuite will generate thumbnails and key frames and return a unique media identifier that can be passed when creating a message.\nSubsequent uploads to an upload URL will be accepted by Amazon but immediately deleted by Hootsuite and only the first valid media file uploaded will be used.\nThe MIME type and size provided in th"
+        },
+        {
+          "info": {
+            "name": "Retrieve media upload status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/media/:mediaId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "mediaId",
+                "value": "aHR0cHM6Ly9ob290c3VpdGUtdmlkZW8uczMuYW1hem9uYXdzLmNvbS9wcm9kdWN0aW9uLzEyMjU1MjQ0XzgyOTVmZjllLWFkOWYtNGNlNy1iOGE3LTgwNzI0NDAwYTBhZS5tcDQ=",
+                "type": "path",
+                "description": "The Media ID to retrieve"
+              }
+            ]
+          },
+          "docs": "Retrieves the status of a media upload to Hootsuite."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Social Profiles",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve social profiles",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/socialProfiles",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Retrieves the social profiles that the authenticated user has access to."
+        },
+        {
+          "info": {
+            "name": "Retrieve social profile",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/socialProfiles/:socialProfileId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "socialProfileId",
+                "value": "115185509",
+                "type": "path",
+                "description": "The social profile ID"
+              }
+            ]
+          },
+          "docs": "Retrieve a social profile. Requires BASIC_USAGE permission on the social profile."
+        },
+        {
+          "info": {
+            "name": "Retrieve social profile's teams",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/socialProfiles/:socialProfileId/teams",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "socialProfileId",
+                "value": "115185509",
+                "type": "path",
+                "description": "The social profile ID"
+              }
+            ]
+          },
+          "docs": "Retrieves a list of team IDs with access to a social profile. Requires BASIC_USAGE permission on the social profile or ORG_MANAGE_SOCIAL_PROFILE permission on the organization that owns the social profile."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Members",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve member",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/members/:memberId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Member ID"
+              }
+            ]
+          },
+          "docs": "Retrieves a member"
+        },
+        {
+          "info": {
+            "name": "Create member",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/members",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a member in a Hootsuite organization.  Requires organization manage members permission."
+        },
+        {
+          "info": {
+            "name": "Retrieve member's organizations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/members/:memberId/organizations",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The member ID"
+              }
+            ]
+          },
+          "docs": "Retrieves the organizations that the member is in."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Me",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve authenticated member",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/me",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Retrieves authenticated member."
+        },
+        {
+          "info": {
+            "name": "Retrieve authenticated member's organizations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/me/organizations",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Retrieves the organizations that the authenticated member is in."
+        },
+        {
+          "info": {
+            "name": "Retrieve authenticated member's social profiles",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/me/socialProfiles",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Retrieves the social media profiles that the authenticated user has BASIC_USAGE permissions on."
+        },
+        {
+          "info": {
+            "name": "Retrieve authenticated member's ad accounts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/me/adAccounts",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organization_id",
+                "value": "15240789",
+                "type": "query",
+                "description": "The Organization ID"
+              }
+            ]
+          },
+          "docs": "Retrieves the ad accounts that the authenticated user has permissions on."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Organizations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve organization teams",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/teams",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              }
+            ]
+          },
+          "docs": "Retrieves a list of teams for a given organization."
+        },
+        {
+          "info": {
+            "name": "Retrieve organization members",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/members",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              }
+            ]
+          },
+          "docs": "Retrieves the members in an organization"
+        },
+        {
+          "info": {
+            "name": "Remove member from organization",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/members/:memberId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              },
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Member ID"
+              }
+            ]
+          },
+          "docs": "Removes a member from an organization."
+        },
+        {
+          "info": {
+            "name": "Retrieve org member's organization permissions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/members/:memberId/permissions",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              },
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Member ID"
+              }
+            ]
+          },
+          "docs": "Retrieves an organization member’s permissions for the organization."
+        },
+        {
+          "info": {
+            "name": "Retrieve org member's teams",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/members/:memberId/teams",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              },
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Member ID"
+              }
+            ]
+          },
+          "docs": "Retrieves the teams an organization member is in."
+        },
+        {
+          "info": {
+            "name": "Retrieve org member’s social profiles",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/members/:memberId/socialProfiles",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              },
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Member ID"
+              }
+            ]
+          },
+          "docs": "Retrieves the organization's social profiles that an organization member can access."
+        },
+        {
+          "info": {
+            "name": "Retrieve org member’s social profile permissions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/members/:memberId/socialProfiles/:socialProfileId/permissions",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              },
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Member ID"
+              },
+              {
+                "name": "socialProfileId",
+                "value": "115185509",
+                "type": "path",
+                "description": "The Social Profile ID"
+              }
+            ]
+          },
+          "docs": "Retrieves an organization member’s permissions for a social profile."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Teams",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create team",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/teams",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a team in an organization."
+        },
+        {
+          "info": {
+            "name": "Add member to team",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/teams/:teamId/members/:memberId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              },
+              {
+                "name": "teamId",
+                "value": "359493",
+                "type": "path",
+                "description": "The Team ID"
+              },
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Member ID"
+              }
+            ]
+          },
+          "docs": "Adds a member to a team."
+        },
+        {
+          "info": {
+            "name": "Retrieve team members",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/teams/:teamId/members",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              },
+              {
+                "name": "teamId",
+                "value": "359493",
+                "type": "path",
+                "description": "The Team ID"
+              }
+            ]
+          },
+          "docs": "Retrieves the members in a team."
+        },
+        {
+          "info": {
+            "name": "Retrieve team member's permissions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/teams/:teamId/members/:memberId/permissions",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              },
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Member ID"
+              },
+              {
+                "name": "teamId",
+                "value": "359493",
+                "type": "path",
+                "description": "The Team ID"
+              }
+            ]
+          },
+          "docs": "Retrieves team member's team permissions."
+        },
+        {
+          "info": {
+            "name": "Retrieve org team’s social profiles",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/organizations/:organizationId/teams/:teamId/socialProfiles",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "626731",
+                "type": "path",
+                "description": "The Organization ID"
+              },
+              {
+                "name": "teamId",
+                "value": "359493",
+                "type": "path",
+                "description": "The Team ID"
+              }
+            ]
+          },
+          "docs": "Retrieves the organization's social profiles that an organization team can access."
+        },
+        {
+          "info": {
+            "name": "Retrieve team",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/v1/teams/:teamId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "teamId",
+                "value": "359493",
+                "type": "path",
+                "description": "The Team ID"
+              }
+            ]
+          },
+          "docs": "Retrieves a team with a given team ID."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "SCIM 2.0",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Users",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/scim/v2/Users",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filtering by username."
+              },
+              {
+                "name": "count",
+                "value": "",
+                "type": "query",
+                "description": "The maximum number of results to return."
+              },
+              {
+                "name": "startIndex",
+                "value": "",
+                "type": "query",
+                "description": "The starting index for pagination."
+              }
+            ]
+          },
+          "docs": "Retrieves Hootsuite users using the SCIM 2.0 protocol. Support equals filtering on username."
+        },
+        {
+          "info": {
+            "name": "Create User",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/scim/v2/Users",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a Hootsuite user using the SCIM 2.0 protocol."
+        },
+        {
+          "info": {
+            "name": "Get User",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/scim/v2/Users/:memberId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Member ID"
+              }
+            ]
+          },
+          "docs": "Retrieves a Hootsuite user using the SCIM 2.0 protocol."
+        },
+        {
+          "info": {
+            "name": "Replace User",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://platform.hootsuite.com/scim/v2/Users/:memberId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "memberId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Member ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates a Hootsuite user using the SCIM 2.0 protocol. To see the JSON object attributes required by the PUT endpoint, call the /Schemas endpoint. For a complete example request, see the [SCIM specification](https://tools.ietf.org/html/rfc7644#section-3.5.1)"
+        },
+        {
+          "info": {
+            "name": "Modify User",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://platform.hootsuite.com/scim/v2/Users/:memberId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "memberId",
+                "value": "1234567",
+                "type": "path",
+                "description": "The member ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Modify one or more attributes of a Hootsuite user. For a complete example request, see the [SCIM specification](https://tools.ietf.org/html/rfc7644#section-3.5.2).\n"
+        },
+        {
+          "info": {
+            "name": "Get Groups",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/scim/v2/Groups",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filtering by displayName."
+              },
+              {
+                "name": "count",
+                "value": "",
+                "type": "query",
+                "description": "The maximum number of results to return."
+              },
+              {
+                "name": "startIndex",
+                "value": "",
+                "type": "query",
+                "description": "The starting index for pagination."
+              }
+            ]
+          },
+          "docs": "Retrieves Hootsuite teams using the SCIM 2.0 protocol. Support equals filtering on displayName."
+        },
+        {
+          "info": {
+            "name": "Create Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/scim/v2/Groups",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a Hootsuite team using the SCIM 2.0 protocol."
+        },
+        {
+          "info": {
+            "name": "Get Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/scim/v2/Groups/:groupId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "teamId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The team Id"
+              }
+            ]
+          },
+          "docs": "Retrieves a Hootsuite team using the SCIM 2.0 protocol."
+        },
+        {
+          "info": {
+            "name": "Replace Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://platform.hootsuite.com/scim/v2/Groups/:groupId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "teamId",
+                "value": "15240789",
+                "type": "path",
+                "description": "The Team ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates a Hootsuite team using the SCIM 2.0 protocol. For a complete example request, see the [SCIM specification](https://tools.ietf.org/html/rfc7644#section-3.5.1)"
+        },
+        {
+          "info": {
+            "name": "Modify Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://platform.hootsuite.com/scim/v2/Groups/:groupId",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "teamId",
+                "value": "1234567",
+                "type": "path",
+                "description": "The team Id"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Modify one or more attributes of a Hootsuite team. For a complete example request, see the [SCIM specification](https://tools.ietf.org/html/rfc7644#section-3.5.2).\n"
+        },
+        {
+          "info": {
+            "name": "Get Resource Types",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/scim/v2/ResourceTypes",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Retrieves the configuration for all supported SCIM resource types"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

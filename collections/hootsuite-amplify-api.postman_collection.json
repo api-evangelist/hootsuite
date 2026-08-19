@@ -1,0 +1,586 @@
+{
+  "item": [
+    {
+      "id": "345a6c19-ff62-4821-a6c7-f88943174a66",
+      "name": "me",
+      "description": {
+        "content": "Operations that you can do related with your authenticated member",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "37e1ca50-3cbc-4cd2-b8ac-e3efbf897361",
+          "name": "Gets the member information",
+          "request": {
+            "name": "Gets the member information",
+            "description": {},
+            "url": {
+              "path": [
+                "me",
+                ""
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "An optional fields mask",
+                "key": "X-Fields",
+                "value": "<mask>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "89d2fd14-4475-4e45-80ca-330ef98e6bfb",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "me",
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "description": "An optional fields mask",
+                    "key": "X-Fields",
+                    "value": "<mask>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"email\": \"john.doe@hootsuite.com\",\n    \"name\": \"John Doe\",\n    \"roles\": [\n      \"subscriber\",\n      \"content_admin\"\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "f31f099c-87dd-4734-80ea-219b15f7b5b5",
+          "name": "Create message using the authenticated member",
+          "request": {
+            "name": "Create message using the authenticated member",
+            "description": {},
+            "url": {
+              "path": [
+                "me",
+                "messages"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "An optional fields mask",
+                "key": "X-Fields",
+                "value": "<mask>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expiryDate\": \"<dateTime>\",\n  \"isPinned\": false,\n  \"isShareable\": true,\n  \"owlyPhotoAttachment\": {\n    \"mimeType\": \"<string>\",\n    \"thumbnailUrl\": \"<string>\",\n    \"url\": \"<string>\"\n  },\n  \"pdfAttachment\": \"<object>\",\n  \"photoUrl\": \"<string>\",\n  \"privacySettings\": {\n    \"tiktokbusiness\": {\n      \"allowComments\": true,\n      \"allowDuet\": true,\n      \"allowStitch\": true\n    }\n  },\n  \"publishedDate\": \"<dateTime>\",\n  \"shareableNetworks\": {\n    \"facebook\": \"<boolean>\",\n    \"facebookpage\": \"<boolean>\",\n    \"instagram\": \"<boolean>\",\n    \"linkedin\": \"<boolean>\",\n    \"tiktokbusiness\": \"<boolean>\",\n    \"twitter\": \"<boolean>\"\n  },\n  \"text\": \"<string>\",\n  \"topics\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"videoAttachment\": \"<object>\",\n  \"isEditable\": false,\n  \"isNativeShareEnabled\": false,\n  \"isPublished\": false,\n  \"isSuggested\": false,\n  \"photoUriBase64\": \"<string>\",\n  \"srcNetwork\": \"\",\n  \"srcUser\": \"\",\n  \"suggestionReason\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "c62e1ffd-b2dd-4b57-9ba0-29762d38d2fb",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "me",
+                    "messages"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "description": "An optional fields mask",
+                    "key": "X-Fields",
+                    "value": "<mask>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"expiryDate\": \"2017-10-23T16:42:23.141Z\",\n  \"isPinned\": false,\n  \"isShareable\": true,\n  \"owlyPhotoAttachment\": {\n    \"mimeType\": \"image/jpeg\",\n    \"thumbnailUrl\": \"https://somethumbnail.jpeg\",\n    \"url\": \"https://somethumbnail.jpeg\"\n  },\n  \"pdfAttachment\": \"<object>\",\n  \"photoUrl\": \"https://one-photo.jpeg\",\n  \"privacySettings\": {\n    \"tiktokbusiness\": {\n      \"allowComments\": true,\n      \"allowDuet\": true,\n      \"allowStitch\": true\n    }\n  },\n  \"publishedDate\": \"2017-10-16T16:42:23.141Z\",\n  \"shareableNetworks\": {\n    \"facebook\": true,\n    \"facebookpage\": true,\n    \"instagram\": false,\n    \"linkedin\": true,\n    \"tiktokbusiness\": true,\n    \"twitter\": true\n  },\n  \"text\": \"5 tips to accelerate your career in a hyper-growth company\",\n  \"topics\": [\n    \"HootsuiteLife\",\n    \"Career\"\n  ],\n  \"videoAttachment\": \"<object>\",\n  \"isEditable\": false,\n  \"isNativeShareEnabled\": false,\n  \"isPublished\": false,\n  \"isSuggested\": false,\n  \"photoUriBase64\": \"data:image/gif;base64,R0lGODlhEAAQAM...\",\n  \"srcNetwork\": \"\",\n  \"srcUser\": \"twitter_techie\",\n  \"suggestionReason\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"expiryDate\": \"2017-10-23T16:42:23.141Z\",\n    \"isPinned\": false,\n    \"isShareable\": true,\n    \"owlyPhotoAttachment\": {\n      \"mimeType\": \"image/jpeg\",\n      \"thumbnailUrl\": \"https://somethumbnail.jpeg\",\n      \"url\": \"https://somethumbnail.jpeg\"\n    },\n    \"pdfAttachment\": \"<object>\",\n    \"photoUrl\": \"https://one-photo.jpeg\",\n    \"privacySettings\": {\n      \"tiktokbusiness\": {\n        \"description\": \"TikTok-specific privacy settings\",\n        \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n      }\n    },\n    \"publishedDate\": \"2017-10-16T16:42:23.141Z\",\n    \"shareableNetworks\": {\n      \"facebook\": true,\n      \"facebookpage\": true,\n      \"instagram\": false,\n      \"linkedin\": true,\n      \"tiktokbusiness\": true,\n      \"twitter\": true\n    },\n    \"text\": \"5 tips to accelerate your career in a hyper-growth company\",\n    \"topics\": [\n      \"HootsuiteLife\",\n      \"Career\"\n    ],\n    \"videoAttachment\": \"<object>\",\n    \"content\": {},\n    \"createdDate\": \"2017-10-16T16:42:23.141Z\",\n    \"id\": \"59d6df3c6bc0160ba6e15f73\",\n    \"isDeleted\": false,\n    \"isReshareable\": false,\n    \"isReshareableWithThoughts\": false,\n    \"raw_message\": {},\n    \"url\": \"http://ow.ly/fjzz30fU6EK\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "c0f10047-69f4-4cd4-b387-373e628cb47a",
+          "name": "Retrieve authenticated members's organizations",
+          "request": {
+            "name": "Retrieve authenticated members's organizations",
+            "description": {},
+            "url": {
+              "path": [
+                "me",
+                "organizations"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "An optional fields mask",
+                "key": "X-Fields",
+                "value": "<mask>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "e6259a7c-1f9d-4472-a8f5-1018e726ed7c",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "me",
+                    "organizations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "description": "An optional fields mask",
+                    "key": "X-Fields",
+                    "value": "<mask>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"enabledNetworks\": {\n        \"facebook\": true,\n        \"facebookpage\": true,\n        \"hootsuite\": true,\n        \"instagram\": false,\n        \"linkedin\": true,\n        \"tiktokbusiness\": true,\n        \"twitter\": true\n      },\n      \"hootId\": 123456,\n      \"id\": \"59d6df3c6bc0160ba6e15f73\",\n      \"name\": \"Hootsuite Inc.\"\n    },\n    {\n      \"enabledNetworks\": {\n        \"facebook\": true,\n        \"facebookpage\": true,\n        \"hootsuite\": true,\n        \"instagram\": false,\n        \"linkedin\": true,\n        \"tiktokbusiness\": true,\n        \"twitter\": true\n      },\n      \"hootId\": 123456,\n      \"id\": \"59d6df3c6bc0160ba6e15f73\",\n      \"name\": \"Hootsuite Inc.\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "854e3790-2809-45e1-9b04-a1525cfe2465",
+          "name": "Retrieve authenticated members's topics",
+          "request": {
+            "name": "Retrieve authenticated members's topics",
+            "description": {},
+            "url": {
+              "path": [
+                "me",
+                "topics"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "An optional fields mask",
+                "key": "X-Fields",
+                "value": "<mask>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "086ea80a-aaaa-4ef8-9f89-39a017cf2adf",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "me",
+                    "topics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "description": "An optional fields mask",
+                    "key": "X-Fields",
+                    "value": "<mask>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"count\": 0,\n      \"lastActivityDate\": \"2017-10-23T16:42:23.141Z\",\n      \"name\": \"sports\",\n      \"privacy\": \"opened\"\n    },\n    {\n      \"count\": 0,\n      \"lastActivityDate\": \"2017-10-23T16:42:23.141Z\",\n      \"name\": \"sports\",\n      \"privacy\": \"opened\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "3756f5ef-b1ad-4ed1-8994-cd27013510e0",
+          "name": "Creates a new topic on the member's organization",
+          "request": {
+            "name": "Creates a new topic on the member's organization",
+            "description": {},
+            "url": {
+              "path": [
+                "me",
+                "topics"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "An optional fields mask",
+                "key": "X-Fields",
+                "value": "<mask>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\",\n  \"privacy\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "6017ee5c-779f-4fb5-b1c4-412bf331b120",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "me",
+                    "topics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "description": "An optional fields mask",
+                    "key": "X-Fields",
+                    "value": "<mask>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"sports\",\n  \"privacy\": \"opened\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"count\": 0,\n    \"lastActivityDate\": \"2017-10-23T16:42:23.141Z\",\n    \"name\": \"sports\",\n    \"privacy\": \"opened\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "c586bbda-406d-4c20-ae8b-c90ad828cfc3",
+          "name": "Converts obfuscated member IDs back into member IDs",
+          "request": {
+            "name": "Converts obfuscated member IDs back into member IDs",
+            "description": {
+              "content": "It is important to note that multiple obfuscated member IDs\ncan point to a single member ID.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "me",
+                "utms",
+                "deobfuscate"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "An optional fields mask",
+                "key": "X-Fields",
+                "value": "<mask>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "fd447675-8c79-46ef-8a74-922b615cc308",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "me",
+                    "utms",
+                    "deobfuscate"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "description": "An optional fields mask",
+                    "key": "X-Fields",
+                    "value": "<mask>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"memberID\": \"123456\",\n      \"obfuscatedID\": \"ABCDEF\"\n    },\n    {\n      \"memberID\": \"123456\",\n      \"obfuscatedID\": \"ABCDEF\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://platform.hootsuite.com/amplify/v1",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "6f25e8d9-1f7c-4616-a6be-fcd35f9b9e94",
+    "name": "Hootsuite Amplify REST API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/b2c92b2ac637931e993a)\n\n# Introduction\n\nThe Hootsuite Amplify API is built on REST principles and uses JSON as a data interchange format.\n\nAll URLs referenced in this document use the following base: https://platform.hootsuite.com/amplify/. The Amplify API is served over HTTPS to ensure data privacy.\n\n## API Access\nIf you need help getting access to the API, please visit [Hootsuite's documentation](https://developer.hootsuite.com/docs/getting-started-with-the-rest-api#section-1-retrieving-api-credentials-from-the-hootsuite-developer-portal).\n\n## User Permissions\nEnsure the user you authenticate with has `Content Admin` permissions both enabled within Amplify, otherwise you might get `403 Forbidden` responses for some of the requests. You can set this permission level within User Management in Amplify dashboard app in Hootsuite.\n\n## Response Format\n\nAll responses are returned in JSON. A successful response is wrapped in a top level data envelope which is an object or array depending on whether a single item or a collection is returned. If a single item is returned the data field will be an object.\n\nSuccessful single item response:\n```json\n{\n    \"data\": {}\n}\n```\n\nSuccessful collection response:\n```json\n{\n    \"data\": [{}, {}, {}]\n}\n```\n\n### Response Codes\nThe Amplify API uses HTTP status codes to indicate the status of your request.\n\n| Code             | Description                                         |\n|------------------|-----------------------------------------------------|\n| 200 OK           | Resource was successfully retrieved or updated.     |\n| 400 Bad Request  | Invalid request, possibly due to missing parameters |\n| 401 Unauthorized | Missing or invalid authentication                   |\n| 403 Forbidden    | Access denied                                       |\n| 404 Not Found    | Requested resource does not exist                   |\n| 500 Server Error | Unexpected error occurred on the server             |\n\n## Error Handling\nIf the response was unsuccessful, an errors array will be returned along with a generic message:\n\n```json\n{\n    \"message\": \"\",\n    \"errors\": [{\n        \"uuid\": \"1a4d81f1-39b0-4734-ad76-46f093895e5a\",\n        \"code\": \"2000\",\n        \"message\": \"Message does not exist.\"\n    }]\n}\n```\n`uuid` is a unique ID for purposes of tracing the error, while `code` and `message` map to the error codes below.\n\n### Error Codes\n\nHere is a list of error codes and descriptions returned by our API:\n\n| Error Code | Description                                             |\n|------------|---------------------------------------------------------|\n| 2000       | Document does not exist.                                |\n| 3000       | Access forbidden to document.                           |\n| 3001       | User does not have the permission for requested action. |\n\n\n# Authentication\n\nFor information about Authentication, visit our [official documentation](https://platform.hootsuite.com/docs/api/index.html#tag/Authentication).\n\n# Pagination\n\nRequests that return multiple items will be paginated to 30 items by default. You can specify further pages with the `page` parameter and number of items per page with `per_page` parameter. Maximum allowed per page is 100.\n\n```sh\ncurl \"https://platform.hootsuite.com/amplify/v1/me/messages?page=2&per_page=100\"\n```\n\nNote that page numbering starts with 1 and omitting the `page` parameter will return the first page.\n\n### Link Header\n\nEvery valid request to a resource endpoint is responded with a [Link header]((http://tools.ietf.org/html/rfc5988)) which includes pagination information. You should form calls with these `Link` header values instead of constructing your own URLs:\n\n    Link: <https://platform.hootsuite.com/amplify/v1/me/messages?page=3&per_page=30>; rel=\"next\",\n          <https://platform.hootsuite.com/amplify/v1/me/messages?page=9&per_page=30>; rel=\"last\"\n\n*Note that this example includes a line break for readability, the actual response doesn't.*\n\nThis `Link` response header contains one or more [Hypermedia](/v3/#hypermedia) link relations, some of which may require expansion as [URI templates](http://tools.ietf.org/html/rfc6570).\n\nThe possible `rel` values are:\n\n| Name  | Description                                                   |\n|-------|---------------------------------------------------------------|\n| next  | The link relation for the immediate next page of results.     |\n| last  | The link relation for the last page of results.               |\n| first | The link relation for the first page of results.              |\n| prev  | The link relation for the immediate previous page of results. |\n\n\nContact Support:\n Name: Hootsuite, Amplify Team\n Email: amplify.devs@hootsuite.com",
+      "type": "text/plain"
+    }
+  }
+}

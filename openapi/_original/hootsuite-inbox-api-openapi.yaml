@@ -1,0 +1,3201 @@
+openapi: 3.1.0
+info:
+  title: Inbox 2.0 API Reference
+  description: Inbox 2.0 API Reference
+  version: v1
+  x-logo:
+    url: static/hootsuite-logo.png
+  contact:
+    email: dev.support@hootsuite.com
+  license:
+    name: Hootsuite Developer Terms and API License Agreement
+    url: https://hootsuite.com/legal/dev-api-terms
+servers:
+  - url: https://platform.hootsuite.com
+    description: Inbox 2.0 production server
+x-tagGroups:
+  - name: General
+    tags:
+      - rest-api-authentication
+  - name: CRM API
+    tags:
+      - crm_introduction
+      - crm_webhooks
+      - crm_rest_api
+  - name: Virtual Agent API
+    tags:
+      - vai_introduction
+      - vai_webhooks
+      - vai_rest_api
+  - name: Real-time metrics API
+    tags:
+      - real_time_metrics_introduction
+      - real_time_metrics_rest_api
+  - name: User Presence API
+    tags:
+      - user_presence_introduction
+      - user_presence_rest_api
+  - name: Queue API
+    tags:
+      - queue_introduction
+      - queue_rest_api
+  - name: Proactive messaging API
+    tags:
+      - proactive_messaging_introduction
+      - proactive_messaging_rest_api
+  - name: Messenger SDK
+    tags:
+      - messenger_introduction
+      - messenger_web_sdk
+tags:
+  - name: rest-api-authentication
+    x-displayName: REST API authentication
+    description: |
+      Follow the steps below to make an authenticated API request.
+
+      # 1. Request client credentials
+
+      ### Step 1: Create your OAuth 2.0 app
+      Follow [these steps](https://developer.hootsuite.com/docs/getting-started-with-the-rest-api) to set up your app and retrieve your client credentials (`client_id` and `client_secret`):
+
+      ### Step 2: Retrieve the appId of your newly created app
+      1. Go to your [Hootsuite Developer Apps](https://hootsuite.com/developers/my-apps) dashboard.
+      2. Select `edit` for your newly created app.
+      3. You can find the appId in the `appId` parameter of the browser URL. Ex: `https://hootsuite.com/developers/my-apps/app-directory/app/edit?appId=XXXXXX`
+
+      ### Step 3: Retrieve the organization ID of your Hootsuite organization
+      1. Sign in into your [Hootsuite account](https://hootsuite.com).
+      2. Select `My profile > Manage accounts and teams`.
+      3. Select `Teams` for your organization.
+      5. You can find the organization ID in the id query parameter in your browser's address bar.
+      ```
+      https://hootsuite.com/dashboard#/organizations/teams/?id=<your_organization_id>
+      ```
+
+      ### Step 4: Request to link your organization to your app
+      1. Add a member to your org that is not a paying member
+      2. Make sure they have at least admin permission level
+      3. Send an email to the Development Support Team to link your organization to your app:
+        - To: `dev.support@hootsuite.com`
+        - Include: 
+         - the `appId` you retrieved in *Step 2*
+         - the `organization ID` you retrieved in *Step 3*
+         - the `member ID` of the non-paying admin member
+      4. Wait for the Development Support Team to link your app to your organization.
+
+
+      # 2. Generate an access token
+
+      When the developer app is correctly set up, you can use your `client_id` and `client_secret` to retrieve an `access_token` to make authorized API requests.
+      When the `access_token` expires, use the [/oauth2/token](#operation/oauthToken) to generate a new token.
+
+      This endpoint requires that you pass in your client credentials (`client_id` and `client_secret`) using the HTTP Basic authentication scheme as described in the [OAuth 2.0 specification](https://datatracker.ietf.org/doc/html/rfc6749#section-2.3.1).
+      Including your client credentials in the request-body is not supported.
+
+      When the `access_token` expires, the API returns a 401 unauthorized. The client can automate this by generating a new access
+      token and replaying the failed request with the fresh access token, as described in the following section.
+
+
+
+      # 3. Include the access token as a bearer token Authorization header
+
+      Add the bearer token in the Authorization header
+
+      ```text
+      Authorization: Bearer <your_access_token>
+      ```
+
+      Example request with token
+
+      ```shell
+      $ curl -X GET https://platform.hootsuite.com/inbox/v1/reporting/metrics/agent-availability \ 
+         -H 'Authorization: Bearer oZy8FDUHEiZ0mh0j4rUwOT9t5yHouTzBDsn-x_GROB0.rz-pMQzh-1F6VIGwnJZMBwH3SRwDfEHE4CRi-AClpcg'
+      ```
+  - name: crm_introduction
+    x-displayName: Introduction
+    description: |
+      Inbox 2.0 CRM integration allows you to pull customer contact data from CRMs or other internal business applications into Inbox 2.0. To integrate your CRM with Inbox 2.0, you need to provide an HTTPS endpoint for lookups. You can also provide an optional HTTPS endpoint for handling write back requests and an HTTP endpoint for Inbox 2.0 to send notifications from our application to your CRM.
+  - name: crm_webhooks
+    x-displayName: Webhooks
+    description: |
+      ### Webhook authentication
+
+      When receiving data from Inbox 2.0, we provide two authentication options. Both mechanisms are in place so that you can make sure the request originates from Inbox 2.0.
+
+      #### Shared secret
+
+      If you choose the shared secret authentication method, a secret will be generated for you. This secret allows you to calculate the signature to verify that the call originated from Inbox 2.0. With this mechanism, every single request from Inbox 2.0 contains the `X-Hootsuite-Signature` header. Here's an example of a request:
+
+      ```shell
+      curl -X POST https://my-webhook-url \
+        -H 'content-type : application/json' \
+        -H 'accept: application/json' \
+        -H 'X-Hootsuite-Signature: e6f93239a06e46ae9654fc9ad2fb4e1cc4eb213830a0d94e711570c047e43c57' \
+        -d '{
+              "version": 2,
+              "contactProfile": {
+                "id": "a7a20053-9c54-11eb-a89f-47717a44c639"
+              },
+              "contactAttributes": [
+                {"attribute": "email", "value": "fj@example.com"}
+              ]
+            }'
+      ```
+
+      The signature is generated using the `HMAC-SHA256` algorithm with the shared secret and the request body. 
+      Use your secret to calculate the signature and compare with the given signature. 
+      Both the secret key you received and the signature are encoded as hexadecimal strings. 
+      Make sure to convert the shared secret from its hexadecimal representation to its binary format before using it. 
+      Most languages come with libraries out of the box to verify this signature. 
+      For example, here's how it looks in JavaScript:
+
+      ```javascript
+      const crypto = require("crypto");
+      const secret = "..."; // do not share!
+      const expectedSignature = request.headers["X-Hootsuite-Signature"];
+      const actualSignature = crypto
+          .createHmac("sha256", Buffer.from(secret, "hex"))
+          .update(request.body, "utf-8")
+          .digest("hex");
+      if (actualSignature !== expectedSignature) {
+          throw new createError.Unauthorized("X-Hootsuite-Signature wrong");
+      }
+      console.log(JSON.parse(request.body).email);
+      ```
+
+      #### OAuth
+
+      If your endpoints support OAuth2, you can configure your client credentials, a Token URL, and, optionally, a Scope in Inbox 2.0.
+
+      We use the OAuth2 Client Credentials flow to authenticate against your CRM. The Token URL is the endpoint where we can authenticate with these credentials and retrieve an access token. To do the actual lookup, write back, or notification requests, we use the token in the Authorization Header to authenticate.
+  - name: crm_rest_api
+    x-displayName: REST API
+    description: |
+      If you want to update contact attributes asynchronously, you'll need to call the Contact API.
+      When calling the Contact API, the client needs to be authenticated.
+
+      The [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client. 
+  - name: vai_introduction
+    x-displayName: Introduction
+    description: |
+      Inbox 2.0 virtual agents allow enterprises to add bots to the platform as if they were real agents. They can respond
+      to incoming messages, resolve conversations, apply topics, and set contact attributes. Instead of limiting the bot
+      platforms that can be integrated, we provide a generic API that you can use to integrate with any platform.
+
+      To integrate your favorite bot platform with Inbox 2.0, you will need to provide an HTTPS endpoint. Inbox 2.0
+      calls this endpoint every time a conversation is assigned to your virtual agent and whenever the contact sends a new
+      message. If you're using a synchronous bot platform, you can immediately answer this request with the response. If
+      you're using an asynchronous bot platform, you can also send a POST request to Inbox 2.0 to send a reply to a
+      conversation.
+
+      ![](static/virtual-agent-api.png)
+
+      # Two types of virtual agents
+
+      ### Inception
+
+      An inception virtual agent automatically picks up private conversations that start in the channels it has access to. If
+      an inception virtual agent needs a human agent, it will place the conversation in the New queue so that any agent can
+      respond. The inception virtual agent can also resolve a conversation if no human assistance is required.
+
+      Because an inception virtual agent automatically picks up conversations in the channel it has access to, you cannot
+      create multiple inception virtual agents that have access to the same channel.
+
+      ### Delegation
+
+      A delegation virtual agent will not automatically pick up conversations. Instead, a human agent can give a conversation
+      to a delegation virtual agent at any point in the conversation. The delegation virtual agent will take over at this
+      point. The handoff rule determines what should happen if a delegation virtual agent needs a human agent. If "New queue"
+      is selected, the conversation moves to the New queue to be picked up by any agent. If "previous agent" is selected, the
+      delegation virtual agent assigns the conversation back to the previous human agent.
+
+      Multiple delegation virtual agents can have access to the same channel. A human agent must specifically select the
+      virtual agent to take over the conversation.
+
+      # Add a virtual agent
+
+      To add a virtual agent:
+        
+        1. Go to `Admin settings`, expand `Virtual agents`, select `Custom virtual agents`, and then
+        select `Add custom virtual agent`.
+        2. Enter a name for the virtual agent. This name will appear in Inbox 2.0 as "{Name} VA".
+        3. Specify whether you want your virtual agent to be activated as an `Inception` agent or a `Delegation` agent.
+        4. The Webhook URL must be provided to properly send conversation information to your virtual agent (see the Webhooks
+        section for more information).
+        5. Fill out the remaining fields as you like, including any handoff rules you want to add.
+        6. Select `Save`.
+        7. Scroll down to the `Channel access` section, and use the toggles to select a channel or channels where this virtual
+        agent can be accessed.
+
+      ### Timeout virtual agent
+
+      You can configure two types of contact rules for virtual agents:
+
+        - Timeout virtual agent - Determines when a handoff (to the New or Resolved queue) will occur if the auto responder stops responding for any reason. The maximum you can set is 1 hour.
+        - Timeout contact - Determines when a handoff will occur if the contact stops responding. The maximum you can set is 23 hours.
+
+      #### Error handling
+
+      If the virtual agent connection times out, an error occurs, or if the contact times out, you can do the following:
+
+        - Mark the conversation as New or Resolved
+        - Automatically apply a topic
+        - If the conversation is marked as Resolved, automatically send a standard reply to the customer
+
+      ### Edit or delete a virtual agent
+        
+      To edit a virtual agent, on the `Custom virtual agents` page, select the `Edit` icon. To delete a virtual agent, select
+      the `Trash` icon.
+
+      ### View the secret for a virtual agent
+
+      On the `Custom virtual agents` page, select the `Edit` icon next to the virtual agent. You can view or copy the shared
+      secret generated for this virtual agent on the `Edit custom virtual agent` page. See the Securing webhooks section for
+      more information.
+  - name: vai_webhooks
+    x-displayName: Webhooks
+    description: |
+      ### Webhook authentication
+
+      When setting up a virtual agent, you received a secret key that you can use to verify whether an incoming webhook
+      request really comes from Inbox 2.0 without alterations. In the request headers of each webhook call is the
+      `X-Hootsuite-Signature`. This contains an `HMAC-SHA256` signature based on the body of the request. 
+      Both the secret key you received and the signature are encoded as hexadecimal strings. 
+      Most languages come with libraries out of the box to verify this signature. 
+      Here is some sample code to verify it in Node.js:
+
+      ```javascript
+      const secret = "..."; // do not share!
+      const expectedSignature = request.headers["X-Hootsuite-Signature"];
+      const actualSignature = crypto
+      .createHmac("sha256", Buffer.from(secret, "hex"))
+      .update(request.body, "utf-8")
+      .digest("hex");
+      if (actualSignature !== expectedSignature) {
+      throw new createError.Unauthorized("X-Hootsuite-Signature wrong");
+      }
+      ```
+
+      Note: Make sure you calculate the signature off the body as is, before you deserialize it from JSON. 
+      During the calculation of the signature, all white space is considered significant.
+
+      As part of the request body, you will find a timestamp. This is the time a request was sent. To prevent replay attacks,
+      we recommend verifying that this timestamp is no older than 5 minutes:
+
+      ```javascript
+      if (moment(JSON.parse(request.body).timestamp).isBefore(moment().subtract(5, "minutes"))) {
+        throw new createError.Unauthorized("Request too old");
+      }
+      ```
+
+      ### Events
+
+      When a conversation is assigned to the virtual agent you registered in the previous section, Inbox 2.0 sends you an event via the URL you configured.
+
+      Three important events are sent:
+
+        - `CONVERSATION_STARTED`
+        - `CONVERSATION_DELEGATED`
+        - `INBOUND_MESSAGE_RECEIVED`
+
+      ### Common fields
+
+      All events have certain common fields:
+
+        - type: A string that defines what kind of event occurred (currently `CONVERSATION_STARTED`, `CONVERSATION_DELEGATED`, or `INBOUND_MESSAGE_RECEIVED`). 
+          New events can be added in the future. Avoid responding with an error to unknown
+          values; instead, ignore them. Depending on this type, the structure of data will be different.
+        - version: A number designating the version of the type of request. Currently, the version is always 1. Versions will be
+          used in the future for introducing non-backward-compatible changes.
+        - idempotencyKey: A string that uniquely identifies each event. When a timeout occurs when sending you the event, (or we
+          receive an error response), we will retry the event. This key can help you to ensure that a request is processed only
+          once.
+        - timestamp: The timestamp when we sent the request. This is used to counter possible replay attacks.
+        - data: An object that contains structured data for the specific type. For example, an `INBOUND_MESSAGE_RECEIVED` type
+          event has fields such as `conversationId` and `message`. Fields may be added in the future.
+
+      ### Requirements
+
+      To provide a good customer experience, some non-functional requirements are imposed on the webhook. When a webhook is
+      sent, you have 10 seconds to respond with a 200 OK. If a timeout occurs, we will retry 3 times using an exponential
+      backoff (up to 2 seconds). If the failures persisted during the retries, the assigned conversation will be handed over
+      to a human agent by placing it in the New queue.
+
+      When the contact sends a message through Inbox 2.0, by default we expect the virtual agent to reply to that message
+      within 5 minutes (using either the response to the webhook call or the REST API). You can configure the timeout on the
+      settings page for your virtual agent (Timeout virtual agent). If the virtual agent does not answer the contact, by
+      default the conversation is placed in the New queue for a human agent to pick up. This can also be configured
+      in `Settings`. If you prefer, you can automatically resolve the conversation and send a message to the contact (such
+      as "Please try again in a little while"). The virtual agent could also decide to immediately return control by
+      sending `RESOLVED` or `HANDOVER` in the `complete` field.
+
+      Similarly, after a `CONVERSATION_DELEGATED` event, your virtual agent has 5 minutes to pose a question to the contact by
+      default. If the virtual agent fails to do this, the conversation is handed back to the previous owner of the
+      conversation or placed in the New queue, depending on the handoff rule.
+
+      ### Response
+
+      Your response to the webhook should be a status `200 OK`. In the body, you can return the response you want to send to the contact:
+        
+        ```json
+        {
+          "sendMessage": {
+            "text": "Hi! How can I help you?",
+            "attachment": "funny_cat.gif"
+          },
+          "applyTopics": [
+            "Hotel Reservation"
+          ],
+          "applyTags": [
+            "Happy"
+          ],
+          "setContactAttributes": {
+            "account_number": "19758293529351"
+          },
+          "complete": "HANDOVER"
+        }
+        ```
+
+      - sendMessage: (Optional) The message you want to send to the contact. You can send only text, only an attachment, or
+        both at the same time. If you want to send an attachment, you must upload it first, so we recommend using the
+        asynchronous flow.
+      - applyTopics: (Optional) The list of topics you want to apply to the conversation (the intent or action that your
+        Virtual Agent matched). Topics that do not exist in Inbox 2.0 will be ignored.
+      - applyTags: The list of tags you want to apply to the message from the contact. Tags that do not exist in Inbox 2.0
+        will be ignored. It's only possible to use `applyTags` in response to an `INBOUND_MESSAGE_RECEIVED`. It's also
+        possible to tag a specific message by specifying the `messageId`. In that case you can respond
+        using 
+        
+        ```json
+        {
+          "applyTags": [{
+              "messageId": "cc75552a-1a78-11e9-855e-6d1e71016abf", 
+              "tag": "Happy"
+            }]
+        }
+        ```
+      - setContactAttributes: The attributes you want to set on a contact. The object is a map between the attribute
+        definition's alias and value to set.
+      - complete: (Optional) This can be either `HANDOVER` if you want to give the conversation to another agent,
+        or `RESOLVED` if you want to resolve the conversation. When you pass HANDOVER, the handoff rule you configured in
+        settings determine what will happen next. If the handoff rule is "No one," the conversation is placed in the New
+        queue without an owner. Any human agent can pick up the conversation. If the rule has been set to "Previous agent,"the
+        conversation will be assigned back to the previous human agent. If there was no previous agent, the conversation is
+        placed in the New queue without an owner.
+        
+        If you are integrating with an asynchronous bot platform, you can simply return an empty JSON body {} and send this
+        message using a POST request. We also recommend using the REST API when you want to send an attachment. You can respond
+        with {}, upload an attachment using a PUT request, and then send the attachment using a POST request.
+  - name: vai_rest_api
+    x-displayName: REST API
+    description: |
+      If you want to send the replies asynchronously or manipulate the conversation in your fulfillment code, you'll need to
+      call the Virtual Agent REST API. 
+
+      The [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client. 
+  - name: real_time_metrics_introduction
+    x-displayName: Introduction
+    description: |
+      The Real-time Metrics API gives you direct access to real-time metrics in the Inbox 2.0 platform via a convenient and
+      secure REST API. The API provides Inbox 2.0 customers a means to integrate with internal contact center dashboards in
+      conjunction with other traditional and/or digital communication channels such as phone, email, live chat, etc.
+
+      ### Use cases
+      If you are building software, you can use the API to engage your customers by displaying current wait time to customers in a mobile application or website.
+
+      If you're a business, you can use the API to streamline internal business processes by:
+      - Displaying current backlog and key metrics on digital channels alongside other contact center mediums on real-time
+        dashboards maintained internally.
+      - Keeping internal stakeholders informed by reporting on hourly trends in volume and backlog statistics across digital
+        channels, to efficiently route agents to another channel if volume spikes.
+  - name: user_presence_introduction
+    x-displayName: Introduction
+    description: |
+      The User Presence API gives you direct access to an overview of online agents in the Inbox 2.0 platform via a 
+      convenient and secure REST API.
+
+      The API provides Inbox 2.0 customers a means to integrate with internal contact center dashboards in
+      conjunction with other traditional and/or digital communication channels such as phone, email, live chat, etc.
+  - name: user_presence_rest_api
+    x-displayName: REST API
+    description: |
+      When calling the User Presence API, the client needs to be authenticated.
+
+      The [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client.
+  - name: queue_introduction
+    x-displayName: Introduction
+    description: |
+      The Queue API gives you direct access to an overview of conversations with the agent that locked the conversation 
+      in the Inbox 2.0 platform via a convenient and secure REST API.
+
+      The API provides Inbox 2.0 customers a means to integrate with internal contact center dashboards in
+      conjunction with other traditional and/or digital communication channels such as phone, email, live chat, etc.
+  - name: queue_rest_api
+    x-displayName: REST API
+    description: |
+      When calling the Queue API, the client needs to be authenticated.
+
+      The [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client.
+  - name: real_time_metrics_rest_api
+    x-displayName: REST API
+    description: |
+      When calling the Real-time Metrics API, the client needs to be authenticated.
+
+      The [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client.
+  - name: proactive_messaging_introduction
+    x-displayName: Introduction
+    description: |
+      ### What is proactive messaging?
+
+      Proactive messaging allows enterprises to reach out preemptively to customers, ensuring higher satisfaction and loyalty. 
+      Typical use cases include appointment reminders, delivery confirmations, shipping updates, order tracking, etc. 
+      With our convenient and secure RESTful API, enterprises can send proactive messages to their customers.
+
+      Hootsdesk's Proactive Messaging API allows you to:
+
+      -   Send messages in real-time to your customers for supported media, including message templates on WhatsApp.
+      -   Follow up on the status of sent messages.
+      -   Retrieve detailed information about reasons for failures.
+
+      ### Supported media
+
+      You can use Inbox 2.0 to send proactive messages on:
+
+      -   WhatsApp
+
+      ### Rate limit
+
+      The Proactive Messaging API is rate-limited to 60 messages per minute per organization. Enterprises exceeding these limits receive an error and must re-send any failed messages.
+
+      ### Metadata
+
+      When sending a proactive message, you can pass along custom information that is stored in Inbox 2.0. This data can then be exported. Please contact `dev.support@hootsuite.com` to add metadata to the Messages export. For example, when you send an appointment confirmation to your customer, you can pass along a unique identifier. You can then download the Messages export from Inbox 2.0, and determine how many unique customers are responding to your outbound notification.
+
+      Example code:
+
+      ```json
+      {
+        "contact": "+32123456789",
+        "text": "This is a message with metadata",
+        "medium": "WHATSAPP",
+        "channel": "Inbox 2.0 WA Channel",
+        "metadata": {
+          "customerID": "ABC123",
+          "Source": "IVR"
+        }
+      }
+      ```
+  - name: proactive_messaging_rest_api
+    x-displayName: REST API
+    description: |
+      When calling the Proactive Messaging API, the client needs to be authenticated.  
+
+      The [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client.
+
+      ### Examples
+
+      1. Send a proactive text message
+
+      The following example shows a proactive outbound message that can be sent as a text message. Inbox 2.0 supports text messaging on WhatsApp
+      Enterprises are responsible for ensuring that the customers have opted-in for proactive communications.
+
+      Request
+
+      ```shell
+      curl -X POST https://platform.hootsuite.com/inbox/v1/proactive-messaging/ \
+        -H 'Authorization: Bearer <token>' \
+        -H 'Content-Type: application/json' \
+        -d '{ "medium": "WHATSAPP", "channel": "myChannel", "contact": "+32495123456", "text": "Hello world!" }'
+      ```
+
+      Response `200`
+
+      ```json
+      {
+        "correlationId": "3a7c6c1d-9f9b-11e8-b23b-6f13d5844b66"
+      }
+      ```
+
+      2. Send a proactive message template (WhatsApp)
+
+      WhatsApp allows for proactive outbound communication when these are sent as message templates that have been authorized by WhatsApp. These templates have a name, corresponding text, and substitution parameters within the text to make them personalized.
+      Inbox 2.0 has simplified how enterprises can send out these message templates through the use of shorthand codes for inline syntax:
+
+      ```text
+      &((namespace=[[NAMESPACE]] template=[[TEMPLATE NAME]] fallback=[[FALLBACK TEXT]] language=[[LANGUAGE]] body_text=[[VARIABLE1]] body_text=[[VARIABLE2]]))&
+      ```
+
+      | Parameter name | Parameter description                                                                                                      | Required  |
+      |----------------|----------------------------------------------------------------------------------------------------------------------------|-----------|
+      | namespace      | Unique code provided by WhatsApp while defining message templates.                                                         | true      |
+      | template       | Name of the template provided on WhatsApp Manager.                                                                         | true      |
+      | fallback       | We recommend setting the same value as the Template name here.                                                             | true      |
+      | language       | The language in which the messages should be sent. The language needs to be defined in the WhatsApp Manager.               | true      |
+      | body_text      | The variable text. 0, 1, or multiple variables in a message. Per variable, there needs to be a body_text parameter.        | true      |
+
+      The language codes can be found on: <https://developers.facebook.com/docs/whatsapp/message-templates/creation>
+
+      Enterprises construct the messages in shorthand and send it in the text field as shown in the following code.
+
+      Request
+
+      ```shell
+      curl -X POST https://platform.hootsuite.com/inbox/v1/proactive-messaging/ \
+        -H 'Authorization: Bearer <token>' \
+        -H 'Content-Type: application/json' \
+        -d '{ "medium": "WHATSAPP", "channel": "myChannel", "contact": "+32495123456", "text": "&((namespace=[[3c860f8b_1ae3_1105_b9ea_647e69aa2d49]] template=[[welcome_customer]] fallback=[[welcome_customer]] language=[[en]] body_text=[[Gregory]] body_text=[[How can I help you?]]))&" }'
+      ```
+
+      Response `200`
+
+      ```json
+      {
+        "correlationId": "3a7c6c1d-9f9b-11e8-b23b-6f13d5844b66"
+      }
+      ```
+
+      3. Get status overview
+
+      Request
+
+      ```shell
+      curl -X GET https://platform.hootsuite.com/inbox/v1/proactive-messaging/3a7c6c1d-9f9b-11e8-b23b-6f13d5844b66 \
+        -H 'Authorization: Bearer '
+      ```
+
+      Response `200`
+
+      ```json
+      {
+        "correlationId": "3a7c6c1d-9f9b-11e8-b23b-6f13d5844b66",
+        "total": 1,
+        "statuses": {
+          "SENT": 1
+        }
+      }
+      ```
+
+      4. Get status details
+
+      Request
+
+      ```shell
+      curl -X GET https://platform.hootsuite.com/inbox/v1/proactive-messaging/f988bd0f-9f9d-11e8-b23b-7d351b0c7ce9/FAILED \
+        -H 'Authorization: Bearer '
+      ```
+
+      Response 200
+
+      ```json
+      [
+        {
+          "status": "FAILED",
+          "contact": "+32495123456",
+          "reason": "No channel found for medium TWIT"
+        }
+      ]
+      ```
+  - name: messenger_introduction
+    x-displayName: Introduction
+    description: |
+      The Inbox Web Messenger SDK allows you to implement a customizable, fully featured messenger on your website. Any customer who visits your website or uses your app can contact your support team directly, eliminating the need for your users to use Facebook, WhatsApp, or any other messaging platform.
+
+      ### Create your channel
+      Please email customer support (`dev.support@hootsuite.com`) to add a new messenger channel.
+  - name: messenger_web_sdk
+    x-displayName: Web Messenger SDK
+    description: |
+      ## Implement Messenger on your website
+
+      ### Get started
+
+      The following steps are required to get Messenger to appear on your website.
+
+      #### Step 1: Add the following code toward the end of the `<head>` section on your page. 
+
+      > **Attention:** Make sure to copy all the code below
+
+      ```html
+       <script>
+          !function(e,t,n,o){var r,s,c,a=[],i=[];e[n]={init:function(){r=arguments;var e={then:function(t){return i.push({type:"t",next:t}),e},catch:function(t){return i.push({type:"c",next:t}),e}};return e},on:function(){a.push(arguments)},render:function(){s=arguments},destroy:function(){c=arguments}},e.__onWebMessengerHostReady__=function(t){if(delete e.__onWebMessengerHostReady__,e[n]=t,r)for(var o=t.init.apply(t,r),p=0;p<i.length;p++){var u=i[p];o="t"===u.type?o.then(u.next):o.catch(u.next)}for(s&&t.render.apply(t,s),c&&t.destroy.apply(t,c),p=0;p<a.length;p++)t.on.apply(t,a[p])};try{var p=t.getElementsByTagName("script")[0],u=t.createElement("script");u.async=!0,u.src="https://assets.hootsuite.com/sdk/messenger/web/"+o+"/webmessenger."+o+".min.js",p.parentNode.insertBefore(u,p)}catch(e){console.error(e)}}(window,document,"WebMessenger","2.6.9");
+       </script>
+       ```
+
+      #### Step 2: Paste the following initialization code toward the end of the `<body>` section.
+      This initializes a basic Web Messenger without any special customizations. Customizations are described in the next section.
+
+      <details>
+        <summary>Initialization script</summary>
+
+        On the third line, insert your specific channel Integration ID. This is one of the pieces of text that is generated on channel creation and will be provided by customer support when the channel is set up.
+
+        ```html
+        <script>
+          var initPromise = WebMessenger.init({
+            integrationId: 'Integration ID here',
+            // This makes sure the customer is not able to create multiple conversations.
+            canUserCreateMoreConversations: false,
+            canUserSeeConversationList: false,
+            
+            customColors: {
+              brandColor: '65758e',
+              conversationColor: '65758e',
+              actionColor: '65758e',
+            },
+            menuItems: {
+              imageUpload: true,
+              fileUpload: true,
+              shareLocation: true
+            },
+            fixedHeader: false,
+            customText: {
+              actionPaymentCompleted: 'Payment Completed',
+              actionPaymentError: 'An error occurred while processing the card. <br> Please try again or use a different card.',
+              actionPostbackError: 'An error occurred while processing your action. Please try again.',
+              clickToRetry: 'Message not delivered. Click to retry.',
+              clickToRetryForm: 'Form not submitted. Click anywhere on the form to retry.',
+              connectNotificationText: 'Sync your conversation and continue messaging us through your favorite app.',
+              connectNotificationSingleText: 'Be notified when you get a reply.',
+              conversationListHeaderText: 'My conversations',
+              conversationListPreviewAnonymousText: 'Someone',
+              conversationListPreviewCarouselText: '{user} sent a message',
+              conversationListPreviewFileText: '{user} sent a file',
+              conversationListPreviewFormText: '{user} sent a form',
+              conversationListPreviewFormResponseText: '{user} filled a form',
+              conversationListPreviewImageText: '{user} sent an image',
+              conversationListPreviewLocationRequestText: '{user} sent a location request',
+              conversationListPreviewUserText: 'You',
+              conversationListRelativeTimeJustNow: 'Just now',
+              conversationListRelativeTimeMinute: '1 minute ago',
+              conversationListRelativeTimeMinutes: '{value} minutes ago',
+              conversationListRelativeTimeHour: '1 hour ago',
+              conversationListRelativeTimeHours: '{value} hours ago',
+              conversationListRelativeTimeYesterday: 'Yesterday',
+              conversationListTimestampFormat: 'MM/DD/YY',
+              conversationTimestampHeaderFormat: 'MMMM D YYYY, h:mm A',
+              couldNotConnect: 'Offline. You will not receive messages.',
+              couldNotConnectRetry: 'Reconnecting...',
+              couldNotConnectRetrySuccess: "You're back online!",
+              couldNotLoadConversations: 'Couldn’t load conversations.',
+              emailChangeAddress: 'Change my email',
+              emailDescription: 'To be notified by email when you get a reply, enter your email address.',
+              emailFieldLabel: 'Email',
+              emailFieldPlaceholder: 'Your email address',
+              emailFormButton: 'Submit',
+              emailLinkingErrorMessage: 'Please submit a valid email address.',
+              fetchHistory: 'Load more',
+              fetchingHistory: 'Retrieving history...',
+              fileTooLargeError: 'Max file size limit exceeded ({size})',
+              fileTypeError: 'Unsupported file type.',
+              formErrorInvalidEmail: 'Email is invalid',
+              formErrorNoLongerThan: 'Must contain no more than ({characters}) characters',
+              formErrorNoShorterThan: 'Must contain at least ({characters}) characters',
+              formErrorUnknown: 'This doesn\'t look quite right',
+              formFieldSelectPlaceholderFallback: 'Choose one...',
+              frontendEmailChannelDescription: 'To talk to us using email just send a message to our email address and we\'ll reply shortly:',
+              headerText: 'How can we help?',
+              imageClickToReload: 'Click to reload image.',
+              imageClickToView: 'Click to view {size} image.',
+              imagePreviewNotAvailable: 'Preview not available.',
+              inputPlaceholder: 'Type a message...',
+              inputPlaceholderBlocked: 'Complete the form above...',
+              introAppText: 'Message us below or from your favorite app.',
+              lineChannelDescription: 'To talk to us using LINE, scan this QR code using the LINE app and send us a message.',
+              linkChannelPageHeader: 'Sync your conversation',
+              linkError: 'An error occurred when attempting to generate a link for this channel. Please try again.',
+              locationNotSupported: 'Your browser does not support location services or it’s been disabled. Please type your location instead.',
+              locationSecurityRestriction: 'This website cannot access your location. Please type your location instead.',
+              locationSendingFailed: 'Could not send location',
+              locationServicesDenied: 'This website cannot access your location. Allow access in your settings or type your location instead.',
+              messageIndicatorTitlePlural: '({count}) New messages',
+              messageIndicatorTitleSingular: '({count}) New message',
+              messageRelativeTimeDay: '{value}d ago',
+              messageRelativeTimeHour: '{value}h ago',
+              messageRelativeTimeJustNow: 'Just now',
+              messageRelativeTimeMinute: '{value}m ago',
+              messageTimestampFormat: 'h:mm A',
+              messageDelivered: 'Delivered',
+              messageSeen: 'Seen',
+              messageSending: 'Sending...',
+              messengerChannelDescription: 'Connect your Facebook Messenger account to be notified when you get a reply and continue the conversation on Facebook Messenger.',
+              newConversationButtonText: 'New Conversation',
+              notificationSettingsChannelsDescription: 'Sync this conversation by connecting to your favorite messaging app to continue the conversation your way.',
+              notificationSettingsChannelsTitle: 'Other Channels',
+              notificationSettingsConnected: 'Connected',
+              notificationSettingsConnectedAs: 'Connected as {username}',
+              prechatCaptureGreetingText: 'Hi there \nTo start off, we\'d like to know a little bit more about you:',
+              prechatCaptureNameLabel: 'Your name',
+              prechatCaptureNamePlaceholder: 'Type your name...',
+              prechatCaptureEmailLabel: 'Email',
+              prechatCaptureEmailPlaceholder: 'name@company.com',
+              prechatCaptureConfirmationText: 'Thanks for that! What can we help you with?',
+              prechatCaptureMailgunLinkingConfirmation: 'You\'ll be notified here and by email at {email} once we reply.',
+              sendButtonText: 'Send',
+              settingsHeaderText: 'Settings',
+              shareLocation: 'Location',
+              smsBadRequestError: 'We were unable to communicate with this number. Try again or use a different one.',
+              smsCancel: 'Cancel',
+              smsChangeNumber: 'Change my number',
+              smsChannelDescription: 'Connect your SMS number to be notified when you get a reply and continue the conversation over SMS.',
+              smsChannelPendingDescription: 'Check your messages at {number} to confirm your phone number.',
+              smsContinue: 'Send',
+              smsInvalidNumberError: 'Please submit a valid phone number.',
+              smsLinkCancelled: 'Link to {appUserNumber} was cancelled.',
+              smsLinkPending: 'Pending',
+              smsPingChannelError: 'There was an error sending a message to your number.',
+              smsSendText: 'Send me a text',
+              smsStartTexting: 'Start Texting',
+              smsTooManyRequestsError: 'A connection for that number was requested recently. Please try again in {minutes} minutes.',
+              smsTooManyRequestsOneMinuteError: 'A connection for that number was requested recently. Please try again in 1 minute.',
+              smsUnhandledError: 'Something went wrong. Please try again.',
+              syncConversation: 'Sync conversation',
+              tapToRetry: 'Message not delivered. Tap to retry.',
+              tapToRetryForm: 'Form not submitted. Tap anywhere on the form to retry.',
+              telegramChannelDescription: 'Connect your Telegram account to be notified when you get a reply and continue the conversation on Telegram',
+              uploadDocument: 'File',
+              uploadInvalidError: 'Invalid file',
+              uploadPhoto: 'Image',
+              uploadVirusError: 'A virus was detected in your file and it has been rejected',
+              unsupportedMessageType: 'Unsupported message type.',
+              unsupportedActionType: 'Unsupported action type.',
+              viberChannelDescription: 'Connect your Viber account to be notified when you get a reply and continue the conversation on Viber. To get started, scan the QR code using the Viber app.',
+              viberChannelDescriptionMobile: 'Connect your Viber account to be notified when you get a reply and continue the conversation on Viber. To get started, install the Viber app and tap Connect.',
+              viberQRCodeError: 'An error occurred while fetching your Viber QR code. Please try again.',
+              wechatChannelDescription: 'Connect your WeChat account to be notified when you get a reply and continue the conversation on WeChat. To get started, scan this QR code using the WeChat app.',
+              wechatChannelDescriptionMobile: 'Connect your WeChat account to be notified when you get a reply and continue the conversation on WeChat. To get started, save this QR code image and upload it in the <a href=\'weixin://dl/scan\'>QR code scanner</a>.',
+              wechatQRCodeError: 'An error occurred while fetching your WeChat QR code. Please try again.',
+              whatsappChannelDescriptionDesktop: 'Sync your account to WhatsApp by scanning the QR code or clicking the link below.\nThen, send the pre-populated message to validate the sync request. (Your code: {{code}}).',
+              whatsappChannelDescriptionMobile: 'Sync your account to WhatsApp by clicking the link below.\nThen, send the pre-populated message to validate the sync request. (Your code: {{code}}).',
+              whatsappLinkingError: 'An error occurred while fetching your WhatsApp linking information. Please try again.'
+            }
+          }).then(function () {
+            // Your code after init is complete
+          });
+        </script>
+        ```
+
+      </details>
+
+      <details>
+        <summary>Optional functions</summary>
+
+        ```javascript
+        // Opens the conversation widget (NOOP when embedded)
+        WebMessenger.open();
+        
+        // Closes the conversation widget (NOOP when embedded)
+        WebMessenger.close();
+        
+        // Tells if the widget is currently opened or closed.
+        WebMessenger.isOpened();
+        
+        // Logs a user in the Web Messenger, retrieving the conversations the user already had on other browser sessions and/or devices. Note that you don't need to call this after `init` if you already passed the external id and jwt as arguments in the call to `init`, in which case it's done internally as part of the initialization sequence. This returns a `Promise` that resolves when the Web Messenger is ready again.
+        WebMessenger.login('external-id', 'some-jwt');
+        
+        // Logs out the current user and reinitialize the widget with an anonymous user. This returns a promise that resolves when the Web Messenger is ready again.
+        WebMessenger.logout();
+        
+        // Destroys the Web Messenger and makes it disappear. The Web Messenger has to be reinitialized with `init` to be working again because it also clears up the integration id from the Web Messenger. It will also unbind all listeners you might have with `WebMessenger.on`.
+        WebMessenger.destroy();
+        
+        // Sends a message to the targeted conversation on the user's behalf.
+        WebMessenger.sendMessage(
+        {
+          type: 'text',
+          text: 'hello'
+        },
+        '<conversation-id>'
+        );
+        // OR
+        WebMessenger.sendMessage('hello', '<conversation-id>');
+        ```
+
+      </details>
+
+      ## Customize Web Messenger options
+
+      Several options are available for customizing your Web Messenger. The following is an example of a fully customized Web Messenger. Every option used is documented following the code snippet.
+
+      <details>
+        <summary>Customization options</summary>
+
+        ```javascript
+        WebMessenger.init({
+          integrationId: '<integration-id>',
+            // For authenticated mode
+          jwt: 'your_jwt',
+          userId: 'user_id',
+          locale: 'en-US',
+          customColors: {
+            brandColor: '65758e',
+            conversationColor: '65758e',
+            actionColor: '65758e',
+          },
+
+          menuItems: {
+            imageUpload: true,
+            fileUpload: true,
+            shareLocation: true
+          },
+
+          fixedIntroPane: false,
+
+          prechatCapture: {
+            enabled: true,
+            fields: [
+              {
+                type: 'email',
+                name: 'email',
+                label: 'Email',
+                placeholder: 'your@email.com'
+              },
+              {
+                type: 'text',
+                name: 'company-website',
+                label: 'Company website',
+                placeholder: 'mycompany.com'
+              },
+              {
+                type: 'select',
+                name: 'company-size',
+                label: 'Company size',
+                placeholder: 'Choose a number...',
+                options: [
+                  {
+                    name: '1-10',
+                    label: '1-10 employees'
+                  },
+                  {
+                    name: '11-50',
+                    label: '11-50 employees'
+                  },
+                  {
+                    name: '51+',
+                    label: '51+ employees'
+                  }
+                ]
+              }
+            ]
+          },
+          customText: {
+            actionPostbackError: 'An error occurred while processing your action. Please try again.',
+            clickToRetry: 'Message not delivered. Click to retry.',
+            connectNotificationText: 'Be notified inside your other apps when you get a reply.',
+            connectNotificationSingleText: 'Be notified when you get a reply.',
+            connectNotificationSingleButtonText: 'Turn on <name> notifications',
+            connectNotificationOthersText: 'others',
+            conversationTimestampHeaderFormat: 'MMMM D YYYY, h:mm A',
+            fetchHistory: 'Load more',
+            fetchingHistory: 'Retrieving history...',
+            fileTooLargeError: 'Max file size limit exceeded ({size})',
+            fileTypeError: 'Unsupported file type.',
+            headerText: 'How can we help?',
+            imageClickToReload: 'Click to reload image.',
+            imageClickToView: 'Click to view {size} image.',
+            imagePreviewNotAvailable: 'Preview not available.',
+            inputPlaceholder: 'Type a message...',
+            introductionText: 'We\'re here to talk, so ask us anything!',
+            invalidFileError: 'Only images are supported. Choose a file with a supported extension (jpg, jpeg, png, gif, or bmp).',
+            locationNotSupported: 'Your browser does not support location services or it’s been disabled. Please type your location instead.',
+            locationSecurityRestriction: 'This website cannot access your location. Please type your location instead.',
+            locationSendingFailed: 'Could not send location',
+            locationServicesDenied: 'This website cannot access your location. Allow access in your settings or type your location instead.',
+            messageError: 'An error occurred while sending your message. Please try again.',
+            messageIndicatorTitlePlural: '({count}) New messages',
+            messageIndicatorTitleSingular: '({count}) New message',
+            messageRelativeTimeDay: '{value}d ago',
+            messageRelativeTimeHour: '{value}h ago',
+            messageRelativeTimeJustNow: 'Just now',
+            messageRelativeTimeMinute: '{value}m ago',
+            messageTimestampFormat: 'h:mm A',
+            messageSending: 'Sending...',
+            messageDelivered: 'Delivered',
+            prechatCaptureGreetingText: 'Hi there \nTo start off, we\'d like to know a little bit more about you:',
+            prechatCaptureConfirmationText: 'Thanks for that! What can we help you with?',
+            sendButtonText: 'Send',
+            settingsHeaderText: 'Settings',
+            shareLocation: 'Share location',
+            tapToRetry: 'Message not delivered. Tap to retry.',
+            unsupportedMessageType: 'Unsupported message type.',
+            unsupportedActionType: 'Unsupported action type.',
+            uploadDocument: 'Upload document',
+            uploadInvalidError: 'Invalid file',
+            uploadPhoto: 'Upload photo',
+          }
+        }).then(function() {
+          // Your code after init is complete
+        });
+        
+        initPromise.then(function() {
+          // do something
+        });
+        
+        // pass it around...
+        initPromise.then(function() {
+          //do something else
+        });
+        ```
+
+      </details>
+
+      ### Options
+
+      The following general settings can be changed.
+
+      | Option                   | Optional? | Default value             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+      |--------------------------|-----------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+      | integrationID            | No        | -                         | Your integration ID.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+      | region                   | Yes       | -                         | The target region in which the app is located.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+      | jwt                      | Yes       | -                         | The token to authenticate your communication with the server.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+      | userId                   | Yes       | -                         | The user's ID.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+      | authCode                 | Yes       | -                         | An auth code for linking to an existing conversation.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+      | locale                   | Yes       | en-US                     | The locale used for date formatting using the `-` format. See [language codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) and [country codes](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). <br /><br /> Note: The country part is optional, and if a country is either not recognized or not supported, the app falls back to the generic language. If the language isn't supported, the app falls back to `en-US`. <br /><br /> Note: This is only used for date formatting and doesn't provide built-in translations for Web Messenger. |
+      | soundNotificationEnabled | Yes       | TRUE                      | Enables the sound notification for new messages.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+      | imageUploadEnabled       | Yes       | TRUE                      | Enables the image upload feature.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+      | embedded                 | Yes       | FALSE                     | Tells the widget it is embedded (see following Embedded section).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+      | displayStyle             | Yes       | button                    | How the messenger appears on your website. Must be either button or tab.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+      | buttonIconUrl            | Yes       | -                         | When the displayStyle is "button", you can select your own button icon. The image must be at least 200 x 200 pixels in JPG, PNG, or GIF format.                                                                                                                                                                                                                                                                                                                                                                                                             |
+      | buttonWidth              | Yes       | 58px                      | When the displayStyle is "button", you have the option of specifying the button width.                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+      | buttonHeight             | Yes       | 58px                      | When the displayStyle is "button", you have the option of specifying the button height.                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+      | businessName             | Yes       | -                         | A custom business name.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+      | businessIconUrl          | Yes       | -                         | A custom business icon URL. The image must be at least 200 x 200 pixels and must be in JPG, PNG, or GIF format.                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+      | backgroundImageUrl       | Yes       | -                         | A background image URL for the conversation. The image is tiled to fit the window.                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+      | customColors             | Yes       | See the following section     | Colors used in the Web Messenger UI.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+      | customText               | Yes       | See the following example | Strings used in the Web Messenger UI. You can use these to either customize the text or translate it. <br /><br /> Note: Some strings include variables (surrounded by {}), which must remain in your customized text.                                                                                                                                                                                                                                                                                                                                      |
+      | menuItems                | Yes       | See the following section |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+      | prechatCapture           | Yes       | See the following section |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+
+      ### Color options
+
+      You can give your Web Messenger a custom look by editing the following settings.
+
+      | Option            | Optional? | Default value | Description                                                                                                                        |
+      |-------------------|-----------|---------------|------------------------------------------------------------------------------------------------------------------------------------|
+      | brandColor        | Yes       | 65758e        | This color is used in the messenger header and the button or tab in idle state. Must be a 3- or 6-character hexadecimal color.     |
+      | conversationColor | Yes       | 0099ff        | This color is used for customer messages, quick replies, and actions in the footer. Must be a 3- or 6-character hexadecimal color. |
+      | actionColor       | Yes       | 0099ff        | This color is used for calls-to-action inside your messages. Must be a 3- or 6-character hexadecimal color.                        |
+
+      ### Text options
+
+      Web Messenger has many text options to choose from. Here are a few examples.
+
+      | Option                              | Default value if not used                                                                                 |
+      |-------------------------------------|-----------------------------------------------------------------------------------------------------------|
+      | actionPostbackError                 | An error occurred while processing your action. Please try again.                                         |
+      | clickToRetry                        | Message not delivered. Click to retry.                                                                    |
+      | connectNotificationText             | Be notified inside your other apps when you get a reply.                                                  |
+      | connectNotificationSingleText       | Be notified when you get a reply.                                                                         |
+      | connectNotificationSingleButtonText | Turn on <name> notifications                                                                              |
+      | connectNotificationOthersText       | others                                                                                                    |
+      | conversationTimestampHeaderFormat   | MMMM D YYYY, h:mm A                                                                                       |
+      | fetchHistory                        | Load more                                                                                                 |
+      | fetchingHistory                     | Retrieving history...                                                                                     |
+      | headerText                          | How can we help?                                                                                          |
+      | inputPlaceholder                    | Type a message...                                                                                         |
+      | introductionText                    | We're here to talk, so ask us anything!                                                                   |
+      | invalidFileError                    | Only images are supported. Choose a file with a supported extension (jpg, jpeg, png, gif, or bmp).        |
+      | locationNotSupported                | Your browser does not support location services or it's been disabled. Please type your location instead. |
+      | locationSecurityRestriction         | This website cannot access your location. Please type your location instead.                              |
+      | locationSendingFailed               | Could not send location                                                                                   |
+      | locationServicesDenied              | This website cannot access your location. Allow access in your settings or type your location instead.    |
+      | messageError                        | An error occurred while sending your message. Please try again.                                           |
+      | messageIndicatorTitlePlural         | ({count}) New messages                                                                                    |
+      | messageIndicatorTitleSingular       | ({count}) New message                                                                                     |
+      | messageRelativeTimeDay              | {value}d ago                                                                                              |
+      | messageRelativeTimeHour             | {value}h ago                                                                                              |
+      | messageRelativeTimeJustNow          | Just now                                                                                                  |
+      | messageRelativeTimeMinute           | {value}m ago                                                                                              |
+      | messageTimestampFormat              | h:mm A                                                                                                    |
+      | messageSending                      | Sending...                                                                                                |
+      | messageDelivered                    | Delivered                                                                                                 |
+      | sendButtonText                      | Send                                                                                                      |
+      | settingsHeaderText                  | Settings                                                                                                  |
+      | tapToRetry                          | Message not delivered. Tap to retry.                                                                      |
+      | unsupportedMessageType              | Unsupported message type.                                                                                 |
+      | unsupportedActionType               | Unsupported action type.                                                                                  |
+      | uploadDocument                      | Upload document.                                                                                          |
+      | uploadInvalidError                  | Invalid file.                                                                                             |
+      | uploadPhoto                         | Upload photo.                                                                                             |
+
+      ### Menu options
+
+      Menu items can be enabled or disabled.
+
+      | Option        | Optional? | Default value | Description                          |
+      |---------------|-----------|---------------|--------------------------------------|
+      | imageUpload   | Yes       | TRUE          | Enables the image upload menu item   |
+      | fileUpload    | Yes       | TRUE          | Enables the file upload menu item    |
+      | shareLocation | Yes       | TRUE          | Enables the share location menu item |
+
+      ### Prechat capture option
+
+      This option allows you to have the Web Messenger automatically post a message to the user. You can implement a variety of messages. The following code snippet is the same as the one used in the earlier example.
+
+      ```javascript
+      prechatCapture: {
+        enabled: true,
+        fields: [
+          {
+            type: 'email',
+            name: 'email',
+            label: 'Email',
+            placeholder: 'your@email.com'
+          },
+          {
+            type: 'text',
+            name: 'company-website',
+            label: 'Company website',
+            placeholder: 'mycompany.com'
+          },
+          {
+            type: 'select',
+            name: 'company-size',
+            label: 'Company size',
+            placeholder: 'Choose a number...',
+            options: [
+              { name: '1-10', label: '1-10 employees' },
+              { name: '11-50', label: '11-50 employees' },
+              { name: '51+',label: '51+ employees' }
+            ]
+          }
+        ]
+      }
+      ```
+
+      ### Embedded mode option
+
+      You have the option to set up the Web Messenger in an embedded mode. This lets you choose where you want the widget to be visible.
+      The following example illustrates what you need to set it up.
+      Note that for embedded mode to work, you must set the parameter of `embedded` to `true` and call the `WebMessenger.render()` function manually.
+
+      ```javascript
+      WebMessenger.init({
+        integrationId: 'INTEGRATION_ID_HERE',
+        embedded: true
+        }).then(() => {
+          // Your code after init is complete
+        });
+
+      WebMessenger.render(document.getElementById('chat-container'));
+      ```
+
+      This sample embeds the Inbox 2.0 messenger within a DOM element with the ID "chat-container". If you open the webpage, you will notice that it is no longer showing a button on the bottom right, but it is visible in the container element.
+
+      ### Use contact attributes to save specific messenger data
+
+      You can store information about the webpage and the user by using contact attributes. To enable this, do the following:
+
+      1.  Go to `Admin settings`, expand `Agent workspace`, and then select `Contact attributes`.
+      2.  Find one of the default contact attributes in the list and use the toggle to enable it.
+
+      Now, when a client contacts you via the WebMessenger Messenger plugin, that specific data will be stored inside of a contact attribute.
+
+      Available contact attributes for the Web Messenger plugin:
+
+      -   Browser Language
+      -   First Name
+      -   Last Name
+      -   Page Domain
+      -   Page Title
+      -   Page URL
+      -   User Id
+
+      ### Use shortcodes to create a rich messaging experience
+
+      Shortcodes are a useful way to create a rich messaging interface.
+
+      #### Available shortcodes
+
+      | Element                 | Syntax          | Example                              |
+      |-------------------------|-----------------|--------------------------------------|
+      | Link button             | `%[]()`         | `%[Button label](http://anyurl.com)` |
+      | Reply button            | `%[](reply:)`   | `%[Button label](reply:PAYLOAD)`     |
+      | Location request button | `%[](location)` | `%[Button label](location)`          |
+      | Image                   | `![]()`         | `![](http://url-of.the/image.jpg)`   |
+
+      #### Link button
+
+      By using multiple Link button shortcodes, you can send a contact multiple links in one message. An example:
+
+      ```
+      %[Link to Facebook](https://facebook.com)
+      %[Link to Twitter](https://twitter.com)
+      %[Link to LinkedIn](https://linkedin.com)
+      ```
+
+      ![A sample message with three link buttons](static/shortcode-multiple-links.png)
+
+      #### Reply button
+
+      By using multiple Reply button shortcodes under each other in one message, you can offer the contact a choice. For example:
+
+      ```
+      %[Sales](reply:Sales)
+      %[Support](reply:Support)
+      %[Engineering](reply:Engineering)
+      ```
+
+      ![A sample message with three reply buttons](static/shortcode-multiple-buttons.png)
+
+      #### Location sharing button
+
+      This code allows you to invite the contact to share their location with you.
+
+      ```
+      %[Share your location with us](location)
+      ```
+
+      ![A sample message with a request to share the location](static/shortcode-share-location.png)
+
+      #### Images
+
+      You can send images and gifs using this shortcode.
+
+      ```
+      ![A sample message with a GIF](http://url-of.the/image.gif)
+      ```
+
+      ![A sample message with a GIF](static/shortcode-image.png)
+components:
+  securitySchemes:
+    bearer-token:
+      type: http
+      scheme: bearer
+    basic-auth:
+      type: http
+      scheme: basic
+    Oauth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: TO_BE_CONFIGURED_IN_INBOX_2_0
+          scopes:
+            some_scope: TO_BE_CONFIGURED_IN_INBOX_2_0
+    SharedSecret:
+      type: apiKey
+      in: header
+      name: X-Hootsuite-Signature
+  schemas:
+    OAuth2BearerToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: |
+            The token used to authorize requests. This should be added to requests as an authorization header: `Authorization: Bearer oZy8FDUHEiZ0mh0j4rUwOT9t5yHouTzBDsn-x_GROB0.rz-pMQzh-1F6VIGwnJZMBwH3SRwDfEHE4CRi-AClpcg`
+          example: oZy8FDUHEiZ0mh0j4rUwOT9t5yHouTzBDsn-x_GROB0.rz-pMQzh-1F6VIGwnJZMBwH3SRwDfEHE4CRi-AClpcg
+        token_Type:
+          type: string
+          description: The token type to be used in the authorization header. This will always be *bearer* for client credentials grant.
+          example: bearer
+        expires_in:
+          type: number
+          description: The number of seconds until the token expires (1 hour)
+          example: 3599
+    OAuthError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error code indicating the type of error that occurred. Should be used in conjunction with HTTP status.
+          enum:
+            - request_unauthorized
+            - request_forbidden
+            - invalid_request
+            - unauthorized_client
+            - access_denied
+            - unsupported_response_type
+            - invalid_scope
+            - server_error
+            - temporarily_unavailable
+            - unsupported_grant_type
+            - invalid_grant
+            - invalid_client
+            - unknown_error
+            - not_found
+            - invalid_state
+            - misconfiguration
+            - insufficient_entropy
+            - invalid_token
+            - token_signature_mismatch
+            - token_expired
+            - scope_not_granted
+            - token_claim
+            - token_inactive
+        error_description:
+          type: string
+          description: A description of error.
+          example: An error message
+        error_hint:
+          type: string
+          description: A helpful hint about the error.
+          example: Make sure that the various parameters are correct, be aware of case sensitivity and trim your parameters.
+        status_code:
+          type: number
+          description: The status code
+          example: 401
+    From:
+      type: string
+      description: |
+        An `ISO-8601` date time marking the inclusive start of the result. Must be URL encoded. The `from` filter can be a maximum of 14 days in the past.
+    To:
+      type: string
+      description: |
+        An `ISO-8601` date time marking the exclusive end of the result. Must be URL encoded
+    Timezone:
+      type: string
+      description: |
+        The `timezone` to be used in conjunction with`groupByInterval`, e.g. America/Los_Angeles. Must be URL encoded. If no `timezone` is provided, the default 'UTC' timezone is used
+    MediumId:
+      type: string
+      enum:
+        - fb
+        - twit
+        - instagram
+        - rtm
+        - whatsapp
+        - linkedin
+      description: |
+        Filter by medium identifier
+    ChannelId:
+      type: string
+      description: |
+        Filter by channel identifier (to obtain a list of your channel IDs, contact a Inbox 2.0 representative)
+    GroupByInterval:
+      type: string
+      enum:
+        - MINUTE
+        - HOUR
+        - DAY
+        - MONTH
+        - YEAR
+        - HOUR_BY_DAY
+      description: |
+        An interval to group results by. No more than 60 intervals can be requested per request. For example, when selecting `minute`, the requested time range cannot be longer than 1 hour
+    TotalMessagesRequest:
+      type: object
+      required:
+        - from
+      properties:
+        from:
+          $ref: '#/components/schemas/From'
+        to:
+          $ref: '#/components/schemas/To'
+        timezone:
+          $ref: '#/components/schemas/Timezone'
+        mediumIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediumId'
+        channelIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelId'
+        groupByInterval:
+          $ref: '#/components/schemas/GroupByInterval'
+    NumberMetricResponse:
+      type: object
+      properties:
+        value:
+          type: integer
+    GroupedMetricResponse:
+      type: object
+      properties:
+        value:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/NumberMetricResponse'
+    TimeSeriesDataPoint:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        value:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/GroupedMetricResponse'
+            - $ref: '#/components/schemas/NumberMetricResponse'
+    TimeSeriesMetricResponse:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/TimeSeriesDataPoint'
+    TeamId:
+      type: string
+      description: |
+        Filter by team identifier
+    ResponseTimeRequest:
+      type: object
+      required:
+        - from
+      properties:
+        from:
+          $ref: '#/components/schemas/From'
+        to:
+          $ref: '#/components/schemas/To'
+        timezone:
+          $ref: '#/components/schemas/Timezone'
+        mediumIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediumId'
+        channelIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelId'
+        teamIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamId'
+        groupByInterval:
+          $ref: '#/components/schemas/GroupByInterval'
+        groupBy:
+          type: string
+          enum:
+            - TEAM
+    TotalResolvedConversationsRequest:
+      type: object
+      required:
+        - from
+      properties:
+        from:
+          $ref: '#/components/schemas/From'
+        to:
+          $ref: '#/components/schemas/To'
+        mediumIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediumId'
+        channelIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelId'
+        teamIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamId'
+        groupBy:
+          type: string
+          enum:
+            - TEAM
+    UserId:
+      type: string
+      description: |
+        Filter by user identifier
+    HandleTimeRequest:
+      type: object
+      required:
+        - from
+      properties:
+        from:
+          $ref: '#/components/schemas/From'
+        to:
+          $ref: '#/components/schemas/To'
+        mediumIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediumId'
+        channelIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelId'
+        userIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserId'
+        handleTimeTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              - HANDLE_TIME
+              - NO_REPLY_TIME
+              - CHERRY_PICKING
+    AgentAvailabilityRequest:
+      type: object
+      properties:
+        teamIds:
+          type: array
+          items:
+            type: string
+          description: |
+            Filter by teams
+        userPresenceStatus:
+          type: string
+          enum:
+            - AWAY
+            - AVAILABLE
+    MetricRequest:
+      type: object
+      required:
+        - status
+      properties:
+        channelIds:
+          type: array
+          items:
+            type: string
+        teamIds:
+          type: array
+          items:
+            type: string
+        mediumId:
+          $ref: '#/components/schemas/MediumId'
+        groupBy:
+          type: string
+          enum:
+            - CHANNEL
+            - OWNER
+            - TOPIC
+            - TEAM
+        status:
+          type: string
+          enum:
+            - NEW
+            - PENDING
+    OnlineAgentsResponse:
+      type: object
+      properties:
+        agents:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - userPresence
+              - statusChangedAt
+            properties:
+              id:
+                type: string
+              userPresence:
+                type: string
+                enum:
+                  - AWAY
+                  - AVAILABLE
+              awayStateId:
+                type: string
+              statusChangedAt:
+                type: string
+                format: date-time
+      example:
+        agents:
+          - id: e7553889-d775-11ec-9dc9-4e81c846c8b4
+            userPresence: AVAILABLE
+            statusChangedAt: '2022-05-19T13:16:33.413Z'
+          - id: f7553884-d876-11ec-3dc5-4e81684ac8bb
+            userPresence: AWAY
+            awayStateId: e75893ea-d775-11ec-9dc9-4e81c846c8b4
+            statusChangedAt: '2022-05-19T13:17:34.414Z'
+    Message:
+      type: object
+      properties:
+        text:
+          type: string
+          example: Hi! How can I help you?
+        attachment:
+          type: string
+          example: funny_cat.gif
+      description: |
+        The messages you want to send
+    ConversationManipulation:
+      type: object
+      properties:
+        indicateTyping:
+          type: string
+          enum:
+            - START
+            - STOP
+          description: |
+            Indicate whether you are typing
+        sendMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+          description: |
+            The messages you want to send
+        sendMessage:
+          $ref: '#/components/schemas/Message'
+          description: |
+            The message you want to send
+        applyTopics:
+          type: array
+          items:
+            type: string
+          example:
+            - Hotel Reservation
+          description: |
+            The topics you want to apply to the conversation
+        applyTags:
+          type: array
+          items:
+            type: string
+          example:
+            - Happy
+          description: |
+            The tag you want to apply to the latest message
+        applyConversationNotes:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+                example: Some note to add
+          description: |
+            The notes you want to apply to the conversation
+        setContactAttributes:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            account_number: '19758293529351'
+          description: |
+            The attributes you want to apply to the contact. The key should match "^[a-zA-Z0-9_]+$"
+        complete:
+          type: string
+          enum:
+            - HANDOVER
+            - RESOLVED
+          description: |
+            Finish a conversation by handing it off to a human agent or by marking the conversation resolved
+    LockResponse:
+      type: object
+      properties:
+        locks:
+          type: array
+          items:
+            type: object
+            properties:
+              conversationId:
+                type: string
+                example: 9dee60dc-cbbf-11ec-95ef-8e8b58e7d3d8
+                description: |
+                  The id of the conversation.
+              userId:
+                type: string
+                example: 57fc9dc2-2b6f-11ec-aed1-66640cff431f
+                description: |
+                  The user id of the agent.
+              lockedAt:
+                type: string
+                description: |
+                  The timestamp since when the agent has locked the conversation.
+                format: date-time
+                example: '2022-05-14T14:15:33.437Z'
+    SendProactiveMessageRequest:
+      type: object
+      properties:
+        medium:
+          type: string
+          description: The medium you want to use
+          enum:
+            - WHATSAPP
+        channel:
+          type: string
+          description: The name of the channel. Use one of the Accounts in Settings -> Channels
+        contact:
+          type: string
+          description: The reference to a contact. In case of a telephone number it should start with a plus sign
+        text:
+          type: string
+          description: The message you want to send
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            myReference: '19758293529351'
+          description: |
+            When sending a proactive message, you can pass along custom information that is stored in Inbox 2.0. This data can then be exported. Please contact `dev.support@hootsuite.com` to add metadata to the Messages export. For example, when you send an appointment confirmation to your customer, you can pass along a unique identifier. You can then download the Messages export from Inbox 2.0, and determine how many unique customers are responding to your outbound notification.
+        sender:
+          type: object
+          properties:
+            pictureUrl:
+              type: string
+              example: https://example.com/my-picture.png
+              description: |
+                The url of the picture to be used as the sender's avatar.
+      required:
+        - medium
+        - channel
+        - contact
+        - text
+    SendProactiveMessageResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          example: 4f1dba7b-9ef3-11e8-a0f4-175408e41992
+    StatusOverviewResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: The correlation id of the sent message.
+        total:
+          type: string
+          description: The total number of sent proactive messages.
+        statuses:
+          type: object
+          description: An overview with the number of messages per status
+          properties:
+            PROCESSING:
+              type: number
+              description: Number of proactive messages that are queued for sending.
+            FAILED:
+              type: number
+              description: Number of proactive messages that failed to send.
+            SENT:
+              type: number
+              description: Number of proactive messages that are sent.
+            DELIVERED:
+              type: number
+              description: Number of proactive messages that are sent and delivered.
+            DELIVERING_FAILED:
+              type: number
+              description: Number of proactive messages that are sent but could not be delivered.
+      example:
+        correlationId: 44717822-9f05-11e8-b71e-671342217f40
+        total: 1
+        statuses:
+          DELIVERED: 1
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+    StatusDetailResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          status:
+            type: string
+            description: The status of the message
+          contact:
+            type: string
+            description: The contact used to send the message to
+          reason:
+            type: string
+            description: The reason of failure
+      example:
+        - status: FAILED
+          contact: '+32495123456'
+          reason: No channel found for medium WHATSAPP
+    CrmLookupAttributesResponse:
+      type: object
+      properties:
+        autoConfirm:
+          type: boolean
+          description: |
+            The `autoConfirm` field tells Inbox 2.0 to automatically save the attributes without having to use the `Confirm` button.
+        contactAttributes:
+          type: array
+          description: Array of JSON objects containing the lookup attributes
+          items:
+            additionalProperties:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                value:
+                  type: string
+      example:
+        autoConfirm: true
+        contactAttributes:
+          - attribute: email
+            value: fj@example.com
+          - attribute: id
+            value: '98765432'
+          - attribute: first_name
+            value: Fred
+          - attribute: last_name
+            value: Jones
+          - attribute: last_order_number
+            value: null
+    CrmErrorNotificationsRequest:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          example: 2
+        eventType:
+          type: string
+          enum:
+            - DATA_IMPORT_ERROR
+        messages:
+          type: array
+          description: an array of explicit error messages
+          items:
+            type: string
+          example:
+            - testMessage1 key:testKey1 value:testValue1
+            - testMessage2 key:testKey2 value:testValue2
+    CrmWriteBackRequest:
+      type: object
+      description: The request contains write back payload.
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: '2022-03-28T09:43:26.635984618Z'
+        idempotencyKey:
+          type: string
+          description: A string that uniquely identifies each event. Used to help ensure that each request is processed only once.
+          example: 6ebc6a78-d9e9-48be-b172-51eda40b7af8
+        version:
+          type: integer
+          description: |
+            A number designating the version of the `type` of request. Used to mark changes to the `data` field structure.
+          example: 1
+        type:
+          type: string
+          enum:
+            - CONVERSATION_RESOLVED
+            - CONVERSATION_SET_TO_PENDING
+          example: CONVERSATION_RESOLVED
+        data:
+          type: object
+          properties:
+            conversation:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 0ad42eef-a806-11eb-9642-f1ceb2f21def
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: '2022-03-28T09:42:27.004817183Z'
+                previousStatus:
+                  type: string
+                  enum:
+                    - new
+                    - pending
+                    - resolved
+                  example: resolved
+                currentStatus:
+                  type: string
+                  enum:
+                    - new
+                    - pending
+                    - resolved
+                  example: resolved
+            medium:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: fb
+            channel:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 0-02534c5ac04-000-261ad914
+                name:
+                  type: string
+                  example: Inbox 2.0 support channel
+            agent:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: '11599'
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Smith
+                email:
+                  type: string
+                  example: john.smith@hootsuite.com
+            contactProfile:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 693ed54b-a426-11eb-9363-cffd945b4b2f
+                mediumContactProfileId:
+                  type: string
+                  example: bb7b0f8f00cc989b97f0725b
+                primaryIdentifier:
+                  type: string
+                  example: John Smith
+                secondaryIdentifier:
+                  type: string
+                  example: '+32439487192'
+                pictureUrl:
+                  type: string
+                  example: https://example.com/my-picture.png
+            statusUpdatedReason:
+              type: string
+              example: 5fd023f6-2e66-11eb-be07-092841b0717d - Response Not Required
+            statusUpdatedComment:
+              type: string
+              example: not a question
+            messages:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  direction:
+                    type: string
+                    enum:
+                      - INBOUND
+                      - OUTBOUND
+                  text:
+                    type: string
+                example:
+                  - id: 0ad20c0d-a806-11eb-9642-f799d0e531de
+                    direction: INBOUND
+                    text: I have a question
+                  - id: 10664516-a806-11eb-9642-fbd9d431bd78
+                    direction: OUTBOUND
+                    text: How can I help you?
+            contactAttributes:
+              type: array
+              items:
+                type: object
+                properties:
+                  attribute:
+                    type: string
+                    example: null
+                  value:
+                    type: string
+                  source:
+                    type: string
+                    enum:
+                      - AGENT
+                      - MEDIUM
+                      - CRM_CONFIRMED
+              example:
+                - attribute: company
+                  value: My company
+                  source: AGENT
+                - attribute: fb-profile-name
+                  value: John Smith
+                  source: MEDIUM
+                - attribute: fb-profile-image
+                  value: https://image.com/sticky/default_profile_images/default_profile_normal.png
+                  source: MEDIUM
+                - attribute: email
+                  value: john.smith@hootsuite.com
+                  source: CRM_CONFIRMED
+                - attribute: first_name
+                  value: John
+                  source: CRM_CONFIRMED
+                - attribute: last_name
+                  value: Smith
+                  source: CRM_CONFIRMED
+                - attribute: company
+                  value: Hootsuite
+                  source: CRM_CONFIRMED
+            notes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  text:
+                    type: string
+                  creationUser:
+                    type: string
+                  creationTimestamp:
+                    type: string
+                    format: date-time
+              example:
+                - id: 8080a48b-3c70-11e1-8931-1e8999d73ad2
+                  text: Here's a note on the conversation!
+                  creationUser: 0-019bd608cfc-001-0c6a2f5b
+                  creationTimestamp: '2018-06-28T00:17:09+00:00'
+            topics:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+              example:
+                - id: aa33389d-8a6a-11e8-b0d0-61f12b43ea29
+                  name: Redeem Rewards
+                - id: ee089cc2-8a6a-11e8-b0d0-942d249592dc
+                  name: Account Rewards
+    VaiWebhookEvent:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: |
+            The timestamp when we sent the request. This is used to counter possible replay attacks.
+          format: date-time
+          example: '2022-04-28T09:43:26.635984618Z'
+        idempotencyKey:
+          type: string
+          description: |
+            A string that uniquely identifies each event. When a timeout occurs when sending you the event, (or we receive an error response), we will retry the event. This key can help you to ensure that a request is processed only once.
+          example: 6ebc6a78-d9e9-48be-b172-51eda40b7af8
+        version:
+          type: integer
+          description: |
+            A number designating the version of the type of request. Currently, the version is always 1. Versions will be used in the future for introducing non-backward compatible changes.
+          example: 1
+    ConversationData:
+      type: object
+      properties:
+        conversationId:
+          type: string
+          example: 0ad42eef-a806-11eb-9642-f1ceb2f21def
+        medium:
+          type: object
+          properties:
+            id:
+              type: string
+              example: fb
+        channel:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 0-02534c5ac04-000-261ad914
+            name:
+              type: string
+              example: Inbox 2.0 support channel
+        language:
+          type: string
+          example: en
+        contactProfile:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 693ed54b-a426-11eb-9363-cffd945b4b2f
+            mediumContactProfileId:
+              type: string
+              example: bb7b0f8f00cc989b97f0725b
+            primaryIdentifier:
+              type: string
+              example: John Smith
+            secondaryIdentifier:
+              type: string
+              example: '+32439487192'
+            pictureUrl:
+              type: string
+              example: https://example.com/my-picture.png
+        contactAttributes:
+          type: array
+          items:
+            type: object
+            properties:
+              attribute:
+                type: string
+                example: null
+              value:
+                type: string
+              source:
+                type: string
+                enum:
+                  - AGENT
+                  - MEDIUM
+                  - CRM_CONFIRMED
+          example:
+            - attribute: company
+              value: My company
+              source: AGENT
+            - attribute: fb-profile-name
+              value: John Smith
+              source: MEDIUM
+            - attribute: fb-profile-image
+              value: https://image.com/sticky/default_profile_images/default_profile_normal.png
+              source: MEDIUM
+            - attribute: email
+              value: john.smith@hootsuite.com
+              source: CRM_CONFIRMED
+            - attribute: first_name
+              value: John
+              source: CRM_CONFIRMED
+            - attribute: last_name
+              value: Smith
+              source: CRM_CONFIRMED
+            - attribute: company
+              value: Hootsuite
+              source: CRM_CONFIRMED
+    ConversationStartedEvent:
+      allOf:
+        - $ref: '#/components/schemas/VaiWebhookEvent'
+        - properties:
+            type:
+              type: string
+              enum:
+                - CONVERSATION_STARTED
+            data:
+              $ref: '#/components/schemas/ConversationData'
+    ConversationDelegatedEvent:
+      allOf:
+        - $ref: '#/components/schemas/VaiWebhookEvent'
+        - properties:
+            type:
+              type: string
+              enum:
+                - CONVERSATION_DELEGATED
+            data:
+              $ref: '#/components/schemas/ConversationData'
+    InboundMessageReceivedEvent:
+      allOf:
+        - $ref: '#/components/schemas/VaiWebhookEvent'
+        - properties:
+            type:
+              type: string
+              enum:
+                - INBOUND_MESSAGE_RECEIVED
+            data:
+              type: object
+              properties:
+                conversationId:
+                  type: string
+                  description: |
+                    An ID indicating the conversation this message is part of.
+                  example: 0-01d90bc1b13-000-9a9ca0d8
+                message:
+                  type: object
+                  description: |
+                    The actual message content.
+                  properties:
+                    messageId:
+                      type: string
+                      example: cc75552a-1a78-11e9-855e-6d1e71016abf
+                    text:
+                      type: string
+                      example: Hello
+                    payload:
+                      type: string
+                      example: <DEVELOPER_DEFINED_PAYLOAD>
+                      description: |
+                        Custom data provided by the virtual agent when sending a rich message with either quick reply or postback buttons
+                trigger:
+                  type: object
+                  x-nullable: true
+                  description: |
+                    An optional trigger providing context on the object that triggered this inbound message.
+                  properties:
+                    type:
+                      type: string
+                      x-nullable: true
+                      description: Type of the object that triggered this inbound message.
+                      example: POST
+                      enum:
+                        - REEL
+                        - STORY
+                        - POST
+                    action:
+                      type: string
+                      x-nullable: true
+                      description: Action on the object that triggered this inbound message.
+                      example: REPLY
+                      enum:
+                        - SHARE
+                        - MENTION
+                        - REPLY
+                conversationTopics:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - Topic 1
+                    - Topic 2
+                channel:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 0-02534c5ac04-000-261ad914
+                    name:
+                      type: string
+                      example: Inbox 2.0 support channel
+                contactProfile:
+                  type: object
+                  description: |
+                    Information on the contact triggering this inbound message.
+                  properties:
+                    id:
+                      type: string
+                      example: 693ed54b-a426-11eb-9363-cffd945b4b2f
+                    mediumContactProfileId:
+                      type: string
+                      example: bb7b0f8f00cc989b97f0725b
+                    primaryIdentifier:
+                      type: string
+                      example: John Smith
+                    secondaryIdentifier:
+                      type: string
+                      example: '+32439487192'
+                    pictureUrl:
+                      type: string
+                      example: https://example.com/my-picture.png
+                medium:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: facebook
+security:
+  - bearer-token: []
+paths:
+  /oauth2/token:
+    post:
+      tags:
+        - rest-api-authentication
+      summary: OAuth2 Token
+      operationId: oauthToken
+      description: |
+        [OAuth2 Token](https://tools.ietf.org/html/rfc6749#section-3.2) endpoint.
+         
+        This endpoint requires that you pass in your client credentials using the HTTP Basic authentication scheme as outlined in the [spec](https://tools.ietf.org/html/rfc6749#section-2.3.1).
+        Including your client credentials in the request-body is not supported.
+      parameters:
+        - name: Authorization
+          in: header
+          description: A base64-encoded client_id:client_secret string used for authentication.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+                - grant_type
+                - organization_id
+              properties:
+                grant_type:
+                  type: string
+                  description: The OAuth2 grant_type used. Must be set to *organization_app*.
+                  enum:
+                    - organization_app
+                organization_id:
+                  type: string
+                  description: The id of your organization. The organization must be linked to your app.
+              example:
+                grant_type: organization_app
+                organization_id: 900002
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/OAuth2BearerToken'
+        '401':
+          description: Unauthorized
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/OAuthError'
+      security:
+        - basic-auth: []
+  /inbox/v1/reporting/metrics/inbound-message-volume:
+    post:
+      tags:
+        - real_time_metrics_rest_api
+      summary: Inbound message volume
+      operationId: metricsInboundMessageVolume
+      description: |
+        A count of inbound messages based on applied filters.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TotalMessagesRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/NumberMetricResponse'
+                  - $ref: '#/components/schemas/TimeSeriesMetricResponse'
+              examples:
+                SingleValue:
+                  value: 6
+                GroupByInterval:
+                  value:
+                    - timestamp: '2022-03-25T00:00:00.000Z'
+                      value: 2
+                    - timestamp: '2022-03-26T00:00:00.000Z'
+                      value: 4
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/reporting/metrics/outbound-message-volume:
+    post:
+      tags:
+        - real_time_metrics_rest_api
+      summary: Outbound message volume
+      operationId: metricsOutboundMessageVolume
+      description: |
+        A count of outbound messages based on applied filters.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TotalMessagesRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/NumberMetricResponse'
+                  - $ref: '#/components/schemas/TimeSeriesMetricResponse'
+              examples:
+                SingleValue:
+                  value: 6
+                GroupByInterval:
+                  value:
+                    - timestamp: '2022-03-25T00:00:00.000Z'
+                      value: 2
+                    - timestamp: '2022-03-26T00:00:00.000Z'
+                      value: 4
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/reporting/metrics/first-response-time:
+    post:
+      tags:
+        - real_time_metrics_rest_api
+      summary: Average first response time
+      operationId: metricsAverageFirstResponseTime
+      description: |
+        The average time in seconds to the first response to an inbound message.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseTimeRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/NumberMetricResponse'
+                  - $ref: '#/components/schemas/GroupedMetricResponse'
+                  - $ref: '#/components/schemas/TimeSeriesMetricResponse'
+              examples:
+                singleValue:
+                  value: 6
+                groupByTeam:
+                  value:
+                    c3144df7-8a04-4b20-b60a-ccfe97723780:
+                      value: 4
+                    3b48a76e-4289-44b8-ac15-c8b60d21f158:
+                      value: 2
+                groupByDay:
+                  value:
+                    - timestamp: '2022-03-25T00:00:00.000Z'
+                      value: 2
+                    - timestamp: '2022-03-26T00:00:00.000Z'
+                      value: 4
+                groupByDayAndTeam:
+                  value:
+                    - timestamp: '2022-03-25T00:00:00.000Z'
+                      value:
+                        c3144df7-8a04-4b20-b60a-ccfe97723780:
+                          value: 4
+                        3b48a76e-4289-44b8-ac15-c8b60d21f158:
+                          value: 2
+                    - timestamp: '2022-03-26T00:00:00.000Z'
+                      value: null
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/reporting/metrics/conversation-response-time:
+    post:
+      tags:
+        - real_time_metrics_rest_api
+      summary: Average conversation response time
+      operationId: metricsAverageConversationResponseTime
+      description: |
+        The average time in seconds for a response to an inbound message except the first response.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseTimeRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/NumberMetricResponse'
+                  - $ref: '#/components/schemas/GroupedMetricResponse'
+                  - $ref: '#/components/schemas/TimeSeriesMetricResponse'
+              examples:
+                singleValue:
+                  value: 6
+                groupByTeam:
+                  value:
+                    c3144df7-8a04-4b20-b60a-ccfe97723780:
+                      value: 4
+                    3b48a76e-4289-44b8-ac15-c8b60d21f158:
+                      value: 2
+                groupByDay:
+                  value:
+                    - timestamp: '2022-03-25T00:00:00.000Z'
+                      value: 2
+                    - timestamp: '2022-03-26T00:00:00.000Z'
+                      value: 4
+                groupByDayAndTeam:
+                  value:
+                    - timestamp: '2022-03-25T00:00:00.000Z'
+                      value:
+                        c3144df7-8a04-4b20-b60a-ccfe97723780:
+                          value: 4
+                        3b48a76e-4289-44b8-ac15-c8b60d21f158:
+                          value: 2
+                    - timestamp: '2022-03-26T00:00:00.000Z'
+                      value: null
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/reporting/metrics/resolved-with-one-reply:
+    post:
+      tags:
+        - real_time_metrics_rest_api
+      summary: Resolved with reply
+      operationId: metricsResolvedWithReply
+      description: |
+        The number of messages that have been resolved with at least one reply.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TotalResolvedConversationsRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/NumberMetricResponse'
+                  - $ref: '#/components/schemas/GroupedMetricResponse'
+              examples:
+                singleValue:
+                  value: 6
+                groupByTeam:
+                  value:
+                    c3144df7-8a04-4b20-b60a-ccfe97723780:
+                      value: 4
+                    3b48a76e-4289-44b8-ac15-c8b60d21f158:
+                      value: 2
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/reporting/metrics/handle-time:
+    post:
+      tags:
+        - real_time_metrics_rest_api
+      summary: Average handle time
+      operationId: metricsAverageHandleTime
+      description: |
+        The average time in seconds that a conversation is handled by an agent, specifically the difference between timestamps
+        of conversation open and conversation pend/resolve. For Average Handle Time to be calculated, there must be an outbound
+        between open and pend/resolve event.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HandleTimeRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NumberMetricResponse'
+              examples:
+                singleValue:
+                  value: 6
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/user-presence/metrics/agent-availability:
+    post:
+      tags:
+        - real_time_metrics_rest_api
+      summary: Agent availability
+      operationId: metricsAgentAvailability
+      description: |
+        The number of agents available or away. You can filter by teams.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentAvailabilityRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NumberMetricResponse'
+              example:
+                value: 30
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/queue/metrics/contacts-waiting:
+    post:
+      tags:
+        - real_time_metrics_rest_api
+      summary: Contacts waiting in queue
+      operationId: metricsContactsWaitingInQueue
+      description: |
+        The number of contacts waiting in the queue for a response.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetricRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/NumberMetricResponse'
+                  - $ref: '#/components/schemas/GroupedMetricResponse'
+              examples:
+                singleValue:
+                  value: 6
+                groupByChannel:
+                  value:
+                    c3144df7-8a04-4b20-b60a-ccfe97723780:
+                      value: 4
+                    3b48a76e-4289-44b8-ac15-c8b60d21f158:
+                      value: 2
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/queue/metrics/longest-wait-time:
+    post:
+      tags:
+        - real_time_metrics_rest_api
+      summary: Longest wait time in queue
+      operationId: metricsLongestWaitTimeInQueue
+      description: |
+        The current longest time in seconds that a contact is waiting for a response. If no mediumId filter is provided, the
+        messages sent in any connected mediums will be included.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetricRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/NumberMetricResponse'
+                  - $ref: '#/components/schemas/GroupedMetricResponse'
+              examples:
+                singleValue:
+                  value: 131
+                groupByChannel:
+                  value:
+                    c3144df7-8a04-4b20-b60a-ccfe97723780:
+                      value: 131
+                    3b48a76e-4289-44b8-ac15-c8b60d21f158:
+                      value: 155
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/user-presence/online-agents:
+    get:
+      tags:
+        - user_presence_rest_api
+      summary: Online Agents
+      operationId: onlineAgents
+      description: |
+        List of all currently online agents.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlineAgentsResponse'
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/virtual-agent/conversations/{conversationId}:
+    post:
+      tags:
+        - vai_rest_api
+      summary: Manipulate conversation
+      operationId: vaiManipulateConversation
+      description: |
+        This allows you to manipulate the conversation in the same way you would when responding to a webhook request. You can
+        send a reply, add a topic, and/or hand off the conversation. Each property in the body is optional. If you only want to
+        send a message, you can send `{"sendMessage": {"text": "Hi!"}}`. If you want to apply a topic and complete, but not send
+        a message, you can, for example, send `{"applyTopics":["Spam"], "complete": "RESOLVED"}`.
+
+        Note that only topics that match a topic in the platform exactly (case insensitive) will be applied to the conversation.
+        Non-existing topics are ignored. Currently, no fuzzy matching will occur and typographical errors will result in a
+        non-existing topic.
+
+        The same applies to tags. Only tags that match a tag in the platform exactly (case
+        insensitive) will be applied to a specific message. Non-existing tags are ignored. You must specify the `messageId` when using the REST
+        API. The `messageId` is part of every `INBOUND_MESSAGE_RECEIVED` event.
+
+        If you want to send an attachment, you must first upload the attachment in a separate
+        call (`PUT /inbox/v1/virtual-agent/conversations/{conversationId}/attachments/{filename}`), and then use the file name when
+        sending the message (`{"sendMessage": {"attachment": ""}}`).
+
+        If the contact already has a value saved for the attribute definition with a particular alias, the update will be
+        ignored. If any of the attribute definitions are configured as CRM lookup values, a CRM lookup is performed after the
+        attributes are set. For the best performance, we recommend setting contact attributes along with the response to
+        indicate that the conversation is completed. Note that the virtual agent will not receive the new attributes from the
+        CRM response until the next `CONVERSATION_STARTED` or `CONVERSATION_DELEGATED` event is received for a conversation with
+        a contact.
+      parameters:
+        - in: path
+          name: conversationId
+          schema:
+            type: string
+          required: true
+          description: Id of the conversation to manipulate. This can be retrieved from the webhook payload.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationManipulation'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: The request is malformed.
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+        '404':
+          description: |
+            The conversation id does not exist or is no longer assigned to the virtual agent.
+  /inbox/v1/virtual-agent/conversations/{conversationId}/attachments/{filename}:
+    post:
+      tags:
+        - vai_rest_api
+      summary: Upload attachments
+      operationId: vaiUploadConversationAttachment
+      description: |
+        This allows you to upload an attachment that you can send in a conversation. You need to upload the attachment first,
+        and then you can send a message with text and an attachment. For example, if you upload an attachment
+        to `/inbox/v1/virtual-agent/conversations/attachments/cat.jpg`, you can send that attachment by sending
+
+        ```json
+        {
+          "sendMessage": {
+            "text": "This is a cat!",
+            "attachment": "cat.jpg"
+          }
+        }
+        ```
+
+        to `/inbox/v1/virtual-agent/conversations/{conversationId}`. The file name should be unique within a conversation and is visible to the contact
+        if they download your attachment.
+
+        The `Content-Type` header should contain the correct mime-type of the attachment (such as `image/jpeg`).
+        The `Content-Length` header should contain the size of the attachment in bytes. Attachments should be fewer than 10
+        megabytes to prevent error.
+      parameters:
+        - in: path
+          name: conversationId
+          schema:
+            type: string
+          required: true
+          description: ID of the conversation to manipulate. This can be retrieved from the webhook payload.
+        - in: path
+          name: filename
+          schema:
+            type: string
+          required: true
+          description: Filename of the attachment. The filename can only contain uppercase and lowercase letters, numbers, -, _ and .
+        - in: header
+          name: Content-Type
+          schema:
+            type: string
+          required: true
+          description: mime-type of the attachment.
+        - in: header
+          name: Content-Length
+          schema:
+            type: string
+          required: true
+          description: Size of the attachment in bytes.
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: |
+            The attachment is uploaded and ready to use in your conversation. Note: after uploading the attachment to Inbox 2.0,
+            you still need to specifically send it to the contact
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: |
+            The request is malformed. This can happen because the filename contains an invalid character, or because the attachment
+            type cannot be sent to the medium.
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+        '404':
+          description: |
+            The conversation id does not exist or is no longer assigned to the virtual agent.
+  /inbox/v1/queue/lock:
+    get:
+      tags:
+        - queue_rest_api
+      summary: Conversations locked by an agent
+      operationId: lock
+      description: |
+        An overview of conversations with the agent that locked the conversation.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LockResponse'
+              example:
+                locks:
+                  - conversationId: 9dee60dc-cbbf-11ec-95ef-8e8b58e7d3d8
+                    userId: 57fc9dc2-2b6f-11ec-aed1-66640cff431f
+                    lockedAt: '2022-05-14T14:15:33.437Z'
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+  /inbox/v1/proactive-messaging:
+    post:
+      tags:
+        - proactive_messaging_rest_api
+      summary: Send proactive message
+      operationId: proactiveSendMessage
+      description: |
+        The message is queued for processing. Use the returned correlation id to get the status of the sent message.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendProactiveMessageRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendProactiveMessageResponse'
+        '400':
+          description: The request is malformed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+              example:
+                errors:
+                  - 'channel: must not be blank'
+                  - 'contactReference: must not be blank'
+                  - 'medium: must not be null'
+                  - 'text: must not be blank'
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token
+  /inbox/v1/proactive-messaging/{correlationId}:
+    get:
+      tags:
+        - proactive_messaging_rest_api
+      summary: Get status
+      operationId: proactiveGetStatusForCorrelationId
+      description: |
+        Get the status overview for a sent proactive message
+      parameters:
+        - in: path
+          name: correlationId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusOverviewResponse'
+        '400':
+          description: The request is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                errors:
+                  - Nothing found for this correlation id
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token
+  /inbox/v1/proactive-messaging/{correlationId}/{status}:
+    get:
+      tags:
+        - proactive_messaging_rest_api
+      summary: Get status detail
+      operationId: proactiveGetStatusDetailForCorrelationId
+      description: |
+        Get the details of a message with a specific status.
+      parameters:
+        - in: path
+          name: correlationId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: status
+          schema:
+            type: string
+            enum:
+              - PROCESSING
+              - FAILED
+              - SENT
+              - DELIVERED
+              - DELIVERING_FAILED
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusDetailResponse'
+        '400':
+          description: The request is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                errors:
+                  - Nothing found for this correlation id
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token
+  /inbox/v2/contact/{contactProfileId}/contact-attributes:
+    put:
+      tags:
+        - crm_rest_api
+      summary: Set contact attributes
+      operationId: crmSetContactAttributes
+      description: |
+        Update the contact attributes of a contact profile.
+      parameters:
+        - in: path
+          name: contactProfileId
+          schema:
+            type: string
+          required: true
+          description: Id of the contact profile that you want to update.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrmLookupAttributesResponse'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: The request is malformed.
+        '401':
+          description: |
+            Unauthorized: when using an invalid or expired access token.
+        '404':
+          description: |
+            Contact profile not found in organization
+webhooks:
+  crm-attribute-lookup:
+    post:
+      summary: Contact attribute lookup
+      description: |
+        Inbox 2.0 CRM integration allows you to pull customer contact data from CRMs or other internal business applications into Inbox 2.0. To integrate your CRM with Inbox 2.0, you need to provide an HTTPS endpoint for lookups.
+
+        ### Create contact attributes
+
+        1.  In Inbox 2.0, go to `Admin settings`, expand `Agent Workspace`, select `Contact attributes`, and then select `Add attribute`.
+        2.  Select `Managed by CRM`. The CRM is the source of truth for these attributes. After they are imported into Inbox 2.0, they only change when the value changes in the CRM.
+        3.  Identify lookup attributes by selecting `Use as lookup attribute`. These are used by the CRM to find a customer's data. For example, if you want to find a customer by email address, create an attribute called "Email" and designate it as a lookup. When the request is made from Inbox 2.0 to your CRM, the lookup fields are included in the request body.
+        4.  In the `Unique identifier` box, enter an alias for the lookup attribute. This is used to map the response from your system to the attribute.
+
+        ### Configure integration URL
+
+        To pull data from your CRM into Inbox 2.0, you need to implement a POST endpoint that accepts a JSON request and returns a JSON response. The request contains the lookup attributes, and the response should contain the contact data from your CRM.
+
+        After the endpoint is implemented, configure it as the lookup URL:
+
+        1.  Go to `Admin settings`.
+        2.  Expand `Integration and APIs`.
+        3.  Select `CRM`.
+
+        ### Handle the request
+
+        When the endpoint in your system is ready and configured in Inbox 2.0, and one or more lookup attributes have been identified, you can make a request via the `Lookup` button in the conversation view.
+        This will trigger the CRM attribute lookup event.
+
+        After you've done the lookup in your system, pass attributes back to Inbox 2.0 as a JSON response. The keys in the attributes object correspond to the aliases that were previously added in Inbox 2.0. If a CRM managed attribute is missing from the object or the key has a `null` value, its value is deleted in Inbox 2.0. Inbox 2.0 expects the response in this format:
+
+        ```json
+        {
+            "autoConfirm": false,
+            "contactAttributes": [
+                {"attribute": "email", "value": "fj@example.com"},
+                {"attribute": "id", "value": "98765432"},
+                {"attribute": "first_name", "value": "Fred"},
+                {"attribute": "last_name", "value": "Jones"},
+                {"attribute": "last_order_number", null}
+            ]
+        }
+        ```
+
+        ### Asynchronous Response
+        You can also return a 200 OK back without a body and call our REST api to send back the result of the lookup request.
+        Call the following REST endpoint:
+
+        ```bash
+        curl --request PUT 'https://platform.hootsuite.com/inbox/v2/contact/{contactProfileId}/contact-attributes' \
+        --header 'content-type: application/json' \
+        --header 'Authorization: BEARER <token>' \
+        --data-raw '{
+                      "autoConfirm": false,
+                      "contactAttributes": [
+                        {"attribute": "email", "value": "fj@example.com"},
+                        {"attribute": "id", "value": "98765432"},
+                        {"attribute": "first_name", "value": "Fred"},
+                        {"attribute": "last_name", "value": "Jones"},
+                        {"attribute": "last_order_number", null}
+                      ]
+                    }'
+        ```
+
+        ### Confirm your attributes
+
+        The CRM attributes sent back in the response must be confirmed before they are saved in Inbox 2.0. There are two ways to do that:
+
+          -   Select the `Confirm` button when you see the CRM attributes displayed in Inbox 2.0 after the lookup request.
+          -   Add an `autoConfirm` field to the response.
+
+        The `autoConfirm` field tells Inbox 2.0 to automatically save the attributes without having to use the `Confirm` button.
+      operationId: crmAttributeLookup
+      security:
+        - Oauth2ClientCredentials: []
+        - SharedSecret: []
+      tags:
+        - crm_webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: JSON object containing the lookup attributes
+              additionalProperties:
+                type: string
+            example:
+              my-customer-id: '123'
+      responses:
+        '200':
+          description: |
+            Returns the attributes to be updated in Inbox 2.0.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrmLookupAttributesResponse'
+        4xx:
+          description: |
+            Lookup failed
+        5xx:
+          description: |
+            Lookup failed
+  crm-error-notifications:
+    post:
+      summary: Contact attribute lookup error notifications event
+      description: |
+        When attribute update validation errors occur, Inbox 2.0 sends a request to the configured notification URL.
+
+        ### Configure notification URL
+
+        When you send your CRM managed contact attributes, Inbox 2.0 does some validation on the response. To see validation errors, we've provided a way to send notifications from Inbox 2.0 to your system. You need to provide a POST endpoint that accepts a JSON request body. Configure a notification URL on the same screen where you configured a lookup URL:
+
+          1.  Go to `Admin settings`.
+          2.  Expand `Integration and APIs`.
+          3.  Select `CRM`.
+
+        ### Handle the request
+
+        When validation errors occur, Inbox 2.0 sends a request to the configured notification URL. A request [looks like this](#operation/crmAttributeLookupValidationErrorNotification).
+
+        The request contains these two fields:
+
+          -   eventType
+          -   messages: an array of explicit error messages
+
+        The following are the event types that can be sent by Inbox 2.0.
+
+        | Event type        | Description                                                 |
+        |-------------------|-------------------------------------------------------------|
+        | DATA_IMPORT_ERROR | Error occurred while pulling data from the CRM to Inbox 2.0. |
+
+        The response to this request can be a 204. Inbox 2.0 does not expect anything in the response body.
+      operationId: crmContactAttributeLookupErrorNotification
+      security:
+        - Oauth2ClientCredentials: []
+        - SharedSecret: []
+      tags:
+        - crm_webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrmErrorNotificationsRequest'
+      responses:
+        '204':
+          description: |
+            To indicate that the notification was received successfully
+        4xx:
+          description: |
+            Could not process notification
+        5xx:
+          description: |
+            Could not process notification
+  crm-write-back:
+    post:
+      summary: |
+        CRM write back event
+      description: |
+        # CRM write back
+
+        You can be notified whenever a conversation has taken place in Inbox 2.0 (`CONVERSATION_RESOLVED`) or an agent has set a current conversation to Pending (`CONVERSATION_SET_TO_PENDING`). This allows you to save conversation details to your existing CRM system. Other use cases include triggering CSAT surveys, case creation, and expanded customer insights from social media profiles.
+
+        ### Configure write back URL
+
+        To push data from Inbox 2.0 into your CRM, you need to implement a POST endpoint that accepts a JSON request and returns a JSON response. The request contains write back payload, and the response's status code represents your ability to parse the payload and the CRM's ability to ingest the data.
+
+        Configure the endpoint as the `Write Back URL`:
+
+          1.  Go to `Admin settings`.
+          2.  Expand `Integration and APIs`.
+          3.  Select `CRM`.
+
+        ### Handle the request
+
+        When the endpoint in your system is ready and configured in Inbox 2.0, and relevant events occur within Inbox 2.0, requests are sent to the configured endpoint. All decoded write back payloads have the following fields:
+
+          -   `type`: A string that defines what kind of write back request is being processed. Used to suggest the structure of the `data` field.
+          -   `version`: A number designating the version of the `type` of request. Used to mark changes to the `data` field structure.
+          -   `idempotencyKey`: A string that uniquely identifies each event to write back. Used to help ensure that each request is processed only once.
+          -   `data`: An object that contains structured data for the specific `type` of write back. For example, a `CONVERSATION_RESOLVED` type event has fields such as `medium`, `channel`, `messages`\*, `notes`, `topics`, `contactProfile`\*, `attributes`\*, and `agent`, among others.
+
+          `*` Applies to all mediums except Twitter. Twitter handle, tweets, and direct message transcripts, and Twitter medium contact attributes (Twitter name, number of followers, etc.), are not sent in the payload, to conform to Twitter's data use policies.
+
+        ### CONVERSATION_RESOLVED and CONVERSATION_SET_TO_PENDING events
+
+        Events with a type of either `CONVERSATION_RESOLVED` or `CONVERSATION_SET_TO_PENDING` have the structure defined.
+
+        ### Write back retry
+
+        If the write back request times out or the endpoint returns a non-success (2XX) status code, Inbox 2.0 retries with exponential backoffs. The requests are sent again with a delay of 1, 2, 4, 8, 16, and 32 hours after each retry (a total of 6 requests), as long as the request does not succeed. If the request still has not succeeded after 6 requests, we store the failed request details for future reference. We recommend that you inspect the endpoint logs regularly to ensure that write back requests are properly processed the first time. To distinguish between unique events, each request is given an Idempotency key.
+
+        ### Idempotency key
+
+        The write back requests from Inbox 2.0 make use of an Idempotency key, which allows the write back endpoint to ensure it processes each request once. This key helps when requests are sent multiple times during the retry schedule, so the endpoint can handle requests in an idempotent way. The key is unique per request.
+      operationId: crmWriteBack
+      security:
+        - Oauth2ClientCredentials: []
+        - SharedSecret: []
+      tags:
+        - crm_webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrmWriteBackRequest'
+      responses:
+        2xx:
+          description: |
+            The response status code represents your ability to parse the payload and the CRM's ability to ingest the data.
+        4xx:
+          description: |
+            The response status code represents your ability to parse the payload and the CRM's ability to ingest the data. Any non-2XX response status code will be retried.
+        5xx:
+          description: |
+            The response status code represents your ability to parse the payload and the CRM's ability to ingest the data. Any non-2XX response status code will be retried.
+  vai-conversation-started:
+    post:
+      summary: |
+        CONVERSATION_STARTED
+      description: |
+        ### CONVERSATION_STARTED
+
+        The `CONVERSATION_STARTED` event is sent when a conversation is assigned to your `Inception virtual agent`. You will
+        only receive messages and will only be able to reply to messages as long as the conversation is assigned to
+        the `Inception virtual agent`.
+
+        As part of this event, you receive extra information about the contact profile trying to contact you, the channel over
+        which they are contacting you, and the contact attributes. The contact attributes include medium specific information,
+        information added manually before, and information coming from previous CRM lookups. Note that
+        the `Inception Virtual Agent` will receive the `CONVERSATION_STARTED` event before any configured CRM lookup is
+        performed and therefore the event will not include any new information from the CRM.
+
+        After the `CONVERSATION_STARTED` event, you'll receive an `INBOUND_MESSAGE_RECEIVED` event for each message the contact
+        sends, starting from the beginning of the conversation.
+      operationId: vaiConversationStarted
+      security:
+        - SharedSecret: []
+      tags:
+        - vai_webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationStartedEvent'
+      responses:
+        '200':
+          description: |
+            Your response to the webhook should be a status `200 OK`. In the body, you can optionally return the response you want to send to the contact.
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ConversationManipulation'
+        4xx:
+          description: |
+            The webhook event is not processed successfully. See [Add a Virtual Agent](#section/Add-a-Virtual-Agent) on how to configure error behavior.
+        5xx:
+          description: |
+            The webhook event is not processed successfully. See [Add a Virtual Agent](#section/Add-a-Virtual-Agent) on how to configure error behavior.
+  vai-conversation-delegated:
+    post:
+      summary: |
+        CONVERSATION_DELEGATED
+      description: |
+        ### CONVERSATION_DELEGATED
+
+        The `CONVERSATION_DELEGATED` event is sent when a conversation is assigned to your Delegation virtual agent. Like
+        the `CONVERSATION_STARTED` event, this contains extra information about the contact profile trying to contact you, the
+        channel over which they are contacting you, and the contact attributes.
+
+        After the `CONVERSATION_DELEGATED` event, you'll receive an `INBOUND_MESSAGE_RECEIVED` event for each message the
+        contact sends, starting from when the conversation is assigned to the virtual agent. Unlike the `CONVERSATION_STARTED`
+        event, the `CONVERSATION_DELEGATED` event is often not immediately followed by an `INBOUND_MESSAGE_RECEIVED`. Instead,
+        it is expected that the virtual agent will ask the first question to the contact. After you've received
+        a `CONVERSATION_DELEGATED` event, you have 2 minutes to ask this first question. See the requirements for more details.
+      operationId: vaiConversationDelegated
+      security:
+        - SharedSecret: []
+      tags:
+        - vai_webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationDelegatedEvent'
+      responses:
+        '200':
+          description: |
+            Your response to the webhook should be a status `200 OK`. In the body, you have the option to return the response you want to send to the contact.
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ConversationManipulation'
+        4xx:
+          description: |
+            The webhook event is not processed successfully. See [Add a virtual agent](#section/Add-a-Virtual-Agent) on how to configure error behavior.
+        5xx:
+          description: |
+            The webhook event is not processed successfully. See [Add a virtual agent](#section/Add-a-Virtual-Agent) on how to configure error behavior.
+  vai-inbound-message-received:
+    post:
+      summary: |
+        INBOUND_MESSAGE_RECEIVED
+      description: |
+        ### INBOUND_MESSAGE_RECEIVED
+
+        After the conversation is assigned to the virtual agent, and after you received a `CONVERSATION_STARTED` or
+        a `CONVERSATION_DELEGATED` event, you will start receiving `INBOUND_MESSAGE_RECEIVED` events. These events occur every
+        time the contact sends a message. Note that we send the conversation topics with each `INBOUND_MESSAGE_RECEIVED` event.
+      operationId: vaiInboundMessageReceived
+      security:
+        - SharedSecret: []
+      tags:
+        - vai_webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InboundMessageReceivedEvent'
+      responses:
+        '200':
+          description: |
+            Your response to the webhook should be a status `200 OK`. In the body, you can optionally return the response you want to send to the contact.
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ConversationManipulation'
+        4xx:
+          description: |
+            The webhook event is not processed successfully. See [Add a Virtual Agent](#section/Add-a-Virtual-Agent) on how to configure error behavior.
+        5xx:
+          description: |
+            The webhook event is not processed successfully. See [Add a Virtual Agent](#section/Add-a-Virtual-Agent) on how to configure error behavior.

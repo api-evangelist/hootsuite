@@ -1,0 +1,276 @@
+generated: '2026-08-13'
+method: derived
+source: >-
+  openapi/hootsuite-rest-api-openapi.yml (89 schemas),
+  openapi/hootsuite-analytics-api-openapi.yml (48 schemas),
+  openapi/hootsuite-inbox-api-openapi.yml (37 schemas),
+  openapi/hootsuite-amplify-api-openapi.yml (23 schemas)
+docs:
+- https://apidocs.hootsuite.com/docs/api/index.html
+- https://developer.hootsuite.com/docs/networks-reference
+description: >-
+  Entity-relationship graph for the Hootsuite platform, derived from $ref links and id-reference
+  fields across the four published contracts. The model is organization-rooted: an Organization owns
+  Members, Teams and SocialProfiles, and every permission question resolves against that triangle.
+  Message is the write-heavy centre - it fans out to many SocialProfiles at once and carries an
+  approval sub-model (Reviewer / ReviewAction / reviewState) that most social APIs do not have.
+id_style: opaque numeric strings
+id_prefixes: none
+note_on_ids: >-
+  Hootsuite ids are bare numeric strings with no type prefix (socialProfileId "1234", organization
+  id "8962198", message id "182836179"). An id alone does not identify its own type, so an agent
+  must track which field it came from. The Error object's optional `resource: {type, id}` block is
+  the only place Hootsuite pairs an id with its type.
+entities:
+- name: Organization
+  schema: MeOrganization
+  key: id
+  fields:
+  - id
+  - name
+  - logoUrl
+  relationships:
+  - has_many: Member
+    via: GET /v1/organizations/{organizationId}/members
+  - has_many: Team
+    via: GET /v1/organizations/{organizationId}/teams
+  - has_many: SocialProfile
+    via: ownerId when owner = organization
+  - has_many: AdAccount
+    via: AdAccount is scoped by organizationId in Analytics paid requests
+- name: Member
+  schema: Member
+  key: id
+  required:
+  - email
+  - fullName
+  fields:
+  - id
+  - email
+  - fullName
+  - companyName
+  - bio
+  - timezone
+  - language
+  - isActive
+  - createdDate
+  - modifiedDate
+  relationships:
+  - belongs_to_many: Organization
+    via: GET /v1/members/{memberId}/organizations
+  - belongs_to_many: Team
+    via: GET /v1/organizations/{orgId}/members/{memberId}/teams
+  - has_many: SocialProfile
+    via: GET /v1/me/socialProfiles (permission-filtered)
+  - mirrors: ScimUser
+    via: /scim/v2/Users - the same member, exposed under the SCIM 2.0 representation
+- name: Team
+  schema: Team
+  key: id
+  fields:
+  - id
+  - name
+  - logoUrl
+  - createdDate
+  - createdByMember
+  - modifiedDate
+  - modifiedByMember
+  relationships:
+  - belongs_to: Organization
+    via: path segment organizationId
+  - has_many: TeamMember
+    via: GET /v1/organizations/{orgId}/teams/{teamId}/members
+  - has_many: SocialProfile
+    via: GET /v1/organizations/{orgId}/teams/{teamId}/socialProfiles
+  - has_one: TeamPermissions
+    via: GET /v1/organizations/{orgId}/teams/{teamId}/members/{memberId}/permissions
+  - mirrors: ScimGroup
+    via: /scim/v2/Groups - a Hootsuite team, exposed under the SCIM 2.0 representation
+- name: SocialProfile
+  schema: SocialProfile
+  key: id
+  fields:
+  - id
+  - type
+  - socialNetworkId
+  - socialNetworkUsername
+  - avatarUrl
+  - owner
+  - ownerId
+  - isReauthRequired
+  relationships:
+  - belongs_to: Member or Organization
+    via: 'polymorphic: owner names the type, ownerId names the row'
+  - has_many: Team
+    via: GET /v1/socialProfiles/{socialProfileId}/teams
+  - has_many: Message
+    via: Message.socialProfileIds
+  - has_one: SocialProfilePermissions
+    via: GET /v1/organizations/{orgId}/members/{memId}/socialProfiles/{profileId}/permissions
+  note: >-
+    isReauthRequired = 1 is the single most operationally important field in the model: it means the
+    upstream network token has lapsed and every publish to that profile will fail until a human
+    reconnects it. An agent must check it before scheduling.
+- name: Message
+  schema: Message
+  key: id
+  fields:
+  - text
+  - socialProfileIds
+  - scheduledSendTime
+  - webhookUrls
+  - tags
+  - targeting
+  - privacy
+  - location
+  - emailNotification
+  - mediaUrls
+  - media
+  - extendedInfo
+  relationships:
+  - has_many: SocialProfile
+    via: socialProfileIds
+  - has_many: Media
+    via: media[].id
+  - has_one: TargetingOptions
+    via: targeting
+  - has_one: PrivacyOptions
+    via: privacy
+  - has_one: Location
+    via: location
+  - has_many: ReviewAction
+    via: GET /v1/messages/{messageId}/history
+  fan_out: >-
+    POST /v1/messages takes an ARRAY of socialProfileIds and returns an ARRAY of uniquely
+    identifiable messages, one per profile. The request is one logical post; the result is N
+    persisted Message rows with N distinct ids. Pinterest cannot be bundled with any other profile.
+  states:
+  - SCHEDULED
+  - PENDING_APPROVAL
+  - APPROVED
+  - SUBMITTED
+  - SENT
+  - SEND_FAILED_PERMANENTLY
+  - DELETED
+  - REJECTED
+- name: SocialProfileComment
+  schema: SocialProfileComment
+  key: id
+  required:
+  - id
+  - reviewState
+  fields:
+  - id
+  - comment
+  - createdDate
+  - creatorId
+  - creatorName
+  - parentId
+  - parentType
+  - reviewState
+  - sequenceNumber
+  - socialProfileId
+  relationships:
+  - belongs_to: SocialProfile
+    via: socialProfileId
+  - belongs_to: Member
+    via: creatorId
+  note: >-
+    parentId is the SOCIAL NETWORK's native post id, not a Hootsuite id - the one place the model
+    crosses into foreign identifier space.
+- name: Media
+  schema: Media
+  key: id
+  fields:
+  - id
+  - thumbnailId
+  - videoOptions
+  relationships:
+  - has_one: MediaUploadUrl
+    via: POST /v1/media returns a presigned S3 uploadUrl plus the media id
+  - referenced_by: Message
+    via: media[].id
+  lifecycle: Hootsuite deletes uploaded media 90 days after it is used in a message.
+- name: AdAccount
+  schema: AdAccount
+  key: ad_account_id
+  fields:
+  - ad_account_id
+  - social_network
+  - external_id
+  - name
+  - status
+  - currency_code
+  - timezone
+  - business_id
+  - can_access_api
+  - social_profile_id
+  - social_profile_token_status
+  - has_payment_method
+  - native_status
+  relationships:
+  - has_one: SocialProfile
+    via: social_profile_id
+  - belongs_to: Organization
+    via: organizationId, required alongside adAccountId in every Analytics paid filter
+  note: >-
+    AdAccount is the only entity in the model using snake_case field names. The rest of the REST API
+    is camelCase - a real inconsistency an agent must handle.
+- name: Reviewer
+  schema: Reviewer
+  key: id
+  fields:
+  - id
+  - type
+  relationships:
+  - belongs_to: Member
+    via: id
+- name: ReviewAction
+  schema: ReviewAction
+  fields:
+  - actorType
+  - actorId
+  - actionType
+  - timestamp
+  relationships:
+  - belongs_to: Message
+    via: GET /v1/messages/{messageId}/history
+- name: ScimUser
+  schema: ScimUser
+  key: id
+  standard: RFC 7643
+  relationships:
+  - mirrors: Member
+- name: ScimGroup
+  schema: ScimGroup
+  key: id
+  standard: RFC 7643
+  relationships:
+  - mirrors: Team
+  - has_many: MemberRef
+    via: members[]
+- name: Conversation
+  source_spec: openapi/hootsuite-inbox-api-openapi.yml
+  key: conversationId
+  relationships:
+  - has_many: InboxMessage
+    via: messageId on INBOUND_MESSAGE_RECEIVED events
+  - has_one: ContactProfile
+    via: contactProfileId
+  note: >-
+    Inbox 2.0 is a separate domain with its own identifier space (conversationId,
+    contactProfileId, correlationId, mediumId). Nothing in the published contracts joins an Inbox
+    Conversation to a REST SocialProfile or Message.
+- name: Topic
+  source_spec: openapi/hootsuite-amplify-api-openapi.yml
+  relationships:
+  - belongs_to: Organization
+  note: Amplify employee-advocacy content topics; a third, separate identifier space.
+domains:
+  count: 4
+  note: >-
+    Hootsuite is not one data model. The REST platform (organization/member/team/profile/message),
+    Analytics (post and profile metrics keyed by profileId), Inbox 2.0 (conversation/contact) and
+    Amplify (topic/message) each define their own entities, and the published contracts do not
+    declare join keys between them beyond profileId, which Analytics accepts and Inbox does not.
+render: null

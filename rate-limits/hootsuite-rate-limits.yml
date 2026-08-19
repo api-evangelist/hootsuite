@@ -1,0 +1,93 @@
+generated: '2026-08-13'
+method: searched
+source: https://developer.hootsuite.com/docs/api-rate-limits
+docs:
+- https://developer.hootsuite.com/docs/api-rate-limits
+- https://developer.hootsuite.com/docs/using-the-api
+description: >-
+  Hootsuite publishes a single platform-wide rate limit for the REST APIs: a per-second request
+  ceiling plus a daily quota, both applied to the calling account. Runtime state is returned on
+  every response in three X-Account-* headers.
+limit_count: 2
+limits:
+- id: per-second-requests
+  scope: per-account
+  window: 1s
+  limit: 20
+  unit: requests
+  burst: null
+  note: >-
+    Published verbatim as "Limits are set to 20 requests / second". Hootsuite warns that the
+    remaining-requests header is reported per cluster node, with the allowance divided equally
+    across nodes, so the value is a guide rather than an exact budget.
+- id: daily-quota
+  scope: per-account
+  window: 1d
+  limit: 100000
+  unit: calls
+  burst: null
+  note: Published verbatim as "a maximum daily quota of 100,000 calls per day".
+headers:
+  style: vendor
+  response:
+  - name: X-Account-Quota
+    description: A description of the quota applied to the client's account.
+    example: 100000 per day
+  - name: X-Account-Quota-Used
+    description: The number of calls that have been made against the account quota.
+    example: '6'
+  - name: X-Account-Rate-Limit-Requests-Remaining
+    description: >-
+      Remaining requests in the current one-second window. Returned per node, so treat as a guide.
+    example: '14'
+  retry_after: false
+  note: >-
+    Hootsuite does NOT emit RFC 9239 / draft-ietf-httpapi RateLimit-* headers and does NOT return
+    Retry-After on a 429. A client has to back off on its own clock until the end of the current
+    one-second window.
+exhaustion:
+  status: 429
+  status_text: Too Many Requests
+  body_format: Hootsuite error envelope (errors[] with code/message/id)
+  example: |
+    {
+      "errors": [
+        {
+          "code": 1003,
+          "message": "Account plan limit exceeded",
+          "id": "0000015bd565ee00-8fbd"
+        }
+      ]
+    }
+  error_codes:
+  - code: 1003
+    meaning: Account plan limit exceeded
+  - code: 1004
+    meaning: API plan limit exceeded
+  - code: 1043
+    meaning: Too many requests
+other_limits:
+- surface: Analytics API
+  limit: At most 10 social profile IDs per call; requests beyond that must be batched.
+  source: https://developer.hootsuite.com/docs/using-the-api
+- surface: Analytics API (paid)
+  limit: filters.adAccounts accepts at most 10 ad accounts per request.
+  source: https://developer.hootsuite.com/docs/using-the-api
+- surface: Analytics API
+  limit: >-
+    Maximum 100 results per call (limit parameter, default 10 for paid collections); a pagination
+    cursor is returned when more results exist.
+  source: https://developer.hootsuite.com/docs/using-the-api
+- surface: Analytics API
+  limit: >-
+    reportingPeriod may start at most 2 years in the past; lastModified at most 30 days in the past.
+  source: https://developer.hootsuite.com/docs/listposts
+- surface: REST API messages
+  limit: >-
+    More than 50 outbound messages returned automatically creates a pagination cursor.
+  source: https://developer.hootsuite.com/reference/retrievemessages
+undocumented:
+  note: >-
+    Hootsuite explicitly reserves the right to apply additional, undocumented rate limiting to
+    prevent abuse, spam and denial-of-service, and states that in those cases a descriptive error
+    may not be returned.

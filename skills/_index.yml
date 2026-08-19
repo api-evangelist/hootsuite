@@ -1,0 +1,107 @@
+generated: '2026-08-13'
+method: generated
+source: >-
+  openapi/hootsuite-rest-api-openapi.yml, openapi/hootsuite-analytics-api-openapi.yml,
+  plus the Hootsuite developer documentation cited in each skill
+description: >-
+  Packaged Agent Skills for the marquee Hootsuite flows. Every operationId referenced in these
+  skills was read out of a first-party Hootsuite specification - none were invented. Each skill
+  carries the runtime rules the specifications do not state: the missing idempotency contract, the
+  dashboard-permission layer that sits behind the two OAuth scopes, the cursor loop, and the
+  proprietary rate-limit headers.
+skill_count: 4
+skills:
+- name: hootsuite-schedule-social-post
+  file: hootsuite-schedule-social-post.md
+  api: Hootsuite REST API
+  summary: >-
+    Schedule a post to one or more connected profiles, with optional presigned S3 media upload, and
+    confirm it landed. Covers the fan-out response, the isReauthRequired trap and safe retry.
+  operations:
+  - retrieveMe
+  - getMySocialProfiles
+  - createMedia
+  - getMedia
+  - scheduleMessage
+  - retrieveMessage
+  - retrieveMessages
+  - deleteMessage
+  consequence: write
+  reversible: only while state is SCHEDULED
+- name: hootsuite-pull-analytics
+  file: hootsuite-pull-analytics.md
+  api: Hootsuite Analytics REST API
+  summary: >-
+    Extract organic post/profile metrics and paid campaign/ad-set/ad metrics into a pipeline,
+    including the app-side analytics:read enablement, the batches of 10, and the cursor loop.
+  operations:
+  - retrieveMeOrganizations
+  - getSocialProfiles
+  - retrieveOrganizationMembersSocialProfiles
+  - getMyAdAccounts
+  - listPosts
+  - listProfilesMetrics
+  - listPaid
+  - listPaidMetrics
+  consequence: read
+- name: hootsuite-provision-users-scim
+  file: hootsuite-provision-users-scim.md
+  api: Hootsuite REST API (SCIM 2.0 + native)
+  summary: >-
+    Provision and deprovision members and teams over SCIM 2.0 or the native organization endpoints,
+    and read back the permissions that actually govern what those users can do.
+  operations:
+  - getScimResourceTypes
+  - createScimUser
+  - getScimUsers
+  - getScimUser
+  - replaceScimUser
+  - modifyScimUser
+  - createScimGroup
+  - getScimGroups
+  - getScimGroup
+  - replaceScimGroup
+  - modifyScimGroup
+  - createMember
+  - retrieveMember
+  - retrieveOrganizationMembers
+  - removeMemberFromOrganization
+  - createTeam
+  - addMemberToTeam
+  - getTeamMembers
+  - getTeam
+  - retrieveOrganizationMemberOrganizationPermissions
+  - retrieveOrganizationMembersTeamPermissions
+  consequence: write
+- name: hootsuite-approval-workflow
+  file: hootsuite-approval-workflow.md
+  api: Hootsuite REST API
+  summary: >-
+    Drive the prescreen approval workflow for messages and comments, read review history before
+    acting, and react to state changes over webhooks instead of polling.
+  operations:
+  - retrieveMessages
+  - retrieveMessage
+  - approveMessage
+  - rejectMessage
+  - getMessageHistory
+  - retrieveComment
+  - approveComment
+  - rejectComment
+  consequence: write
+  reversible: false
+provider_published_skills:
+  found: false
+  note: >-
+    Hootsuite publishes no AGENTS.md, no /skills directory and no agent-skill manifest on any host.
+    /llms.txt exists and is captured verbatim at llms/hootsuite-llms.txt, but it is a documentation
+    index, not a skill package. These four skills are ours, generated from Hootsuite's own contracts.
+cross_cutting:
+  idempotency: >-
+    NONE. Every write skill carries an explicit reconcile-before-retry procedure because Hootsuite
+    ships no Idempotency-Key and no replay-safe retry contract.
+  errors: errors/hootsuite-problem-types.yml
+  conventions: conventions/hootsuite-conventions.yml
+  rate_limits: rate-limits/hootsuite-rate-limits.yml
+  authentication: authentication/hootsuite-authentication.yml
+  scopes: scopes/hootsuite-scopes.yml

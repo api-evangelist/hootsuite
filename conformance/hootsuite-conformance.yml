@@ -1,0 +1,155 @@
+generated: '2026-08-13'
+method: derived
+source: >-
+  openapi/hootsuite-rest-api-openapi.yml, openapi/hootsuite-inbox-api-openapi.yml,
+  openapi/hootsuite-analytics-api-openapi.yml, openapi/hootsuite-amplify-api-openapi.yml,
+  well-known/hootsuite-oauth-authorization-server.json,
+  well-known/hootsuite-oauth-protected-resource.json,
+  well-known/hootsuite-api-catalog.json,
+  https://developer.hootsuite.com/docs/api-overview
+description: >-
+  Industry and cross-cutting standards Hootsuite conforms to, each with the evidence that
+  establishes it. Hootsuite is unusually strong on discovery and identity standards for a marketing
+  SaaS - it serves RFC 8414, RFC 9728 and RFC 9727 documents and ships SCIM 2.0 provisioning - and
+  unusually weak on error and idempotency standards.
+standards:
+- id: oauth2
+  name: OAuth 2.0 (RFC 6749)
+  conforms: true
+  evidence: >-
+    securitySchemes OAuth2 with authorizationCode flow on the REST and Analytics specs;
+    authorizationUrl https://platform.hootsuite.com/oauth2/auth, tokenUrl
+    https://platform.hootsuite.com/oauth2/token. OAuth error bodies use the RFC 6749 section 5.2
+    shape and enum. Documented at https://developer.hootsuite.com/docs/api-authentication.
+- id: rfc8414
+  name: OAuth 2.0 Authorization Server Metadata (RFC 8414)
+  conforms: true
+  evidence: >-
+    https://platform.hootsuite.com/.well-known/oauth-authorization-server returns HTTP 200 with a
+    valid metadata document (issuer, authorization_endpoint, token_endpoint,
+    registration_endpoint, scopes_supported, grant_types_supported, code_challenge_methods_supported).
+    Probed 2026-08-13.
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata (RFC 9728)
+  conforms: true
+  evidence: >-
+    https://platform.hootsuite.com/.well-known/oauth-protected-resource returns HTTP 200 with
+    resource, authorization_servers, bearer_methods_supported and scopes_supported. Probed 2026-08-13.
+  caveat: >-
+    scopes_supported is published as the single string "offline analytics:read" rather than the
+    two-element array RFC 9728 requires. A strict client parsing this array gets one unknown scope.
+- id: rfc7636
+  name: PKCE (RFC 7636)
+  conforms: true
+  evidence: code_challenge_methods_supported = ["S256"] in the authorization server metadata.
+- id: rfc7591
+  name: OAuth 2.0 Dynamic Client Registration (RFC 7591)
+  conforms: partial
+  evidence: >-
+    The authorization server metadata advertises registration_endpoint
+    https://platform.hootsuite.com/oauth2/register. Not exercised, and not documented anywhere in
+    the developer documentation, which instead directs developers to register apps by hand in the
+    Hootsuite dashboard. Recorded as advertised-but-undocumented.
+- id: rfc9727
+  name: API Catalog (RFC 9727) / linkset (RFC 9264)
+  conforms: true
+  evidence: >-
+    https://www.hootsuite.com/.well-known/api-catalog returns HTTP 200 with content-type
+    application/linkset+json and three anchors carrying service-desc and service-doc relations.
+    Probed 2026-08-13. Hootsuite is one of very few commercial SaaS providers serving this.
+  caveat: >-
+    The catalog is incomplete: it lists the REST and Inbox 2.0 specifications but omits the
+    Analytics API and Amplify API OpenAPIs, both of which are published and publicly fetchable.
+- id: scim
+  name: SCIM 2.0 (RFC 7643 / RFC 7644)
+  conforms: true
+  evidence: >-
+    11 operations under /scim/v2/ (Users, Groups, ResourceTypes) with PATCH PatchOp bodies,
+    SCIM error responses carrying urn:ietf:params:scim:api:messages:2.0:Error and the scimType enum
+    (invalidSyntax, mutability, invalidValue, uniqueness). Declared in
+    openapi/hootsuite-rest-api-openapi.yml under the "SCIM 2.0" tag.
+- id: saml
+  name: SAML 2.0
+  conforms: true
+  evidence: >-
+    "SAML 2.0 for Single Sign On integration" listed as a platform feature at
+    https://developer.hootsuite.com/docs/api-overview. Configuration is not publicly documented.
+- id: openapi
+  name: OpenAPI Specification
+  conforms: true
+  evidence: >-
+    Four first-party machine-readable contracts published: REST API (Swagger 2.0), Amplify API
+    (Swagger 2.0), Analytics API (OpenAPI 3.0.0), Inbox 2.0 API (OpenAPI 3.1.0). Two of the four are
+    still on Swagger 2.0, a decade-old version.
+- id: openapi-webhooks
+  name: OpenAPI 3.1 webhooks
+  conforms: true
+  evidence: >-
+    openapi/hootsuite-inbox-api-openapi.yml declares six top-level `webhooks` entries
+    (crm-attribute-lookup, crm-error-notifications, crm-write-back, vai-conversation-started,
+    vai-conversation-delegated, vai-inbound-message-received).
+- id: rfc9457
+  name: Problem Details for HTTP APIs (RFC 9457 / RFC 7807)
+  conforms: false
+  evidence: >-
+    No operation in any of the four specifications returns application/problem+json. Errors use
+    Hootsuite's own errors[] envelope with content-type application/json;charset=utf-8. See
+    errors/hootsuite-problem-types.yml.
+- id: idempotency
+  name: Idempotency-Key (draft-ietf-httpapi-idempotency-key-header)
+  conforms: false
+  evidence: >-
+    No idempotency key header, no replay-safe retry contract, no client request id on any surface,
+    including POST /v1/messages which schedules real social posts.
+- id: ratelimit-headers
+  name: RateLimit header fields (RFC 9239 / draft-ietf-httpapi-ratelimit-headers)
+  conforms: false
+  evidence: >-
+    Hootsuite emits proprietary X-Account-Quota, X-Account-Quota-Used and
+    X-Account-Rate-Limit-Requests-Remaining, and returns no Retry-After on a 429.
+- id: rfc8594
+  name: Sunset header (RFC 8594)
+  conforms: false
+  evidence: >-
+    No Sunset or Deprecation header is documented, and no operation carries `deprecated: true`.
+    Deprecations are announced only in the developer changelog.
+- id: pagination
+  name: Cursor pagination
+  conforms: true
+  evidence: >-
+    Opaque cursor tokens returned in the response metadata block on messages and analytics
+    collections; documented at https://developer.hootsuite.com/docs/using-the-api and surfaced as
+    error code 3020 "Invalid cursor format".
+- id: json-api
+  name: 'JSON:API'
+  conforms: false
+  evidence: >-
+    Hootsuite uses its own {data, errors, metadata} envelope. It is envelope-shaped but not
+    JSON:API - no type/id/attributes/relationships structure, no application/vnd.api+json.
+- id: cloudevents
+  name: CloudEvents
+  conforms: partial
+  evidence: >-
+    Webhook payloads use reverse-DNS versioned event type names in the CloudEvents style
+    (com.hootsuite.messages.event.v1, com.hootsuite.comments.event.v1, com.hootsuite.apps.event.v1,
+    com.hootsuite.ping.event.v1) and carry `type` and `data`. They do NOT carry the required
+    CloudEvents attributes specversion, id, source or time, so they are CloudEvents-flavored, not
+    conformant.
+- id: gdpr
+  name: GDPR
+  conforms: true
+  evidence: >-
+    https://www.hootsuite.com/security links GDPR guidance; Hootsuite publishes a Developer Data
+    Processing Addendum at https://www.hootsuite.com/legal/api-terms-of-service/developer-dpa.
+- id: asyncapi
+  name: AsyncAPI
+  conforms: false
+  evidence: >-
+    Hootsuite documents webhooks in prose and in the Inbox 2.0 OpenAPI 3.1 webhooks block, but
+    publishes no AsyncAPI document. See asyncapi/hootsuite-webhooks.yml.
+not_applicable:
+- fhir
+- fapi
+- psd2
+- odata
+- open-banking

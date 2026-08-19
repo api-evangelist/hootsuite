@@ -1,17 +1,133 @@
-generated: '2026-07-11'
-method: derived
-source: openapi/hootsuite-openapi.yml
+generated: '2026-08-13'
+method: searched
+source: >-
+  https://platform.hootsuite.com/.well-known/oauth-authorization-server,
+  https://developer.hootsuite.com/docs/using-the-api,
+  https://developer.hootsuite.com/docs/api-permissions-matrix,
+  openapi/hootsuite-rest-api-openapi.yml, openapi/hootsuite-analytics-api-openapi.yml,
+  openapi/hootsuite-inbox-api-openapi.yml
+docs: https://developer.hootsuite.com/docs/api-permissions-matrix
+description: >-
+  Hootsuite's OAuth scope surface is deliberately tiny - the authorization server advertises exactly
+  two scopes - because scopes are not how Hootsuite authorizes. Access is decided by the caller's
+  dashboard role (organization / team / social-network permissions), which Hootsuite publishes as a
+  separate operation-by-operation permissions matrix. Both layers are recorded here, because holding
+  the right scope is necessary and not sufficient.
+scope_count: 2
+authoritative_source: https://platform.hootsuite.com/.well-known/oauth-authorization-server
 schemes:
 - name: OAuth2
-  source: openapi/hootsuite-openapi.yml
+  source: openapi/hootsuite-rest-api-openapi.yml
   flows:
   - flow: authorizationCode
     authorizationUrl: https://platform.hootsuite.com/oauth2/auth
     tokenUrl: https://platform.hootsuite.com/oauth2/token
+- name: OAuth2
+  source: openapi/hootsuite-analytics-api-openapi.yml
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: https://platform.hootsuite.com/oauth2/auth
+    tokenUrl: https://platform.hootsuite.com/oauth2/token
+- name: Oauth2ClientCredentials
+  source: openapi/hootsuite-inbox-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: TO_BE_CONFIGURED_IN_INBOX_2_0
 scopes:
 - scope: offline
-  description: Issue a refresh token alongside the access token
+  description: >-
+    Request refresh tokens. Without it the authorization-code exchange returns an access token only,
+    and the integration must re-prompt the user every hour.
   flows:
   - authorizationCode
+  grants_access_to: nothing on its own - it is a token-lifetime scope, not a data scope
   sources:
-  - openapi/hootsuite-openapi.yml
+  - https://platform.hootsuite.com/.well-known/oauth-authorization-server
+  - openapi/hootsuite-rest-api-openapi.yml
+  - openapi/hootsuite-analytics-api-openapi.yml
+- scope: analytics:read
+  description: Request analytics API access.
+  flows:
+  - authorizationCode
+  - member_app
+  grants_access_to:
+  - POST /v1/analytics/posts (listPosts)
+  - POST /v1/analytics/profiles (listProfilesMetrics)
+  - POST /v1/analytics/paid/{adEntityCollection} (listPaid)
+  - POST /v1/analytics/paid/{adEntityCollection}/metrics (listPaidMetrics)
+  enablement: >-
+    Must be enabled on the app itself before it can be requested - App directory -> Developer apps
+    -> [app] -> Security -> Rest API tab -> tick analytics:read -> Save.
+  sources:
+  - https://platform.hootsuite.com/.well-known/oauth-authorization-server
+  - https://developer.hootsuite.com/docs/using-the-api
+  - openapi/hootsuite-analytics-api-openapi.yml
+not_a_scope:
+- value: some_scope
+  found_in: openapi/hootsuite-inbox-api-openapi.yml (Oauth2ClientCredentials.scopes)
+  description_in_spec: TO_BE_CONFIGURED_IN_INBOX_2_0
+  note: >-
+    Placeholder text left in the published Inbox 2.0 specification, not a real scope. Recorded here
+    so a later derive pass does not promote it into the scopes[] list. Inbox 2.0 client-credentials
+    scope is provisioned per customer as a CRM-Instance-URL value, per
+    https://developer.hootsuite.com/reference/oauth2token.
+coverage:
+  operations_total: 76
+  operations_covered_by_a_data_scope: 4
+  note: >-
+    Only the four Analytics operations sit behind a data scope. The other 72 published operations -
+    including scheduling messages, deleting messages, creating members, removing members from
+    organizations and the full SCIM 2.0 provisioning surface - are reachable with a token carrying
+    no data scope at all. There is no publish scope, no read-only scope and no admin scope.
+permission_model:
+  note: >-
+    The real authorization boundary. Hootsuite publishes required permissions per operation at
+    https://developer.hootsuite.com/docs/api-permissions-matrix.
+  organization_levels:
+  - Admin or above
+  custom_organization_permissions:
+  - Manage Members
+  - Manage Teams
+  team_permissions:
+  - Admin OR Member in Team
+  custom_team_permissions:
+  - Manage Social Networks in the Team
+  social_network_levels:
+  - Limited or above
+  - Editor or above
+  custom_social_network_permissions:
+  - Basic Usage
+  - Publish Message
+  - Publish Message with Approval
+  examples:
+  - operation: POST /v1/messages
+    social_network_permission: Limited or above
+    custom: Publish Message OR Publish Message with Approval
+  - operation: DELETE /v1/messages/{messageId}
+    social_network_permission: Editor or above
+    custom: Publish Message (Scheduled) OR Publish Message with Approval (Pending)
+  - operation: POST /v1/members
+    organization_permission: Admin or above
+    custom: Manage Members
+  - operation: GET /v1/socialProfiles
+    social_network_permission: Limited or above
+    custom: Basic Usage
+  - operation: GET /v1/organizations/{organizationId}/teams
+    organization_permission: Admin or above
+    custom: Manage Teams
+  failure_codes:
+  - 4002 Insufficient permissions to view organization members
+  - 4003 Insufficient permissions to view member permissions
+  - 4004 Insufficient permissions to view member organizations
+  - 4005 Insufficient permissions to view team members
+  - 4006 Insufficient permissions to view team
+  - 4007 Insufficient permissions to create team
+  - 4008 Insufficient permissions to view team social profile
+  - 4009 Insufficient organization permissions
+  - 4010 Insufficient permissions to view organization teams
+  - 1037 The required scope to access this endpoint was not granted by the user
+  - 1201 Not authorized to make changes to organization
+metadata_caveat: >-
+  https://platform.hootsuite.com/.well-known/oauth-protected-resource publishes scopes_supported as
+  a single string "offline analytics:read" rather than a two-element JSON array. A strict RFC 9728
+  client reads that as ONE scope named "offline analytics:read" and will request it verbatim.

@@ -1,0 +1,63 @@
+generated: '2026-08-13'
+method: probed
+source: https://developer.hootsuite.com/mcp
+name: Hootsuite Developer Documentation MCP
+description: >-
+  Hootsuite serves a remote Model Context Protocol endpoint from its own developer-documentation
+  host at https://developer.hootsuite.com/mcp. A plain GET returns the plain-text banner
+  "This URL can only be accessed with a MCP client." (HTTP 200, content-type text/html, 48 bytes),
+  which is the ReadMe documentation-MCP signature - developer.hootsuite.com is a ReadMe-hosted docs
+  site (x-render-origin-server: Render, readme-subdomain: hootsuite). It is a documentation server,
+  not a wrapper over the Hootsuite REST/Analytics/Inbox operations: no Hootsuite tool exposes
+  scheduleMessage, listPosts or any other published operationId.
+status: published
+deployment:
+  mode: remote
+  endpoint: https://developer.hootsuite.com/mcp
+  auth: unknown
+  verified: probed
+  note: >-
+    Remote and reachable, but gated. A JSON-RPC initialize and a tools/list both return
+    HTTP 401 with {"jsonrpc":"2.0","error":{"code":-32001,"message":"Authorization required"}}.
+    The response carries no WWW-Authenticate challenge, and neither
+    /.well-known/oauth-protected-resource nor /.well-known/oauth-protected-resource/mcp exists
+    on developer.hootsuite.com (both 404), so the credential type could not be established
+    anonymously. Recorded as unknown rather than guessed.
+probes:
+- url: https://developer.hootsuite.com/mcp
+  method: GET
+  status: 200
+  body: This URL can only be accessed with a MCP client.
+- url: https://developer.hootsuite.com/mcp
+  method: 'POST jsonrpc initialize (protocolVersion 2025-06-18)'
+  status: 401
+  body: '{"jsonrpc":"2.0","error":{"code":-32001,"message":"Authorization required"},"id":null}'
+- url: https://developer.hootsuite.com/mcp
+  method: 'POST jsonrpc tools/list'
+  status: 401
+  body: '{"jsonrpc":"2.0","error":{"code":-32001,"message":"Authorization required"},"id":null}'
+- url: https://developer.hootsuite.com/.well-known/oauth-protected-resource
+  method: GET
+  status: 404
+- url: https://platform.hootsuite.com/mcp
+  method: GET
+  status: 404
+- url: https://mcp.hootsuite.com/mcp
+  method: GET
+  status: 404
+tools:
+  status: gated
+  count: null
+  note: >-
+    NOT RECORDED. The live tool list requires authentication and Hootsuite publishes no
+    documentation page describing this server's tools - developer.hootsuite.com/llms.txt does not
+    mention MCP at all, and /docs/mcp 404s. Nothing was inferred: a ReadMe docs MCP typically ships
+    documentation search/retrieval tools, but that is vendor-pattern knowledge, not a Hootsuite
+    publication, so no tool names are asserted here. Authenticated introspection is required.
+related:
+  openapi:
+  - openapi/hootsuite-rest-api-openapi.yml
+  - openapi/hootsuite-analytics-api-openapi.yml
+  - openapi/hootsuite-inbox-api-openapi.yml
+  llms_txt: llms/hootsuite-llms.txt
+  crosswalk: mcp/hootsuite-tool-crosswalk.yml

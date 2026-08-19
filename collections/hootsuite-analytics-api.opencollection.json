@@ -1,0 +1,206 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hootsuite Analytics REST API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "authorization_code",
+      "authorizationUrl": "https://platform.hootsuite.com/oauth2/auth",
+      "accessTokenUrl": "https://platform.hootsuite.com/oauth2/token",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "analytics-api",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Posts and Metrics",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/analytics/posts",
+            "params": [
+              {
+                "name": "datatype",
+                "value": "ORGANIC",
+                "type": "query",
+                "description": "The datatype to retrieve analytics for."
+              },
+              {
+                "name": "networkId",
+                "value": "FACEBOOKPAGE",
+                "type": "query",
+                "description": "The network type to retrieve analytics for."
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Cursor for pagination, provided by a previous call."
+              },
+              {
+                "name": "limit",
+                "value": "10",
+                "type": "query",
+                "description": "Number of results to return in this page of data."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Fetch posts that have been published on this Social Network, including lifetime metrics for each post.\n`profileId` is a required filter, the others are optional. `lastModified` may start at most 30 days in the past.  `reportingPeriod` may start at most 2 years in the past.\nWhen filtering by `reportingPeriod`, the creation date of the post is used.\n"
+        },
+        {
+          "info": {
+            "name": "List Profiles and Metrics",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/analytics/profiles",
+            "params": [
+              {
+                "name": "datatype",
+                "value": "ORGANIC",
+                "type": "query",
+                "description": "The datatype to retrieve analytics for."
+              },
+              {
+                "name": "networkId",
+                "value": "FACEBOOKPAGE",
+                "type": "query",
+                "description": "The network type to retrieve analytics for."
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Cursor for pagination, provided by a previous call."
+              },
+              {
+                "name": "limit",
+                "value": "10",
+                "type": "query",
+                "description": "Number of results to return in this page of data."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Fetch daily analytics metrics for profiles on this social network.\n`profileId` is a required filter, the others are optional. `lastModified` may start at most 30 days in the past.  `reportingPeriod` may start at most 2 years in the past.\n"
+        },
+        {
+          "info": {
+            "name": "List Paid campaigns, ad sets, or ads",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/analytics/paid/:adEntityCollection",
+            "params": [
+              {
+                "name": "adEntityCollection",
+                "value": "ads",
+                "type": "path",
+                "description": "Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.\n"
+              },
+              {
+                "name": "datatype",
+                "value": "ORGANIC",
+                "type": "query",
+                "description": "The datatype to retrieve analytics for."
+              },
+              {
+                "name": "adAccountType",
+                "value": "FACEBOOK",
+                "type": "query",
+                "description": "The ad account type to retrieve analytics for."
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Cursor for pagination, provided by a previous call."
+              },
+              {
+                "name": "limit",
+                "value": "10",
+                "type": "query",
+                "description": "Number of results to return in this page of data."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Returns paid entities for the collection given in the path (`campaigns`, `adsets`, or `ads`). Use query parameters for ad account type, pagination, and datatype; use the request body for filters (ad accounts, time range, etc.)\nnote: In this API, 'adsets' and related response fields map to Facebook ad sets and Twitter ad groups ('adgroups').\n"
+        },
+        {
+          "info": {
+            "name": "List Metrics for paid campaigns, ad sets, or ads",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/v1/analytics/paid/:adEntityCollection/metrics",
+            "params": [
+              {
+                "name": "adEntityCollection",
+                "value": "ads",
+                "type": "path",
+                "description": "Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.\n"
+              },
+              {
+                "name": "datatype",
+                "value": "ORGANIC",
+                "type": "query",
+                "description": "The datatype to retrieve analytics for."
+              },
+              {
+                "name": "adAccountType",
+                "value": "FACEBOOK",
+                "type": "query",
+                "description": "The ad account type to retrieve analytics for."
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Cursor for pagination, provided by a previous call."
+              },
+              {
+                "name": "limit",
+                "value": "10",
+                "type": "query",
+                "description": "Number of results to return in this page of data."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Fetch daily metrics for the collection given in the path (`campaigns`,`adsets`, or `ads`) on the ad account  in the request body.\nUse query parameters for ad account type, limit and pagination, and use the request body for filters (ad accounts, time range, etc.) note: In this API, 'adsets' and related response fields map to Facebook ad sets and Twitter ad groups ('adgroups').\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

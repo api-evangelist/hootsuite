@@ -1,0 +1,132 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hootsuite Amplify REST API",
+    "version": "1.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "me",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Gets the member information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/amplify/v1/me/",
+            "headers": [
+              {
+                "name": "X-Fields",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Gets the member information"
+        },
+        {
+          "info": {
+            "name": "Create message using the authenticated member",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/amplify/v1/me/messages",
+            "headers": [
+              {
+                "name": "X-Fields",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create message using the authenticated member"
+        },
+        {
+          "info": {
+            "name": "Retrieve authenticated members's organizations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/amplify/v1/me/organizations",
+            "headers": [
+              {
+                "name": "X-Fields",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Retrieve authenticated members's organizations"
+        },
+        {
+          "info": {
+            "name": "Retrieve authenticated members's topics",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/amplify/v1/me/topics",
+            "headers": [
+              {
+                "name": "X-Fields",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Retrieve authenticated members's topics"
+        },
+        {
+          "info": {
+            "name": "Creates a new topic on the member's organization",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/amplify/v1/me/topics",
+            "headers": [
+              {
+                "name": "X-Fields",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new topic on the member's organization"
+        },
+        {
+          "info": {
+            "name": "Converts obfuscated member IDs back into member IDs",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/amplify/v1/me/utms/deobfuscate",
+            "headers": [
+              {
+                "name": "X-Fields",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "It is important to note that multiple obfuscated member IDs\ncan point to a single member ID."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,143 @@
+generated: '2026-08-13'
+method: probed
+source: live GET probes of every apis.yml host and every OpenAPI servers[] host
+summary:
+  hosts_probed: 4
+  paths_probed: 8
+  hits: 3
+  note: >-
+    Three real documents were returned. platform.hootsuite.com (the API host) serves both
+    RFC 8414 OAuth authorization server metadata and RFC 9728 OAuth protected resource
+    metadata, and hootsuite.com / www.hootsuite.com serve an RFC 9727 API catalog linkset
+    that names every published Hootsuite OpenAPI. No security.txt, openid-configuration,
+    ai-plugin.json or agent card is served on any host.
+hosts:
+- host: platform.hootsuite.com
+  paths:
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    content_type: application/json;charset=UTF-8
+    file: hootsuite-oauth-authorization-server.json
+    document: true
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    content_type: application/json;charset=UTF-8
+    file: hootsuite-oauth-protected-resource.json
+    document: true
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: www.hootsuite.com
+  paths:
+  - path: /.well-known/api-catalog
+    status: 200
+    content_type: application/linkset+json
+    file: hootsuite-api-catalog.json
+    document: true
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: hootsuite.com
+  paths:
+  - path: /.well-known/api-catalog
+    status: 200
+    content_type: application/linkset+json
+    document: true
+    note: byte-identical to the www.hootsuite.com response; saved once
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: developer.hootsuite.com
+  paths:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  note: ReadMe-hosted docs site; returns a real 404 (not an SPA soft-200) on every well-known path.
+documents:
+- file: hootsuite-oauth-authorization-server.json
+  url: https://platform.hootsuite.com/.well-known/oauth-authorization-server
+  standard: RFC 8414
+  highlights:
+    issuer: https://platform.hootsuite.com
+    authorization_endpoint: https://platform.hootsuite.com/oauth2/auth
+    token_endpoint: https://platform.hootsuite.com/oauth2/token
+    registration_endpoint: https://platform.hootsuite.com/oauth2/register
+    scopes_supported:
+    - offline
+    - analytics:read
+    grant_types_supported:
+    - authorization_code
+    - refresh_token
+    code_challenge_methods_supported:
+    - S256
+    note: >-
+      Advertises RFC 7591 dynamic client registration and PKCE S256. Note that the discovery
+      document does not list Hootsuite's two custom grant types (member_app, organization_app),
+      which the developer docs do document.
+- file: hootsuite-oauth-protected-resource.json
+  url: https://platform.hootsuite.com/.well-known/oauth-protected-resource
+  standard: RFC 9728
+  highlights:
+    resource: https://platform.hootsuite.com
+    authorization_servers:
+    - https://platform.hootsuite.com
+    bearer_methods_supported:
+    - header
+- file: hootsuite-api-catalog.json
+  url: https://www.hootsuite.com/.well-known/api-catalog
+  standard: RFC 9727 (linkset, RFC 9264)
+  highlights:
+    anchors: 3
+    service_desc:
+    - https://apidocs.hootsuite.com/docs/api/swagger.yaml
+    - https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
+    service_doc:
+    - https://developer.hootsuite.com/docs/api-overview
+    - https://apidocs.hootsuite.com/docs/api/index.html
+    - https://apidocs.hootsuite.com/docs/api/inbox/index.html
+    - https://developer.hootsuite.com/docs/the-hootsuite-platform
+  note: >-
+    This catalog is how the Inbox 2.0 OpenAPI 3.1 was discovered. It does not list the
+    Analytics API OpenAPI, which is published at
+    https://apidocs.hootsuite.com/docs/api/analytics/openapi/openapi.yaml and reachable
+    from the developer docs - an incompleteness in Hootsuite's own catalog.

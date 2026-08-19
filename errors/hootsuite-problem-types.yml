@@ -1,0 +1,399 @@
+generated: '2026-08-13'
+method: searched
+source: https://apidocs.hootsuite.com/docs/api/swagger.yaml (info.description "Error Codes" table)
+docs:
+- https://apidocs.hootsuite.com/docs/api/index.html
+- https://developer.hootsuite.com/docs/api-overview
+format: vendor
+description: Hootsuite does NOT use RFC 9457 problem+json. It returns its own errors[] envelope with content-type
+  application/json;charset=utf-8, and publishes a numeric error-code registry of 97 codes inside its own
+  OpenAPI info.description. The OAuth 2.0 endpoints are the exception and return RFC 6749 error bodies;
+  the SCIM 2.0 endpoints return RFC 7644 SCIM error bodies. That makes three distinct error shapes on
+  one host.
+envelopes:
+- id: ErrorsResponseEnvelope
+  applies_to: REST API, Analytics API, Amplify API
+  content_type: application/json;charset=utf-8
+  shape: '{ "errors": [ { "code": 1234, "message": "...", "id": "...", "resource": { "type": "socialProfile",
+    "id": "7534653235" } } ] }'
+  fields:
+  - name: code
+    type: number
+    description: Unique number indicating type of error; see error_codes[] below.
+  - name: message
+    type: string
+    description: Human-readable description of the error.
+  - name: id
+    type: string
+    description: Unique error id for tracing purposes. Quote it to dev.support@hootsuite.com.
+  - name: resource
+    type: object
+    description: Optional {type, id} pointing at the field or resource that caused the error.
+  note: A partially-failed request returns BOTH data and errors in the same 200 response.
+- id: OAuthError
+  applies_to: GET /oauth2/auth, POST /oauth2/token
+  standard: RFC 6749 section 5.2
+  shape: '{ "error": "invalid_grant", "error_description": "...", "error_hint": "...", "error_debug":
+    "...", "status_code": 400 }'
+  enum:
+  - request_unauthorized
+  - request_forbidden
+  - invalid_request
+  - unauthorized_client
+  - access_denied
+  - unsupported_response_type
+  - invalid_scope
+  - server_error
+  - temporarily_unavailable
+  - unsupported_grant_type
+  - invalid_grant
+  - invalid_client
+  - unknown_error
+  - not_found
+  - invalid_state
+  - misconfiguration
+  - insufficient_entropy
+  - invalid_token
+  - token_signature_mismatch
+  - token_expired
+- id: ScimErrorResponse
+  applies_to: /scim/v2/* (SCIM 2.0)
+  standard: RFC 7644 section 3.12
+  shape: '{ "schemas": ["urn:ietf:params:scim:api:messages:2.0:Error"], "status": "400", "detail": "...",
+    "scimType": "invalidValue" }'
+  scim_types:
+  - invalidSyntax
+  - mutability
+  - invalidValue
+  - uniqueness
+status_codes:
+- status: 200
+  meaning: Resource was successfully created, updated, deleted or retrieved.
+- status: 400
+  meaning: Invalid request, possibly due to missing parameters
+  observed_in_specs: 48
+- status: 401
+  meaning: Missing or invalid authentication
+  observed_in_specs: 20
+- status: 403
+  meaning: Access denied
+  observed_in_specs: 2
+- status: 404
+  meaning: Requested resource does not exist
+  observed_in_specs: 5
+- status: 429
+  meaning: Rate Limit Exceeded. Contact dev.support@hootsuite.com for assistance.
+  observed_in_specs: 0
+  note: Documented in the narrative but declared on ZERO operations in any of the four OpenAPI documents
+    - an agent reading only the machine-readable contract would never expect a 429.
+- status: 500
+  meaning: Unexpected error occurred on the server
+  observed_in_specs: 0
+error_code_count: 97
+error_codes:
+- code: 1000
+  title: Missing or duplicate access token
+  family: oauth-and-token
+- code: 1001
+  title: Invalid access token
+  family: oauth-and-token
+- code: 1002
+  title: Invalid API key
+  family: oauth-and-token
+- code: 1003
+  title: Account plan limit exceeded
+  family: oauth-and-token
+- code: 1004
+  title: API plan limit exceeded
+  family: oauth-and-token
+- code: 1005
+  title: Token could not be retrieved
+  family: oauth-and-token
+- code: 1006
+  title: Token removal failed
+  family: oauth-and-token
+- code: 1007
+  title: The client could not be authenticated due to missing or invalid client credentials
+  family: oauth-and-token
+- code: 1008
+  title: Resource Owner authentication failed
+  family: oauth-and-token
+- code: 1009
+  title: Invalid grant_type
+  family: oauth-and-token
+- code: 1010
+  title: Invalid OAuth request
+  family: oauth-and-token
+- code: 1011
+  title: Duplicate OAuth parameters
+  family: oauth-and-token
+- code: 1012
+  title: Invalid authorization code
+  family: oauth-and-token
+- code: 1013
+  title: Must be confidential client
+  family: oauth-and-token
+- code: 1014
+  title: Unauthorized JWT user
+  family: oauth-and-token
+- code: 1015
+  title: Client registration could not be deleted
+  family: oauth-and-token
+- code: 1016
+  title: Client info could not be retrieved
+  family: oauth-and-token
+- code: 1017
+  title: Client info could not be updated
+  family: oauth-and-token
+- code: 1018
+  title: Client could not be registered
+  family: oauth-and-token
+- code: 1019
+  title: A registration type must be selected
+  family: oauth-and-token
+- code: 1020
+  title: Client key could not be deleted
+  family: oauth-and-token
+- code: 1021
+  title: The id_token values could not be retrieved
+  family: oauth-and-token
+- code: 1022
+  title: id_token could not be registered
+  family: oauth-and-token
+- code: 1023
+  title: id_token could not be removed therefore user logout could not be executed
+  family: oauth-and-token
+- code: 1024
+  title: Token could not be revoked
+  family: oauth-and-token
+- code: 1025
+  title: Token could not be registered
+  family: oauth-and-token
+- code: 1026
+  title: Non-valid parameter list for this operation
+  family: oauth-and-token
+- code: 1027
+  title: Missing authorization code
+  family: oauth-and-token
+- code: 1028
+  title: Authorization code could not be validated
+  family: oauth-and-token
+- code: 1029
+  title: id_token could not be validated
+  family: oauth-and-token
+- code: 1030
+  title: The client is not authorized to execute a status check
+  family: oauth-and-token
+- code: 1031
+  title: Invalid oauth parameters
+  family: oauth-and-token
+- code: 1032
+  title: Token could not be validated
+  family: oauth-and-token
+- code: 1033
+  title: The requested scope is not valid
+  family: oauth-and-token
+- code: 1034
+  title: The session is not valid
+  family: oauth-and-token
+- code: 1035
+  title: Missing oauth_token parameter
+  family: oauth-and-token
+- code: 1036
+  title: oauth_token invalid or expired
+  family: oauth-and-token
+- code: 1037
+  title: The required scope to access this endpoint was not granted by the user
+  family: oauth-and-token
+- code: 1038
+  title: token_type_hint is not supported
+  family: oauth-and-token
+- code: 1039
+  title: Client not authorized to revoke token
+  family: oauth-and-token
+- code: 1040
+  title: oauth_consumer_key invalid or expired
+  family: oauth-and-token
+- code: 1041
+  title: The token may not have been revoked due to an unknown error
+  family: oauth-and-token
+- code: 1042
+  title: Missing oauth_signature
+  family: oauth-and-token
+- code: 1043
+  title: Too many requests
+  family: oauth-and-token
+- code: 1044
+  title: Invalid oauth_signature_method
+  family: oauth-and-token
+- code: 1100
+  title: Invalid JSON schema
+  family: validation
+- code: 1201
+  title: Not authorized to make changes to organization
+  family: authorization
+- code: 2000
+  title: Invalid member password
+  family: member
+- code: 2001
+  title: Invalid member email
+  family: member
+- code: 2002
+  title: Invalid member name (please enter name between 2 and 100 chars in length)
+  family: member
+- code: 2003
+  title: Invalid member default timezone
+  family: member
+- code: 2004
+  title: Invalid initials
+  family: member
+- code: 2005
+  title: Missing member name
+  family: member
+- code: 2006
+  title: Missing member email
+  family: member
+- code: 2007
+  title: Missing member password
+  family: member
+- code: 2008
+  title: No more available seats in organization
+  family: member
+- code: 2303
+  title: Invalid organization ID
+  family: member
+- code: 2304
+  title: Invalid member ID
+  family: member
+- code: 2305
+  title: Missing member ID
+  family: member
+- code: 2306
+  title: Missing social profile ID
+  family: member
+- code: 3002
+  title: Team name has to be between 2-200 characters
+  family: team-and-organization
+- code: 3003
+  title: Unable to find an organization with that ID
+  family: team-and-organization
+- code: 3004
+  title: Missing team ID
+  family: team-and-organization
+- code: 3005
+  title: Invalid team ID
+  family: team-and-organization
+- code: 3006
+  title: Team name has to be unique in the organization
+  family: team-and-organization
+- code: 3008
+  title: Member is not seated in the organization
+  family: team-and-organization
+- code: 3010
+  title: Email is already in use
+  family: team-and-organization
+- code: 3020
+  title: Invalid cursor format
+  family: team-and-organization
+- code: 3021
+  title: Invalid social network type
+  family: team-and-organization
+- code: 3301
+  title: Payment member can’t be removed from the organization
+  family: team-and-organization
+- code: 4000
+  title: Schema validation failed
+  family: permissions-and-lookup
+- code: 4001
+  title: Resource not found
+  family: permissions-and-lookup
+- code: 4002
+  title: Insufficient permissions to view organization members
+  family: permissions-and-lookup
+- code: 4003
+  title: Insufficient permissions to view member permissions
+  family: permissions-and-lookup
+- code: 4004
+  title: Insufficient permissions to view member organizations
+  family: permissions-and-lookup
+- code: 4005
+  title: Insufficient permissions to view team members
+  family: permissions-and-lookup
+- code: 4006
+  title: Insufficient permissions to view team
+  family: permissions-and-lookup
+- code: 4007
+  title: Insufficient permissions to create team
+  family: permissions-and-lookup
+- code: 4008
+  title: Insufficient permissions to view team social profile
+  family: permissions-and-lookup
+- code: 4009
+  title: Insufficient organization permissions
+  family: permissions-and-lookup
+- code: 4010
+  title: Insufficient permissions to view organization teams
+  family: permissions-and-lookup
+- code: 4303
+  title: Member does not exist in organization
+  family: permissions-and-lookup
+- code: 5000
+  title: An unknown error occurred
+  family: server
+- code: 5001
+  title: HTTP method not permitted
+  family: server
+- code: 5002
+  title: Unsupported operation
+  family: server
+- code: 9000
+  title: An internal error occurred
+  family: server
+- code: 40001
+  title: Social profile isn’t owned by organization (required for posting messages with tags)
+  family: messaging
+- code: 40003
+  title: You have attempted to delete a message that cannot be deleted in its current state
+  family: messaging
+- code: 40004
+  title: Only attachments from http://static.ow.ly or http://ow.ly/i/ are currently allowed
+  family: messaging
+- code: 40005
+  title: Insufficient permission to create new message tags
+  family: messaging
+- code: 40019
+  title: Message state filter not supported
+  family: messaging
+- code: 40020
+  title: Specified date range is too large
+  family: messaging
+- code: 40021
+  title: Uploaded media is not yet ready to be used (further processing required)
+  family: messaging
+- code: 40022
+  title: Invalid boolean for includeUnscheduledReviewMsgs flag
+  family: messaging
+- code: 40023
+  title: Twitter only allows 1 network per message
+  family: messaging
+- code: 40024
+  title: Posting to Facebook Groups is no longer supported
+  family: messaging
+- code: 40025
+  title: Scheduled message limit reached
+  family: messaging
+families:
+  oauth-and-token: 45
+  validation: 1
+  authorization: 1
+  member: 13
+  team-and-organization: 10
+  permissions-and-lookup: 12
+  server: 4
+  messaging: 11
+gaps:
+- No remediation guidance is published per code - Hootsuite ships code + one-line title only, so no `action`
+  field could be derived without inventing it.
+- No HTTP status is mapped to each numeric code in the published table; the mapping has to be observed
+  at runtime.
+- 429 and 500 are documented in prose but declared on no operation in any spec.

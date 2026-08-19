@@ -1,0 +1,147 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  https://apidocs.hootsuite.com/docs/api/swagger.yaml (info.description),
+  https://developer.hootsuite.com/docs/api-overview,
+  https://developer.hootsuite.com/docs/api-authentication,
+  https://developer.hootsuite.com/docs/api-rate-limits,
+  https://developer.hootsuite.com/docs/using-the-api
+docs:
+- https://developer.hootsuite.com/docs/api-overview
+- https://apidocs.hootsuite.com/docs/api/index.html
+description: >-
+  Cross-cutting runtime semantics for the Hootsuite platform APIs, taken from the narrative
+  introduction Hootsuite ships inside its own OpenAPI info.description and from the developer
+  documentation. The three public REST surfaces (REST API, Analytics API, Amplify API) share the
+  same OAuth 2.0 authorization server and the same data/errors response envelope; Inbox 2.0 is a
+  separate service with its own auth story.
+base_urls:
+  rest: https://platform.hootsuite.com/v1
+  oauth: https://platform.hootsuite.com/oauth2
+  analytics: https://platform.hootsuite.com/v1/analytics
+  inbox: https://platform.hootsuite.com/inbox/v1
+  amplify: https://platform.hootsuite.com/amplify/v1
+  scim: https://platform.hootsuite.com/scim/v2
+  note: >-
+    All Hootsuite platform APIs are served from the single host platform.hootsuite.com over HTTPS.
+    Version lives in the path segment immediately after the host or the service prefix.
+auth:
+  style: oauth2
+  scheme: Bearer token in the Authorization header
+  flows:
+  - authorization_code
+  - refresh_token
+  - member_app
+  - organization_app
+  client_authentication: >-
+    HTTP Basic on the token endpoint. Hootsuite explicitly states client credentials in the request
+    body are NOT supported.
+  token_lifetime: 3600 seconds (access token); refresh tokens do not expire but are single-use.
+  authorization_code_lifetime: 10 minutes, single use. Reusing a code revokes every token issued from it.
+  scopes:
+  - offline
+  - analytics:read
+  discovery: well-known/hootsuite-oauth-authorization-server.json
+  detail: authentication/hootsuite-authentication.yml
+  note: >-
+    Beyond scopes, every call is additionally gated by the caller's Hootsuite dashboard permissions
+    (organization / team / social-network roles). Hootsuite publishes an operation-by-operation
+    permission table at https://developer.hootsuite.com/docs/api-permissions-matrix - an agent that
+    holds the right OAuth scope can still get a 403 on a permission it lacks.
+request:
+  content_type: application/json;charset=utf-8
+  note: >-
+    Hootsuite requires POST requests to set content-type AND character encoding to
+    application/json;charset=utf-8. Query parameters must be percent-encoded. Repeated array
+    parameters use the repeat-the-key form (?socialProfileIds=1234&socialProfileIds=5678).
+  verbs:
+    GET: retrieve resources
+    POST: create OR partially update; a subset of fields updates only those fields, and an
+      explicit null removes a field
+    DELETE: delete; returns 200 with an empty data envelope
+  note_patch: >-
+    Hootsuite uses POST for partial update on the REST API rather than PATCH. PATCH appears only on
+    the SCIM 2.0 endpoints, where it carries the SCIM PatchOp body.
+response_envelope:
+  style: data-envelope
+  success_single: '{ "data": { ... } }'
+  success_collection: '{ "data": [ ... ], "metadata": { ... } }'
+  error: '{ "errors": [ { "code": n, "message": "...", "id": "...", "resource": {...} } ] }'
+  partial_failure: >-
+    A partially-successful request returns BOTH data and errors in the same body. Clients must not
+    treat a 200 with a populated errors[] as a clean success.
+  note: >-
+    The envelope is NOT RFC 9457 problem+json. Content-type on errors is
+    application/json;charset=utf-8 and the shape is Hootsuite's own. The OAuth2 endpoints are the
+    exception: they return RFC 6749 error bodies ({error, error_description, ...}).
+  detail: errors/hootsuite-problem-types.yml
+pagination:
+  style: cursor
+  request_params:
+  - name: limit
+    note: Analytics API default 10 for paid collections, maximum 100.
+  - name: cursor
+    note: Opaque cursor token returned by the previous page.
+  response_fields:
+  - metadata.cursor
+  triggers:
+  - >-
+    Retrieve outbound messages automatically creates a cursor when more than 50 results match.
+  - >-
+    Analytics list calls return a cursor when more than `limit` results are available.
+  error_code: 3020 (Invalid cursor format)
+  note: >-
+    No offset/page-number pagination is offered anywhere in the platform. Cursors are opaque and
+    must be echoed back verbatim.
+idempotency:
+  supported: false
+  header: null
+  note: >-
+    Hootsuite publishes NO idempotency mechanism. There is no Idempotency-Key header, no client
+    request-id echo, and no documented replay-safe retry contract on any of the four specs or
+    anywhere in the developer documentation. This matters for POST /v1/messages (scheduleMessage),
+    which is the platform's principal write: a retried schedule after a timeout can publish twice,
+    and the only compensating control published is that message state can be inspected via GET
+    /v1/messages and a message deleted via DELETE /v1/messages/{messageId} while it is still
+    SCHEDULED. Recorded as an honest absence, not an omission in this artifact.
+tracing:
+  request_id_header: null
+  error_correlation: >-
+    Every error object carries an `id` field described by Hootsuite as "a unique error id for
+    tracing purposes" (example f7d32670-4e6a-48c0-a2a7-87803536a712). This is a RESPONSE-side
+    correlation id only - there is no client-supplied request id and no header carrying it.
+  support: Quote the error `id`, request, response and timestamp to dev.support@hootsuite.com.
+versioning:
+  style: uri-path
+  current:
+    rest: v1
+    analytics: v1
+    inbox: v1 (v2 on the CRM contact-attributes endpoint)
+    amplify: v1
+    scim: v2
+  note: >-
+    No Accept-header or query-parameter versioning. Inbox 2.0 mixes /inbox/v1/ and /inbox/v2/ paths
+    within one specification. The iFrame SDK versions independently (current 4.1).
+  detail: lifecycle/hootsuite-lifecycle.yml
+rate_limits:
+  detail: rate-limits/hootsuite-rate-limits.yml
+  summary: 20 req/s and 100,000 calls/day per account; X-Account-* headers; 429 on exhaustion.
+field_expansion:
+  supported: false
+  note: No sparse-fieldset, `expand`, `fields` or `include` parameter is documented on any surface.
+metadata:
+  supported: false
+  note: >-
+    No customer-defined metadata bag on any resource. `metadata` in the response envelope is
+    Hootsuite's pagination block, not a user-writable field.
+webhooks:
+  detail: asyncapi/hootsuite-webhooks.yml
+  summary: >-
+    HTTP callbacks with a monotonically increasing seq_no, CloudEvents-style reverse-DNS type
+    names (com.hootsuite.messages.event.v1). Inbox 2.0 signs its callbacks with X-Hootsuite-Signature.
+media:
+  note: >-
+    Media is a two-step upload: POST /v1/media returns a presigned Amazon S3 uploadUrl, then the
+    client PUTs the bytes to that URL with a Content-Type and Content-Length that must match the
+    values declared in the create call. Only the first valid upload to a URL is kept. Hootsuite
+    deletes uploaded media 90 days after it is used in a message.

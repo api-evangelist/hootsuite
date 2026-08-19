@@ -1,0 +1,148 @@
+generated: '2026-08-13'
+method: derived
+source: >-
+  openapi/hootsuite-rest-api-openapi.yml, openapi/hootsuite-analytics-api-openapi.yml,
+  openapi/hootsuite-inbox-api-openapi.yml, openapi/hootsuite-amplify-api-openapi.yml,
+  mcp/hootsuite-mcp.yml
+description: >-
+  Binding between Hootsuite's MCP surface and its published REST operations. The finding is a
+  complete non-overlap: Hootsuite serves a remote MCP endpoint, but it is the documentation MCP on
+  its ReadMe-hosted developer site, not a wrapper over the platform API. Every one of the 76
+  published operations is rest_only. No tool was mapped, because no tool name could be observed -
+  the endpoint returns HTTP 401 to tools/list and Hootsuite publishes no tool documentation.
+surfaces:
+  openapi:
+  - file: openapi/hootsuite-rest-api-openapi.yml
+    base: https://platform.hootsuite.com
+    operations: 48
+    gated: false
+  - file: openapi/hootsuite-analytics-api-openapi.yml
+    base: https://platform.hootsuite.com
+    operations: 4
+    gated: false
+  - file: openapi/hootsuite-inbox-api-openapi.yml
+    base: https://platform.hootsuite.com
+    operations: 18
+    gated: false
+  - file: openapi/hootsuite-amplify-api-openapi.yml
+    base: https://platform.hootsuite.com/amplify/v1
+    operations: 6
+    gated: false
+  graphql:
+    endpoint: null
+    note: >-
+      Hootsuite publishes no GraphQL API. /graphql returns 404 on platform.hootsuite.com,
+      hootsuite.com, www.hootsuite.com and api.hootsuite.com; developer.hootsuite.com/graphql
+      answers 200 only because the ReadMe docs SPA serves its shell for unknown paths, and a POST
+      introspection query returns nothing.
+  mcp:
+    url: https://developer.hootsuite.com/mcp
+    gated: true
+    note: >-
+      tools/list returns HTTP 401 {"code":-32001,"message":"Authorization required"} with no
+      WWW-Authenticate challenge and no OAuth protected-resource metadata to negotiate against.
+crosswalk: []
+mcp_only: []
+rest_only:
+- api: rest
+  reason: >-
+    No MCP tool exposes any Hootsuite platform operation. All 48 REST API operations
+    (Authentication, Me, Media, Members, Messages, Comments, Organizations, SCIM 2.0,
+    Social Profiles, Teams) are reachable only over HTTPS with an OAuth 2.0 bearer token.
+  operations:
+  - oauth2Authorize
+  - oauth2Token
+  - scheduleMessage
+  - retrieveMessages
+  - retrieveMessage
+  - deleteMessage
+  - approveMessage
+  - rejectMessage
+  - getMessageHistory
+  - retrieveComment
+  - approveComment
+  - rejectComment
+  - createMedia
+  - getMedia
+  - getSocialProfiles
+  - getSocialProfile
+  - getSocialProfileTeams
+  - retrieveMember
+  - createMember
+  - retrieveMe
+  - retrieveMeOrganizations
+  - getMySocialProfiles
+  - getMyAdAccounts
+  - retrieveMemberOrganizationsById
+  - getOrganizationTeams
+  - createTeam
+  - addMemberToTeam
+  - getTeamMembers
+  - retrieveOrganizationMembers
+  - removeMemberFromOrganization
+  - retrieveOrganizationMemberOrganizationPermissions
+  - retrieveOrganizationMembersTeams
+  - retrieveOrganizationMembersTeamPermissions
+  - retrieveOrganizationTeamsSocialProfiles
+  - retrieveOrganizationMembersSocialProfiles
+  - retrieveOrganizationSocialProfilePermissions
+  - getTeam
+  - createScimUser
+  - getScimUsers
+  - getScimUser
+  - replaceScimUser
+  - modifyScimUser
+  - createScimGroup
+  - getScimGroups
+  - getScimGroup
+  - replaceScimGroup
+  - modifyScimGroup
+  - getScimResourceTypes
+- api: analytics
+  reason: No MCP tool exposes the Analytics API.
+  operations:
+  - listPosts
+  - listProfilesMetrics
+  - listPaid
+  - listPaidMetrics
+- api: inbox
+  reason: No MCP tool exposes the Inbox 2.0 API.
+  operations:
+  - oauthToken
+  - metricsInboundMessageVolume
+  - metricsOutboundMessageVolume
+  - metricsAverageFirstResponseTime
+  - metricsAverageConversationResponseTime
+  - metricsResolvedWithReply
+  - metricsAverageHandleTime
+  - metricsAgentAvailability
+  - metricsContactsWaitingInQueue
+  - metricsLongestWaitTimeInQueue
+  - onlineAgents
+  - vaiManipulateConversation
+  - vaiUploadConversationAttachment
+  - lock
+  - proactiveSendMessage
+  - proactiveGetStatusForCorrelationId
+  - proactiveGetStatusDetailForCorrelationId
+  - crmSetContactAttributes
+- api: amplify
+  reason: No MCP tool exposes the Amplify API.
+  operations:
+  - get_me
+  - post_messages
+  - get_my_organizations
+  - get_topics
+  - post_topics
+  - post_utms
+coverage:
+  rest_operations: 76
+  mcp_tools: null
+  mapped: 0
+  mcp_only: 0
+  rest_only: 76
+  rest_coverage_pct: 0
+  note: >-
+    mcp_tools is null, not zero: a server exists and almost certainly exposes tools, but the list
+    is auth-gated so no count was observed. mapped: 0 is a measured fact about the surfaces that
+    could be read, not an inference about the gated one.

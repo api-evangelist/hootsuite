@@ -1,11 +1,112 @@
-generated: '2026-07-11'
-method: derived
-source: openapi/hootsuite-openapi.yml
+generated: '2026-08-13'
+method: searched
+source: >-
+  https://developer.hootsuite.com/docs/api-authentication,
+  https://developer.hootsuite.com/docs/enabling-oauth-20,
+  https://developer.hootsuite.com/docs/set-up-your-oauth-20-app,
+  https://developer.hootsuite.com/docs/rest-api-faq,
+  https://platform.hootsuite.com/.well-known/oauth-authorization-server,
+  openapi/hootsuite-rest-api-openapi.yml, openapi/hootsuite-analytics-api-openapi.yml,
+  openapi/hootsuite-inbox-api-openapi.yml
+docs: https://developer.hootsuite.com/docs/api-authentication
 summary:
   types:
   - oauth2
+  - http
+  - apiKey
+  api_key_in:
+  - header
   oauth2_flows:
   - authorizationCode
+  - refreshToken
+  - member_app
+  - organization_app
+  - clientCredentials
+  primary: OAuth 2.0 authorization code with refresh tokens
+discovery:
+  authorization_server_metadata: https://platform.hootsuite.com/.well-known/oauth-authorization-server
+  protected_resource_metadata: https://platform.hootsuite.com/.well-known/oauth-protected-resource
+  local:
+  - well-known/hootsuite-oauth-authorization-server.json
+  - well-known/hootsuite-oauth-protected-resource.json
+  note: >-
+    Both documents are live and returned HTTP 200 on 2026-08-13. This puts Hootsuite ahead of most
+    marketing SaaS: an agent can negotiate the whole OAuth surface without reading the docs.
+endpoints:
+  authorization: https://platform.hootsuite.com/oauth2/auth
+  token: https://platform.hootsuite.com/oauth2/token
+  refresh: https://platform.hootsuite.com/oauth2/token
+  registration: https://platform.hootsuite.com/oauth2/register
+  registration_note: >-
+    Advertised in the RFC 8414 metadata as an RFC 7591 dynamic client registration endpoint, but
+    NOT documented anywhere in the developer documentation, which instead directs developers to
+    register apps by hand at App directory -> Developer apps.
+client_authentication:
+  method: HTTP Basic (client_id:client_secret)
+  body_credentials_supported: false
+  note: >-
+    Hootsuite states explicitly: "This endpoint requires that you pass in your client credentials
+    using the HTTP Basic authentication scheme... Including your client credentials in the
+    request-body is not supported." The RFC 8414 metadata contradicts this slightly by listing
+    client_secret_post and none among token_endpoint_auth_methods_supported.
+tokens:
+  access_token:
+    type: bearer
+    placement: Authorization header
+    ttl_seconds: 3599
+  refresh_token:
+    expiry: none
+    single_use: true
+    note: >-
+      "Refresh tokens don't have an expiry but can only be used once." Each refresh returns a new
+      access token AND a new refresh token; a client that loses the new one is locked out.
+  authorization_code:
+    ttl: 10 minutes
+    single_use: true
+    revocation_trap: >-
+      "If an authorization code is used a second time, all tokens granted with the first
+      /oauth2/token call will be revoked." A naive retry on a code exchange destroys the session.
+pkce:
+  supported: true
+  methods:
+  - S256
+  source: code_challenge_methods_supported in the authorization server metadata
+grants:
+- id: authorization_code
+  standard: RFC 6749
+  description: Web-server apps acting on behalf of an interactively authorizing user.
+  required_params:
+  - client_id
+  - response_type=code
+  - redirect_uri
+  - scope
+- id: refresh_token
+  standard: RFC 6749
+  description: Exchange a single-use refresh token for a new access token.
+- id: member_app
+  standard: custom
+  description: >-
+    Act on behalf of a MEMBER who has installed the app. Requires grant_type=member_app plus
+    member_id, with Basic client auth. Only usable for members who have installed the app.
+  note: >-
+    This is the grant Hootsuite recommends for single-customer Analytics ETL integrations, because
+    it needs no interactive browser flow.
+- id: organization_app
+  standard: custom
+  description: >-
+    Act on behalf of an ORGANIZATION that has installed the app. Requires
+    grant_type=organization_app plus organization_id, with Basic client auth.
+  restriction: >-
+    Organizations used for prescreen components must be on the Enterprise plan, and the
+    organization-app installation must be configured by Hootsuite.
+- id: client_credentials
+  standard: RFC 6749
+  scope: Inbox 2.0 CRM integration only
+  note: >-
+    Declared in openapi/hootsuite-inbox-api-openapi.yml as Oauth2ClientCredentials with tokenUrl
+    literal "TO_BE_CONFIGURED_IN_INBOX_2_0" and scope "some_scope". That is placeholder text
+    shipped in a production specification, not a usable configuration - the real values are
+    provisioned per customer.
 schemes:
 - name: OAuth2
   type: oauth2
@@ -13,6 +114,71 @@ schemes:
   - flow: authorizationCode
     authorizationUrl: https://platform.hootsuite.com/oauth2/auth
     tokenUrl: https://platform.hootsuite.com/oauth2/token
+    scopes: 2
+  sources:
+  - openapi/hootsuite-rest-api-openapi.yml
+  - openapi/hootsuite-analytics-api-openapi.yml
+- name: Basic_Auth
+  type: http
+  scheme: basic
+  used_for: client authentication on POST /oauth2/token
+  sources:
+  - openapi/hootsuite-rest-api-openapi.yml
+  - openapi/hootsuite-inbox-api-openapi.yml
+- name: bearer-token
+  type: http
+  scheme: bearer
+  sources:
+  - openapi/hootsuite-inbox-api-openapi.yml
+- name: Oauth2ClientCredentials
+  type: oauth2
+  flows:
+  - flow: clientCredentials
+    tokenUrl: TO_BE_CONFIGURED_IN_INBOX_2_0
     scopes: 1
   sources:
-  - openapi/hootsuite-openapi.yml
+  - openapi/hootsuite-inbox-api-openapi.yml
+- name: SharedSecret
+  type: apiKey
+  in: header
+  parameter: X-Hootsuite-Signature
+  used_for: verifying Inbox 2.0 webhook callbacks
+  sources:
+  - openapi/hootsuite-inbox-api-openapi.yml
+- name: Amplify
+  type: none-declared
+  sources:
+  - openapi/hootsuite-amplify-api-openapi.yml
+  note: >-
+    The Amplify Swagger declares NO securityDefinitions at all. Its six operations carry no
+    security requirement in the published contract, even though the API is plainly authenticated.
+    An honest gap in Hootsuite's own specification, recorded rather than filled in.
+redirect_uris:
+  management: App directory -> Developer apps -> [app] -> Security
+  allowed_schemes:
+  - https://
+  - http://localhost
+  multiple: true
+  restriction: >-
+    Apps that are In Review or Launched cannot change redirect URIs self-serve and must contact
+    Hootsuite Developer Support.
+authorization_beyond_scopes:
+  model: dashboard permissions
+  levels:
+  - organization (Admin or above, plus custom permissions such as Manage Members / Manage Teams)
+  - team (Admin or Member in Team, plus Manage Social Networks in the Team)
+  - social network (Limited / Editor or above, plus Basic Usage / Publish Message / Publish Message
+      with Approval)
+  matrix: https://developer.hootsuite.com/docs/api-permissions-matrix
+  note: >-
+    OAuth scope is NOT the authorization model. Hootsuite only publishes two scopes; the real
+    access decision is the caller's dashboard role, which is why 12 of the 97 published error codes
+    are "Insufficient permissions to ..." variants. A correctly-scoped agent will still receive 403s
+    it cannot predict from the contract.
+scopes_detail: scopes/hootsuite-scopes.yml
+sso:
+  saml2: true
+  scim2: true
+  note: >-
+    Hootsuite lists SAML 2.0 SSO as a platform feature and ships 11 SCIM 2.0 operations for user and
+    group provisioning under /scim/v2/.

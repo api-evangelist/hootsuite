@@ -1,0 +1,108 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  https://developer.hootsuite.com/docs/iframe-sdk-overview,
+  https://developer.hootsuite.com/docs/upgrading-sdk-version,
+  https://developer.hootsuite.com/docs/iframe-sdk-authentication,
+  https://apps.hootsuite.com/docs/sdk/4.1.1/index.html,
+  https://developer.hootsuite.com/docs/sparkcentral-messenger-sdk
+docs:
+- https://developer.hootsuite.com/docs/iframe-sdk-overview
+- https://apps.hootsuite.com/docs/sdk/4.1.1/index.html
+description: >-
+  Hootsuite's client-side surface is not a component library a developer drops into their own page.
+  It is the inverse: an embedding contract that lets a developer's own hosted app render INSIDE the
+  Hootsuite dashboard, mediated by a postMessage bridge. The one component Hootsuite ships for
+  embedding into a customer's own property is the Sparkcentral / Inbox 2.0 messenger.
+families:
+- id: iframe-sdk
+  name: Hootsuite iFrame SDK
+  version: '4.1'
+  loader: https://assets.hootsuite.com/jsapi/4-1/hsp.js
+  global: hsp
+  transport: HTML5 window.postMessage
+  hosting: >-
+    The app is hosted on the developer's own platform and rendered in an iframe inside the
+    Hootsuite dashboard. Hootsuite supplies HTML and CSS templates for consistent styling.
+  direction: developer app embedded INTO Hootsuite
+  extensions:
+  - id: stream
+    name: Stream Extension
+    description: >-
+      A custom stream in a Hootsuite tab, monitoring messages from networks or sites Hootsuite does
+      not natively support.
+    docs: https://developer.hootsuite.com/docs/add-an-app-stream
+  - id: plugin
+    name: Plugin Extension
+    description: >-
+      Receives messages a user sends from a Hootsuite stream into the app, via the `sendToApp`
+      event.
+    docs: https://developer.hootsuite.com/docs/add-an-app-plugin
+  - id: content-source
+    name: Content Source Extension
+    description: Pulls media from an external source into the Hootsuite composer.
+    docs: https://developer.hootsuite.com/docs/add-a-content-source-component
+  - id: media-library
+    name: Media Library App
+    description: Exposes an external asset library as a media source inside Hootsuite.
+    docs: https://developer.hootsuite.com/docs/create-a-media-library-app
+  - id: plan
+    name: Plan App
+    description: Surfaces planned content from an external system in the Hootsuite planner.
+    docs: https://developer.hootsuite.com/docs/create-a-plan-app
+  authentication: https://developer.hootsuite.com/docs/iframe-sdk-authentication
+  breaking_changes:
+    from: '4.0'
+    to: '4.1'
+    notes:
+    - >-
+      The `sendToApp` event payload became network-specific; Twitter payloads are reduced to status
+      ID and account ID only.
+    - The assignments callback payload carries limited information for Twitter streams.
+    - '`getTwitterAccounts()` now returns Twitter account IDs instead of handles.'
+    source: https://developer.hootsuite.com/docs/upgrading-sdk-version
+  version_history:
+  - version: '0.6'
+    status: deprecated
+    date: '2015-03-05'
+  - version: '2.0'
+    status: deprecated
+    date: '2018-01-30'
+  - version: '4.0'
+    status: deprecated
+    date: '2021-11-02'
+  - version: '4.1'
+    status: current
+- id: sparkcentral-messenger
+  name: Sparkcentral Messenger SDK
+  version: 1.25.7
+  direction: Hootsuite component embedded INTO the customer's own property
+  platforms:
+  - web
+  - mobile
+  description: >-
+    Real-time messaging widget for a customer's website or mobile app, feeding conversations into
+    Inbox 2.0.
+  docs:
+  - https://developer.hootsuite.com/docs/sparkcentral-messenger-sdk
+  - https://developer.hootsuite.com/docs/sparkcentral-messenger-sdk-1257
+  spec_tags:
+  - messenger_introduction
+  - messenger_web_sdk
+  note: >-
+    Declared as a tag group in openapi/hootsuite-inbox-api-openapi.yml but carries no operations
+    there - the messenger is a client SDK, not a REST surface.
+prebuilt_surfaces:
+- id: app-directory
+  name: Hootsuite App Directory
+  url: https://hootsuite.com/dashboard#/app-directory/
+  description: >-
+    The distribution channel for iFrame SDK apps. Public listing requires submission and review;
+    private apps can be installed by their own developer without review.
+  docs: https://developer.hootsuite.com/docs/app-submission-process
+gaps:
+- No web-component or design-system package is published to any registry (see packages/).
+- >-
+  hootsuite-react on npm is a third-party 2018 port of Hootsuite design components, not a Hootsuite
+  publication.
+- No embedded-analytics or hosted-dashboard component is offered.

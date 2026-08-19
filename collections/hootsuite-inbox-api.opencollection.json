@@ -1,0 +1,401 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Inbox 2.0 API Reference",
+    "version": "v1"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "rest-api-authentication",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "OAuth2 Token",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/oauth2/token",
+            "headers": [
+              {
+                "name": "Authorization",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "form-urlencoded",
+              "data": [
+                {
+                  "name": "grant_type",
+                  "value": ""
+                },
+                {
+                  "name": "organization_id",
+                  "value": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "basic",
+              "username": "{{username}}",
+              "password": "{{password}}"
+            }
+          },
+          "docs": "[OAuth2 Token](https://tools.ietf.org/html/rfc6749#section-3.2) endpoint.\n \nThis endpoint requires that you pass in your client credentials using the HTTP Basic authentication scheme as outlined in the [spec](https://tools.ietf.org/html/rfc6749#section-2.3.1).\nIncluding your client credentials in the request-body is not supported.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "real_time_metrics_rest_api",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Inbound message volume",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/reporting/metrics/inbound-message-volume",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "A count of inbound messages based on applied filters.\n"
+        },
+        {
+          "info": {
+            "name": "Outbound message volume",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/reporting/metrics/outbound-message-volume",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "A count of outbound messages based on applied filters.\n"
+        },
+        {
+          "info": {
+            "name": "Average first response time",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/reporting/metrics/first-response-time",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "The average time in seconds to the first response to an inbound message.\n"
+        },
+        {
+          "info": {
+            "name": "Average conversation response time",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/reporting/metrics/conversation-response-time",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "The average time in seconds for a response to an inbound message except the first response.\n"
+        },
+        {
+          "info": {
+            "name": "Resolved with reply",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/reporting/metrics/resolved-with-one-reply",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "The number of messages that have been resolved with at least one reply.\n"
+        },
+        {
+          "info": {
+            "name": "Average handle time",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/reporting/metrics/handle-time",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "The average time in seconds that a conversation is handled by an agent, specifically the difference between timestamps\nof conversation open and conversation pend/resolve. For Average Handle Time to be calculated, there must be an outbound\nbetween open and pend/resolve event.\n"
+        },
+        {
+          "info": {
+            "name": "Agent availability",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/user-presence/metrics/agent-availability",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "The number of agents available or away. You can filter by teams.\n"
+        },
+        {
+          "info": {
+            "name": "Contacts waiting in queue",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/queue/metrics/contacts-waiting",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "The number of contacts waiting in the queue for a response.\n"
+        },
+        {
+          "info": {
+            "name": "Longest wait time in queue",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/queue/metrics/longest-wait-time",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "The current longest time in seconds that a contact is waiting for a response. If no mediumId filter is provided, the\nmessages sent in any connected mediums will be included.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "user_presence_rest_api",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Online Agents",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/inbox/v1/user-presence/online-agents"
+          },
+          "docs": "List of all currently online agents.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "vai_rest_api",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Manipulate conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/virtual-agent/conversations/:conversationId",
+            "params": [
+              {
+                "name": "conversationId",
+                "value": "",
+                "type": "path",
+                "description": "Id of the conversation to manipulate. This can be retrieved from the webhook payload."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "This allows you to manipulate the conversation in the same way you would when responding to a webhook request. You can\nsend a reply, add a topic, and/or hand off the conversation. Each property in the body is optional. If you only want to\nsend a message, you can send `{\"sendMessage\": {\"text\": \"Hi!\"}}`. If you want to apply a topic and complete, but not send\na message, you can, for example, send `{\"applyTopics\":[\"Spam\"], \"complete\": \"RESOLVED\"}`.\n\nNote that only topics that match a topic in the p"
+        },
+        {
+          "info": {
+            "name": "Upload attachments",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/virtual-agent/conversations/:conversationId/attachments/:filename",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": ""
+              },
+              {
+                "name": "Content-Length",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "conversationId",
+                "value": "",
+                "type": "path",
+                "description": "ID of the conversation to manipulate. This can be retrieved from the webhook payload."
+              },
+              {
+                "name": "filename",
+                "value": "",
+                "type": "path",
+                "description": "Filename of the attachment. The filename can only contain uppercase and lowercase letters, numbers, -, _ and ."
+              }
+            ]
+          },
+          "docs": "This allows you to upload an attachment that you can send in a conversation. You need to upload the attachment first,\nand then you can send a message with text and an attachment. For example, if you upload an attachment\nto `/inbox/v1/virtual-agent/conversations/attachments/cat.jpg`, you can send that attachment by sending\n\n```json\n{\n  \"sendMessage\": {\n    \"text\": \"This is a cat!\",\n    \"attachment\": \"cat.jpg\"\n  }\n}\n```\n\nto `/inbox/v1/virtual-agent/conversations/{conversationId}`. The file name sh"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "queue_rest_api",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Conversations locked by an agent",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/inbox/v1/queue/lock"
+          },
+          "docs": "An overview of conversations with the agent that locked the conversation.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "proactive_messaging_rest_api",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Send proactive message",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://platform.hootsuite.com/inbox/v1/proactive-messaging",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "The message is queued for processing. Use the returned correlation id to get the status of the sent message.\n"
+        },
+        {
+          "info": {
+            "name": "Get status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/inbox/v1/proactive-messaging/:correlationId",
+            "params": [
+              {
+                "name": "correlationId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get the status overview for a sent proactive message\n"
+        },
+        {
+          "info": {
+            "name": "Get status detail",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://platform.hootsuite.com/inbox/v1/proactive-messaging/:correlationId/:status",
+            "params": [
+              {
+                "name": "correlationId",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "status",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get the details of a message with a specific status.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "crm_rest_api",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Set contact attributes",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://platform.hootsuite.com/inbox/v2/contact/:contactProfileId/contact-attributes",
+            "params": [
+              {
+                "name": "contactProfileId",
+                "value": "",
+                "type": "path",
+                "description": "Id of the contact profile that you want to update."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update the contact attributes of a contact profile.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

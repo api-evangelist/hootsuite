@@ -1,0 +1,90 @@
+generated: '2026-08-13'
+method: searched
+source: https://hootsuite.com/plans
+docs:
+- https://hootsuite.com/plans
+- https://developer.hootsuite.com/docs/faq
+description: >-
+  Hootsuite sells the platform on seat-based subscription tiers. API access is NOT a priced product
+  line: Hootsuite states plainly that the REST API endpoints and the SDK are free to anyone with
+  approved developer access. The plan a customer sits on still governs the API indirectly, because
+  API calls execute under the caller's dashboard permissions and seat/social-account entitlements,
+  and because two capabilities (the Ow.ly URL-shortener API and organization apps used for
+  prescreen components) are Enterprise-only.
+currency: USD
+plan_count: 4
+billing_note: >-
+  Prices below are the per-user monthly rate on ANNUAL billing, as displayed on the plans page.
+  Hootsuite states monthly billing is also available for Standard, Professional and Advanced but
+  does not display the monthly rate on the same view.
+plans:
+- name: Standard
+  price: 99
+  currency: USD
+  unit: per user
+  period: month
+  billing: annual
+  users_included: 1
+  social_accounts: 10
+  limits:
+  - Trial accounts are subject to a daily posting limit of 10-20 posts per organization.
+- name: Professional
+  price: 199
+  currency: USD
+  unit: per user
+  period: month
+  billing: annual
+  users_included: 1
+  social_accounts: unlimited
+  limits:
+  - Trial accounts are subject to a daily posting limit of 10-20 posts per organization.
+- name: Advanced
+  price: 399
+  currency: USD
+  unit: per user
+  period: month
+  billing: annual
+  users_included: 1
+  social_accounts: unlimited
+  limits:
+  - Trial accounts are subject to a daily posting limit of 10-20 posts per organization.
+- name: Enterprise
+  price: null
+  currency: USD
+  unit: null
+  period: null
+  billing: custom
+  users_included: custom
+  social_accounts: unlimited
+  onboarding: Request a demo (sales-gated)
+  payment_methods:
+  - credit card
+  - check
+  - wire
+  - ACH
+  limits: []
+api_access:
+  priced: false
+  statement: >-
+    "Hootsuite's REST API end-points and the SDK are free for anyone with approved developer
+    access." - https://developer.hootsuite.com/docs/faq
+  gating: >-
+    Access requires a Hootsuite account plus an approved developer account; approved third-party
+    developers get REST API keys automatically on app registration.
+  rate_limits_apply: 20 req/s, 100,000 calls/day per account (see rate-limits/hootsuite-rate-limits.yml)
+  enterprise_only:
+  - name: Ow.ly URL shortener API
+    note: >-
+      "Ow.ly API for URL shortening is available to Enterprise users only. If you currently have an
+      Enterprise Account, please contact your Customer Success Manager (CSM) to request Ow.ly API
+      access." No OpenAPI or reference is published for it.
+    source: https://developer.hootsuite.com/docs/faq
+  - name: Organization apps for prescreen components
+    note: >-
+      "Organizations used for prescreen components must be on the Enterprise plan, and the
+      Organization App installation must be configured by Hootsuite."
+    source: https://developer.hootsuite.com/docs/api-authentication
+machine_readable_pricing: false
+note: >-
+  No pricing or product-catalog API endpoint is published. Values above were read from the rendered
+  plans page on 2026-08-13 and should be re-checked; Hootsuite runs frequent promotional pricing.

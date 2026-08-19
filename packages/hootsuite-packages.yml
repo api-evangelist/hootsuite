@@ -1,0 +1,143 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  registry.npmjs.org search + package metadata, pypi.org/pypi JSON API,
+  https://api.github.com/orgs/hootsuite/repos,
+  https://developer.hootsuite.com/docs/upgrading-sdk-version,
+  https://developer.hootsuite.com/docs/faq
+description: >-
+  Hootsuite publishes NO first-party API client SDK to any package registry. There is no
+  `hootsuite` package on npm, PyPI, RubyGems, Packagist, Maven Central, NuGet, crates.io or
+  pkg.go.dev. The only first-party client library Hootsuite ships is the iFrame SDK, a browser
+  script distributed from its own CDN with no registry entry at all, and its distribution URL is
+  pinned only to a major.minor path segment.
+official_package_count: 1
+third_party_package_count: 4
+packages:
+- name: hsp.js (Hootsuite iFrame SDK)
+  official: true
+  registry: cdn
+  language: javascript
+  url: https://assets.hootsuite.com/jsapi/4-1/hsp.js
+  install: '<script src="https://assets.hootsuite.com/jsapi/4-1/hsp.js"></script>'
+  version: '4.1'
+  published: null
+  probed: '2026-08-13'
+  http_status: 200
+  size_bytes: 54627
+  docs: https://apps.hootsuite.com/docs/sdk/4.1.1/index.html
+  note: >-
+    Distributed only from Hootsuite's own CDN - there is no npm/unpkg/jsDelivr entry, so no registry
+    metadata endpoint exists to query and `published` cannot be established. The URL pins the
+    major.minor path segment (jsapi/4-1/) but not the patch: the file's own header declares
+    `version: '4.1'` while the reference documentation is published for 4.1.1, so a consumer loading
+    this URL cannot tell which patch they are getting. Recorded as version 4.1 (the value the
+    artifact itself asserts) with published: null.
+  scope: >-
+    NOT a REST API client. This is the postMessage bridge for apps that render inside the Hootsuite
+    dashboard (stream, plugin, content-source, media-library and plan extensions).
+- name: hsp.js 4.0
+  official: true
+  registry: cdn
+  language: javascript
+  url: https://assets.hootsuite.com/jsapi/4-0/hsp.js
+  version: '4.0'
+  published: null
+  probed: '2026-08-13'
+  http_status: 200
+  deprecated: true
+  deprecated_date: '2021-11-02'
+  note: >-
+    Deprecated in November 2021 but still served (HTTP 200, 51419 bytes). Legacy versions 2.0 and
+    0.6 also still resolve. Hootsuite deprecates SDK versions without withdrawing them.
+- name: hootsuite-rest
+  official: false
+  registry: npm
+  language: javascript
+  url: https://www.npmjs.com/package/hootsuite-rest
+  version: 0.1.7
+  published: '2018-01-18'
+  publisher: grimace1975
+  note: >-
+    Third-party REST client, last released 2018 - more than eight years stale against a REST API
+    that has changed since. Not endorsed by Hootsuite.
+- name: '@pipedream/hootsuite'
+  official: false
+  registry: npm
+  language: javascript
+  url: https://www.npmjs.com/package/@pipedream/hootsuite
+  version: 0.3.2
+  published: '2026-03-31'
+  publisher: adolfo-pd
+  note: Pipedream integration components. Actively maintained, but by Pipedream, not Hootsuite.
+- name: '@activepieces/piece-hootsuite'
+  official: false
+  registry: npm
+  language: javascript
+  url: https://www.npmjs.com/package/@activepieces/piece-hootsuite
+  version: 0.0.6
+  published: '2026-08-04'
+  publisher: abdul_activepiecer
+  note: Activepieces automation connector. Third-party.
+- name: hootsuite-react
+  official: false
+  registry: npm
+  language: javascript
+  url: https://www.npmjs.com/package/hootsuite-react
+  version: 0.0.4
+  published: '2018-05-01'
+  publisher: grimace1975
+  note: Third-party React port of Hootsuite design components. Abandoned since 2018.
+registries_checked:
+- registry: npm
+  method: 'registry.npmjs.org/-/v1/search?text=hootsuite plus direct metadata lookups'
+  first_party_found: 0
+  note: >-
+    Direct lookups on `hootsuite`, `hootsuite-api`, `hootsuite-sdk`, `@hootsuite/sdk` and
+    `@hootsuite/hootsuite-sdk` all return "Not found". No @hootsuite npm scope is published.
+- registry: pypi
+  method: pypi.org/pypi/<pkg>/json
+  first_party_found: 0
+  note: '`hootsuite` and `hootsuite-api` both return HTTP 404.'
+- registry: rubygems
+  first_party_found: 0
+- registry: packagist
+  first_party_found: 0
+- registry: maven-central
+  first_party_found: 0
+- registry: nuget
+  first_party_found: 0
+- registry: crates.io
+  first_party_found: 0
+- registry: pkg.go.dev
+  first_party_found: 0
+github_org:
+  url: https://github.com/hootsuite
+  public_repos: 14
+  api_clients: 0
+  note: >-
+    The public org carries Swift/Android/Go engineering libraries (copyable-macro, token-ui,
+    nachos, healthchecks, vault-ctrl-tool) and two app-directory samples
+    (embedded-apps-template, hootsuite-app-express). None of them is a client for the Hootsuite
+    REST, Analytics, Inbox or Amplify APIs.
+collections:
+  postman:
+    url: https://app.getpostman.com/run-collection/eeda0fcdf55ea26bd0ec
+    official: true
+    probed: '2026-08-13'
+    http_status: 200
+    note: >-
+      Hootsuite embeds a Run-in-Postman button directly in its OpenAPI info.description, with a
+      preconfigured Hootsuite environment (url, authorization_url, token_url, client_id,
+      client_secret). This is the closest thing Hootsuite ships to a first-party client, and it is
+      the onboarding path its own Getting Started guide recommends.
+  repo_local:
+  - collections/hootsuite.postman_collection.json
+  - collections/hootsuite.opencollection.json
+gaps:
+- >-
+  No first-party SDK in any language for any of the four REST surfaces. A developer integrating
+  Hootsuite writes raw HTTP or adopts an abandoned 2018 third-party package.
+- >-
+  The one official client (hsp.js) has no registry presence, no changelog, no semver-pinned URL and
+  no publication date - none of the currency signals a consumer would use to judge it.

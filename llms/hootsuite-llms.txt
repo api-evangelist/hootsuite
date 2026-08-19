@@ -1,0 +1,151 @@
+# Hootsuite Developers Documentation
+
+> Hootsuite Developer Documentation
+
+## Guides
+- [The Hootsuite Platform](https://developer.hootsuite.com/docs/the-hootsuite-platform.md)
+- [API Guides](https://developer.hootsuite.com/docs/api-guides.md)
+- [API Rate Limits](https://developer.hootsuite.com/docs/api-rate-limits.md)
+- [Set up your OAuth 2.0 app](https://developer.hootsuite.com/docs/set-up-your-oauth-20-app.md)
+- [Set up a Member App](https://developer.hootsuite.com/docs/set-up-a-member-app.md)
+- [Set up an Org App](https://developer.hootsuite.com/docs/set-up-an-org-app.md)
+- [Uninstall Callback](https://developer.hootsuite.com/docs/️-uninstall-callback.md)
+- [App Submission Process](https://developer.hootsuite.com/docs/app-submission-process.md)
+- [FAQ](https://developer.hootsuite.com/docs/faq.md)
+- [Create a Content Source App](https://developer.hootsuite.com/docs/add-a-content-source-component.md)
+- [Create a Media Library App](https://developer.hootsuite.com/docs/create-a-media-library-app.md)
+- [Create a Plan App](https://developer.hootsuite.com/docs/create-a-plan-app.md)
+- [Overview](https://developer.hootsuite.com/docs/iframe-sdk-overview.md)
+- [Authentication](https://developer.hootsuite.com/docs/iframe-sdk-authentication.md)
+- [Upgrading to SDK version 4.1](https://developer.hootsuite.com/docs/upgrading-sdk-version.md)
+- [Best Practices](https://developer.hootsuite.com/docs/iframe-sdk-best-practices.md)
+- [App Listing Requirements](https://developer.hootsuite.com/docs/app-listing-requirements.md)
+- [FAQ](https://developer.hootsuite.com/docs/iframe-sdk-faq.md)
+- [Overview](https://developer.hootsuite.com/docs/api-overview.md)
+- [Authentication](https://developer.hootsuite.com/docs/api-authentication.md)
+- [Scheduling Messages](https://developer.hootsuite.com/docs/message-scheduling.md)
+- [Attach Media](https://developer.hootsuite.com/docs/uploading-media.md)
+- [Webhook Events](https://developer.hootsuite.com/docs/webhooks.md)
+- [API Permissions Matrix](https://developer.hootsuite.com/docs/api-permissions-matrix.md)
+- [FAQ](https://developer.hootsuite.com/docs/rest-api-faq.md)
+- [Overview of Amplify](https://developer.hootsuite.com/docs/amplify-overview.md)
+- [Overview](https://developer.hootsuite.com/docs/predefined-api-overview.md)
+- [Authentication](https://developer.hootsuite.com/docs/predefined-api-authentication.md)
+- [Enabling OAuth 2.0](https://developer.hootsuite.com/docs/enabling-oauth-20.md)
+- [Setting up CRM API](https://developer.hootsuite.com/docs/crm-apis.md)
+- [Overview of Inbox 2.0](https://developer.hootsuite.com/docs/inbox-overview.md)
+- [Add Chatbots with Virtual Agent API](https://developer.hootsuite.com/docs/add-bots-like-real-agents-with-virtual-agents-api.md)
+- [Access the Real-Time Metrics API](https://developer.hootsuite.com/docs/access-real-time-metrics-with-real-time-metrics-api.md)
+- [Use the Proactive Messaging API](https://developer.hootsuite.com/docs/reach-customers-preemptively-with-proactive-messaging-api.md)
+- [Webhook Overview](https://developer.hootsuite.com/docs/webhooks-overview.md)
+- [Sparkcentral Messenger SDK](https://developer.hootsuite.com/docs/sparkcentral-messenger-sdk.md)
+- [Sparkcentral Messenger SDK 1.25.7](https://developer.hootsuite.com/docs/sparkcentral-messenger-sdk-1257.md)
+- [Sparkcentral CRM API v2](https://developer.hootsuite.com/docs/sparkcentral-crm-api-v2.md)
+- [Sparkcentral CRM API v1](https://developer.hootsuite.com/docs/sparkcentral-crm-api-v1.md)
+- [Sparkcentral Proactive API](https://developer.hootsuite.com/docs/sparkcentral-proactive-api.md)
+- [Sparkcentral Real-Time Metrics API](https://developer.hootsuite.com/docs/sparkcentral-real-time-metrics-api.md)
+- [Sparkcentral Virtual Agent API](https://developer.hootsuite.com/docs/sparkcentral-virtual-agent-api.md)
+- [Sparkcentral Queue API](https://developer.hootsuite.com/docs/sparkcentral-queue-api.md)
+- [Overview](https://developer.hootsuite.com/docs/analytics-overview.md)
+- [Using the Analytics API](https://developer.hootsuite.com/docs/using-the-api.md)
+- [Networks Reference](https://developer.hootsuite.com/docs/networks-reference.md): Unified reference for the supported datatypes and networks in the API
+- [Metrics Reference](https://developer.hootsuite.com/docs/metrics-reference.md)
+- [Breakdowns Reference](https://developer.hootsuite.com/docs/breakdowns-reference.md)
+- [Ad Metrics Reference](https://developer.hootsuite.com/docs/paid-api-native-metrics-reference.md)
+- [Updates to API Terms of Service](https://developer.hootsuite.com/docs/updates-to-api-terms-of-service.md)
+- [Adobe Experience Manager Assets for Hootsuite](https://developer.hootsuite.com/docs/adobe-experience-manager-assets-for-hootsuite.md): AEM Assets for Hootsuite is installed once from the App Directory. Once installed, you can use it two ways: in the Compose window and Publisher, or as a Media Library source in Perch.
+- [Update Log](https://developer.hootsuite.com/docs/aem-update-log.md)
+
+## API Reference
+- [OAuth2 Authorize](https://developer.hootsuite.com/reference/oauth2authorize-2.md): [OAuth2 Authorize](https://tools.ietf.org/html/rfc6749#section-3.1) endpoint.
+- [OAuth2 Token](https://developer.hootsuite.com/reference/oauth2token-2.md): [OAuth2 Token](https://tools.ietf.org/html/rfc6749#section-3.2) endpoint. The required parameters depend on the grant type requested:  |Required Parameter|Grant Type| |---|---| |code|authorization_code| |redirect_uri|authorization_code| |member_id|member_app| |organization_id|organization_app| |refresh_token|refresh_token|  This endpoint requires that you pass in your client credentials using the HTTP Basic authentication scheme as per outlined in the [spec](https://tools.ietf.org/html/rfc6749#section-2.3.1). Including your client credentials in the request-body is not supported.  **Note**: The specific authorization code provided for the `code` parameter must only be used successfully once. If an authorization code is used a second time, all tokens granted with the first `/oauth2/token` call will be revoked.
+- [Retrieve authenticated member](https://developer.hootsuite.com/reference/retrieveme.md): Retrieves authenticated member.
+- [Retrieve authenticated member's organizations](https://developer.hootsuite.com/reference/retrievemeorganizations.md): Retrieves the organizations that the authenticated member is in.
+- [Retrieve authenticated member's social profiles](https://developer.hootsuite.com/reference/getmysocialprofiles.md): Retrieves the social media profiles that the authenticated user has BASIC_USAGE permissions on.
+- [Retrieve authenticated member's ad accounts](https://developer.hootsuite.com/reference/getmyadaccounts.md): Retrieves the ad accounts that the authenticated user has permissions on.
+- [Create media upload url](https://developer.hootsuite.com/reference/createmedia.md): Creates an Amazon S3 upload URL that can be used to transfer media to Hootsuite which ensures the media is available when a scheduled message is sent to the social network. Hootsuite will generate thumbnails and key frames and return a unique media identifier that can be passed when creating a message. Subsequent uploads to an upload URL will be accepted by Amazon but immediately deleted by Hootsuite and only the first valid media file uploaded will be used. The MIME type and size provided in this call must match the MIME type and size of the media uploaded.  After requesting an upload URL, make a `PUT` request to the `uploadUrl` returned, an example cURL request would look like the following, replace the fields as appropriate:  ``` curl --location --request PUT 'https://hootsuite-video.s3.amazonaws.com/production/12255244_01942650-3d42-42b8-a191-aa84eb45d105.mp4?AWSAccessKeyId=REDACTED_AWS_ACCESS_KEY_ID&Expires=1471978770&Signature=b%2B196oEHxySdmE%2FC34ZRL6pXSAI%3D' \   --header 'Content-Type: video/mp4' \   --header 'Content-Length: 383631' \   --data 'SOURCE-MEDIA-LOCATION' ```  Hootsuite will remove uploaded media 90 days after using the media in a message.
+- [Retrieve media upload status](https://developer.hootsuite.com/reference/getmedia-1.md): Retrieves the status of a media upload to Hootsuite.
+- [Retrieve member](https://developer.hootsuite.com/reference/retrievemember.md): Retrieves a member
+- [Create member](https://developer.hootsuite.com/reference/createmember.md): Creates a member in a Hootsuite organization.  Requires organization manage members permission.
+- [Retrieve member's organizations](https://developer.hootsuite.com/reference/retrievememberorganizationsbyid.md): Retrieves the organizations that the member is in.
+- [Schedule messages](https://developer.hootsuite.com/reference/schedulemessage-1.md): Schedules a message to send on one or more social profiles (except Pinterest). Returns an array of uniquely identifiable messages (one per social profile requested).<br/><br/>Scheduling a message to Pinterest can not be bundled with any other social profiles.
+- [Retrieve outbound messages](https://developer.hootsuite.com/reference/retrievemessages.md): Outbound messages are messages that are scheduled or were previously sent. This endpoint returns outbound messages sorted by increasing scheduled send time. Messages pending approval, including those created by and/or actionable by the given user, will also be returned via this API.  Messages returned can be filtered by social profile or the current state of the message. If more than 50 results are returned a cursor will be automatically created to paginate the results.  Query Parameters must be [URL encoded](https://en.wikipedia.org/wiki/Percent-encoding). For example:  ``` ?startTime=2020-01-01T00%3A00%3A00Z &endTime=2020-01-15T17%3A55%3A01Z &socialProfileIds=1234 &state=SCHEDULED &limit=5 ```  To specify multiple social profiles, use the following [syntax](http://stackoverflow.com/questions/6243051/how-to-pass-an-array-within-a-query-string):  ``` ?socialProfileIds=1234&socialProfileIds=5678 ```
+- [Retrieve message](https://developer.hootsuite.com/reference/retrievemessage.md): Retrieves a message. A message is always associated with a single social profile. Messages might be unavailable for a brief time during upload to social networks.
+- [Delete message](https://developer.hootsuite.com/reference/deletemessage.md): Deletes a message. A message is always associated with a single social profile.
+- [Approve message](https://developer.hootsuite.com/reference/approvemessage.md): Approve a message.
+- [Reject message](https://developer.hootsuite.com/reference/rejectmessage.md): Reject a message.
+- [Get message review history](https://developer.hootsuite.com/reference/getmessagehistory.md): Gets a message's prescreening review history.
+- [Retrieve comment](https://developer.hootsuite.com/reference/retrievecomment.md): Retrieves a comment if it's been through the approvals workflow.
+- [Approve comment](https://developer.hootsuite.com/reference/approvecomment.md): Approve a comment.
+- [Reject comment](https://developer.hootsuite.com/reference/rejectcomment.md): Reject a comment.
+- [Retrieve organization teams](https://developer.hootsuite.com/reference/getorganizationteams.md): Retrieves a list of teams for a given organization.
+- [Retrieve organization members](https://developer.hootsuite.com/reference/retrieveorganizationmembers.md): Retrieves the members in an organization
+- [Remove member from organization](https://developer.hootsuite.com/reference/removememberfromorganization.md): Removes a member from an organization.
+- [Retrieve org member's organization permissions](https://developer.hootsuite.com/reference/retrieveorganizationmemberorganizationpermissions.md): Retrieves an organization member’s permissions for the organization.
+- [Retrieve org member's teams](https://developer.hootsuite.com/reference/retrieveorganizationmembersteams.md): Retrieves the teams an organization member is in.
+- [Retrieve org member’s social profiles](https://developer.hootsuite.com/reference/retrieveorganizationmemberssocialprofiles.md): Retrieves the organization's social profiles that an organization member can access.
+- [Retrieve org member’s social profile permissions](https://developer.hootsuite.com/reference/retrieveorganizationsocialprofilepermissions.md): Retrieves an organization member’s permissions for a social profile.
+- [Create User](https://developer.hootsuite.com/reference/createscimuser.md): Creates a Hootsuite user using the SCIM 2.0 protocol.
+- [Get Users](https://developer.hootsuite.com/reference/getscimusers.md): Retrieves Hootsuite users using the SCIM 2.0 protocol. Support equals filtering on username.
+- [Get User](https://developer.hootsuite.com/reference/getscimuser.md): Retrieves a Hootsuite user using the SCIM 2.0 protocol.
+- [Replace User](https://developer.hootsuite.com/reference/replacescimuser.md): Updates a Hootsuite user using the SCIM 2.0 protocol. To see the JSON object attributes required by the PUT endpoint, call the /Schemas endpoint. For a complete example request, see the [SCIM specification](https://tools.ietf.org/html/rfc7644#section-3.5.1)
+- [Modify User](https://developer.hootsuite.com/reference/modifyscimuser.md): Modify one or more attributes of a Hootsuite user. For a complete example request, see the [SCIM specification](https://tools.ietf.org/html/rfc7644#section-3.5.2).
+- [Create Group](https://developer.hootsuite.com/reference/createscimgroup.md): Creates a Hootsuite team using the SCIM 2.0 protocol.
+- [Get Groups](https://developer.hootsuite.com/reference/getscimgroups.md): Retrieves Hootsuite teams using the SCIM 2.0 protocol. Support equals filtering on displayName.
+- [Get Group](https://developer.hootsuite.com/reference/getscimgroup.md): Retrieves a Hootsuite team using the SCIM 2.0 protocol.
+- [Replace Group](https://developer.hootsuite.com/reference/replacescimgroup.md): Updates a Hootsuite team using the SCIM 2.0 protocol. For a complete example request, see the [SCIM specification](https://tools.ietf.org/html/rfc7644#section-3.5.1)
+- [Modify Group](https://developer.hootsuite.com/reference/modifyscimgroup.md): Modify one or more attributes of a Hootsuite team. For a complete example request, see the [SCIM specification](https://tools.ietf.org/html/rfc7644#section-3.5.2).
+- [Get Resource Types](https://developer.hootsuite.com/reference/getscimresourcetypes.md): Retrieves the configuration for all supported SCIM resource types
+- [Retrieve social profiles](https://developer.hootsuite.com/reference/getsocialprofiles-1.md): Retrieves the social profiles that the authenticated user has access to.
+- [Retrieve social profile](https://developer.hootsuite.com/reference/getsocialprofile.md): Retrieve a social profile. Requires BASIC_USAGE permission on the social profile.
+- [Retrieve social profile's teams](https://developer.hootsuite.com/reference/getsocialprofileteams.md): Retrieves a list of team IDs with access to a social profile. Requires BASIC_USAGE permission on the social profile or ORG_MANAGE_SOCIAL_PROFILE permission on the organization that owns the social profile.
+- [Create team](https://developer.hootsuite.com/reference/createteam.md): Creates a team in an organization.
+- [Add member to team](https://developer.hootsuite.com/reference/addmembertoteam.md): Adds a member to a team.
+- [Retrieve team members](https://developer.hootsuite.com/reference/getteammembers.md): Retrieves the members in a team.
+- [Retrieve team member's permissions](https://developer.hootsuite.com/reference/retrieveorganizationmembersteampermissions.md): Retrieves team member's team permissions.
+- [Retrieve org team’s social profiles](https://developer.hootsuite.com/reference/retrieveorganizationteamssocialprofiles.md): Retrieves the organization's social profiles that an organization team can access.
+- [Retrieve team](https://developer.hootsuite.com/reference/getteam.md): Retrieves a team with a given team ID.
+- [List Posts and Metrics](https://developer.hootsuite.com/reference/listposts.md): Fetch posts that have been published on this Social Network, including lifetime metrics for each post. `profileId` is a required filter, the others are optional. `lastModified` may start at most 30 days in the past.  `reportingPeriod` may start at most 2 years in the past. When filtering by `reportingPeriod`, the creation date of the post is used.
+- [List Profiles and Metrics](https://developer.hootsuite.com/reference/listprofilesmetrics.md): Fetch daily analytics metrics for profiles on this social network. `profileId` is a required filter, the others are optional. `lastModified` may start at most 30 days in the past.  `reportingPeriod` may start at most 2 years in the past.
+- [List Paid campaigns, ad sets, or ads](https://developer.hootsuite.com/reference/listpaid.md): Returns paid entities for the collection given in the path (`campaigns`, `adsets`, or `ads`). Use query parameters for ad account type, pagination, and datatype; use the request body for filters (ad accounts, time range, etc.) note: In this API, 'adsets' and related response fields map to Facebook ad sets and Twitter ad groups ('adgroups').
+- [List Metrics for paid campaigns, ad sets, or ads](https://developer.hootsuite.com/reference/listpaidmetrics.md): Fetch daily metrics for the collection given in the path (`campaigns`,`adsets`, or `ads`) on the ad account  in the request body. Use query parameters for ad account type, limit and pagination, and use the request body for filters (ad accounts, time range, etc.) note: In this API, 'adsets' and related response fields map to Facebook ad sets and Twitter ad groups ('adgroups').
+- [Inbound message volume](https://developer.hootsuite.com/reference/metricsinboundmessagevolume.md): A count of inbound messages based on applied filters.
+- [Outbound message volume](https://developer.hootsuite.com/reference/metricsoutboundmessagevolume.md): A count of outbound messages based on applied filters.
+- [Average first response time](https://developer.hootsuite.com/reference/metricsaveragefirstresponsetime.md): The average time in seconds to the first response to an inbound message.
+- [Average conversation response time](https://developer.hootsuite.com/reference/metricsaverageconversationresponsetime.md): The average time in seconds for a response to an inbound message except the first response.
+- [Resolved with reply](https://developer.hootsuite.com/reference/metricsresolvedwithreply.md): The number of messages that have been resolved with at least one reply.
+- [Average handle time](https://developer.hootsuite.com/reference/metricsaveragehandletime.md): The average time in seconds that a conversation is handled by an agent, specifically the difference between timestamps of conversation open and conversation pend/resolve. For Average Handle Time to be calculated, there must be an outbound between open and pend/resolve event.
+- [Agent availability](https://developer.hootsuite.com/reference/metricsagentavailability.md): The number of agents available or away. You can filter by teams.
+- [Contacts waiting in queue](https://developer.hootsuite.com/reference/metricscontactswaitinginqueue.md): The number of contacts waiting in the queue for a response.
+- [Longest wait time in queue](https://developer.hootsuite.com/reference/metricslongestwaittimeinqueue.md): The current longest time in seconds that a contact is waiting for a response. If no mediumId filter is provided, the messages sent in any connected mediums will be included.
+- [Online Agents](https://developer.hootsuite.com/reference/onlineagents.md): List of all currently online agents.
+- [Manipulate conversation](https://developer.hootsuite.com/reference/vaimanipulateconversation.md): This allows you to manipulate the conversation in the same way you would when responding to a webhook request. You can send a reply, add a topic, and/or hand off the conversation. Each property in the body is optional. If you only want to send a message, you can send `{"sendMessage": {"text": "Hi!"}}`. If you want to apply a topic and complete, but not send a message, you can, for example, send `{"applyTopics":["Spam"], "complete": "RESOLVED"}`.  Note that only topics that match a topic in the platform exactly (case insensitive) will be applied to the conversation. Non-existing topics are ignored. Currently, no fuzzy matching will occur and typographical errors will result in a non-existing topic.  The same applies to tags. Only tags that match a tag in the platform exactly (case insensitive) will be applied to a specific message. Non-existing tags are ignored. You must specify the `messageId` when using the REST API. The `messageId` is part of every `INBOUND_MESSAGE_RECEIVED` event.  If you want to send an attachment, you must first upload the attachment in a separate call (`PUT /inbox/v1/virtual-agent/conversations/{conversationId}/attachments/{filename}`), and then use the file name when sending the message (`{"sendMessage": {"attachment": ""}}`).  If the contact already has a value saved for the attribute definition with a particular alias, the update will be ignored. If any of the attribute definitions are configured as CRM lookup values, a CRM lookup is performed after the attributes are set. For the best performance, we recommend setting contact attributes along with the response to indicate that the conversation is completed. Note that the virtual agent will not receive the new attributes from the CRM response until the next `CONVERSATION_STARTED` or `CONVERSATION_DELEGATED` event is received for a conversation with a contact.
+- [Upload attachments](https://developer.hootsuite.com/reference/vaiuploadconversationattachment.md): This allows you to upload an attachment that you can send in a conversation. You need to upload the attachment first, and then you can send a message with text and an attachment. For example, if you upload an attachment to `/inbox/v1/virtual-agent/conversations/attachments/cat.jpg`, you can send that attachment by sending  ```json {   "sendMessage": {     "text": "This is a cat!",     "attachment": "cat.jpg"   } } ```  to `/inbox/v1/virtual-agent/conversations/{conversationId}`. The file name should be unique within a conversation and is visible to the contact if they download your attachment.  The `Content-Type` header should contain the correct mime-type of the attachment (such as `image/jpeg`). The `Content-Length` header should contain the size of the attachment in bytes. Attachments should be fewer than 10 megabytes to prevent error.
+- [Conversations locked by an agent](https://developer.hootsuite.com/reference/lock.md): An overview of conversations with the agent that locked the conversation.
+- [Send proactive message](https://developer.hootsuite.com/reference/proactivesendmessage.md): The message is queued for processing. Use the returned correlation id to get the status of the sent message.
+- [Get status](https://developer.hootsuite.com/reference/proactivegetstatusforcorrelationid.md): Get the status overview for a sent proactive message
+- [Get status detail](https://developer.hootsuite.com/reference/proactivegetstatusdetailforcorrelationid.md): Get the details of a message with a specific status.
+- [Set contact attributes](https://developer.hootsuite.com/reference/crmsetcontactattributes.md): Update the contact attributes of a contact profile.
+- [Fetch planned content](https://developer.hootsuite.com/reference/getplannedcontent.md): This endpoint returns planned content items based on the provided parameters.
+- [OAuth2 Authorization](https://developer.hootsuite.com/reference/oauth2authorize-1.md): <p> <a href='https://tools.ietf.org/html/rfc6749#section-3.1'>OAuth2 Authorize</a> endpoint. Please note that this authorization url is configured in the developer portal. </p>
+- [Oauth2 token endpoint](https://developer.hootsuite.com/reference/oauth2token.md): <p> <a href='https://tools.ietf.org/html/rfc6749#section-3.2'>OAuth2 Token</a> endpoint. Please note that this authorization url is configured in the developer portal. The required parameters depend on the grant type requested: </p> <p>Authorization Code (Media Library/Planned Content)</p> <ul> <li>grant_type: authorization_code</li> <li>client_id</li> <li>client_secret</li> <li>code</li> <li>redirect_uri</li> </ul> <p>Refresh Token (Media Library/Planned Content)</p> <ul> <li>grant_type: refresh_token</li> <li>client_id </li> <li>client_secret </li> <li>refresh_token </li> </ul> <p>Client Credentials (CRM integration)</p> <ul> <li>grant_type: client_credentials</li> <li>client_id </li> <li>client_secret </li> <li>scope: CRM-Instance-URL provided by the customer </li> </ul>
+- [Get status of server](https://developer.hootsuite.com/reference/getstatus.md): Handles the status endpoint
+- [Retrieve media](https://developer.hootsuite.com/reference/getmedia.md): Retrieve media content and optionally filter by search criteria and mediaType. If no parameters are given, the app should return either the contents of the base folder if it has a folder hierarchy or trending/popular media results otherwise.
+- [/v1/case](https://developer.hootsuite.com/reference/createcase.md): Create a new case in the CRM system
+- [/v1/contact](https://developer.hootsuite.com/reference/deletecontacts.md): Delete any PII assocated with a case contact
+- [Subscribe to events published by CRM app.](https://developer.hootsuite.com/reference/subscribe.md): This endpoint is only required if you app does not have another method to register the CRM events callback during  installation.
+
+## Pages
+- [Support](https://developer.hootsuite.com/page/support.md)
+
+## Changelog
+- [Changes to Facebook metrics](https://developer.hootsuite.com/changelog/changes-to-facebook-metrics.md)
+- [Webhooks](https://developer.hootsuite.com/changelog/webhooks.md)
+- [iFrame SDK 4.1](https://developer.hootsuite.com/changelog/iframe-sdk-41.md)
+- [A New Content Library Experience](https://developer.hootsuite.com/changelog/a-new-content-library-experience.md)
+- [Stay Updated: New Media Upload Specs for Social Networks](https://developer.hootsuite.com/changelog/updated-media-restrictions.md)
+- [Media Library Video Support](https://developer.hootsuite.com/changelog/media-library-video-support.md)
+- [Assignments Manager Deprecation](https://developer.hootsuite.com/changelog/assignments-manager-deprecation.md)
+- [API Updates](https://developer.hootsuite.com/changelog/api-updates-and-assignment-manager-changes.md)
+- [10 Year Anniversary of the Hootsuite App Directory](https://developer.hootsuite.com/changelog/10-year-anniversary-of-the-hootsuite-app-directory.md)
+- [New SDK functions: New Compose](https://developer.hootsuite.com/changelog/new-api-version-new-compose.md)

@@ -1,0 +1,78 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Hootsuite Inbox 2.0 API
+  version: 1.0.0
+x-provenance:
+  generated: '2026-08-13'
+  method: generated
+  source: openapi/hootsuite-inbox-api-openapi.yml
+  note: Captures API Evangelist enhancements only. The underlying OpenAPI is never mutated - apply this
+    overlay to reproduce our annotated view.
+extends: openapi/hootsuite-inbox-api-openapi.yml
+actions:
+- target: $.info
+  description: Record where this contract came from and that it is first-party.
+  update:
+    x-api-evangelist:
+      provider: Hootsuite
+      provider-slug: hootsuite
+      source: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
+      discovered: '2026-08-13'
+      catalog: https://apis.io/hootsuite
+- target: $.info
+  description: Attach the cross-cutting runtime semantics an agent needs and the spec does not state.
+  update:
+    x-conventions:
+      authentication: 'OAuth 2.0 authorization code with refresh tokens, or the custom member_app /
+        organization_app grants. Client credentials MUST go in an HTTP Basic header - Hootsuite does
+        not accept them in the request body. Authorization codes are single-use and expire in 10 minutes;
+        reusing one revokes every token issued from it. Refresh tokens never expire but are single-use.
+        Discovery: https://platform.hootsuite.com/.well-known/oauth-authorization-server. See authentication/hootsuite-authentication.yml.'
+      authorization: OAuth scope is not the authorization model. Only two scopes exist (offline, analytics:read);
+        the real decision is the caller's Hootsuite dashboard role. A correctly scoped call can still
+        403 with codes 4002-4010. See scopes/hootsuite-scopes.yml and https://developer.hootsuite.com/docs/api-permissions-matrix.
+      errors: 'Errors use Hootsuite''s own envelope, not RFC 9457 problem+json: {"errors":[{"code":1234,"message":"...","id":"...","resource":{"type":"...","id":"..."}}]}.
+        A partially-failed request returns BOTH data and errors in one 200 response - never treat a
+        200 with a populated errors[] as clean. 97 numeric codes are catalogued in errors/hootsuite-problem-types.yml.
+        OAuth endpoints return RFC 6749 bodies and SCIM endpoints return RFC 7644 bodies instead.'
+      idempotency: NO IDEMPOTENCY. Hootsuite publishes no Idempotency-Key header and no replay-safe
+        retry contract on any surface. A retried POST /v1/messages after a timeout can schedule the
+        post twice. Before retrying a write, reconcile with GET /v1/messages and delete the duplicate
+        with DELETE /v1/messages/{messageId} while it is still SCHEDULED. See conventions/hootsuite-conventions.yml.
+      rate-limits: Hootsuite enforces 20 requests/second and a 100,000 call/day quota per account. Responses
+        carry X-Account-Quota, X-Account-Quota-Used and X-Account-Rate-Limit-Requests-Remaining (reported
+        per cluster node, so treat as a guide). Exhaustion returns HTTP 429 with error code 1003, 1004
+        or 1043 and NO Retry-After header - back off until the end of the current one-second window.
+        See rate-limits/hootsuite-rate-limits.yml.
+      pagination: Cursor pagination only - no offset or page numbers. Cursors are opaque and returned
+        in the response metadata block; echo them back verbatim. Invalid cursor format is error code
+        3020.
+      artifact: conventions/hootsuite-conventions.yml
+- target: $.info
+  description: Point at the API Evangelist artifacts derived from this specification.
+  update:
+    x-artifacts:
+      conventions: conventions/hootsuite-conventions.yml
+      errors: errors/hootsuite-problem-types.yml
+      authentication: authentication/hootsuite-authentication.yml
+      scopes: scopes/hootsuite-scopes.yml
+      rate-limits: rate-limits/hootsuite-rate-limits.yml
+      lifecycle: lifecycle/hootsuite-lifecycle.yml
+      conformance: conformance/hootsuite-conformance.yml
+      data-model: data-model/hootsuite-data-model.yml
+      webhooks: asyncapi/hootsuite-webhooks.yml
+      well-known: well-known/hootsuite-well-known.yml
+      skills: skills/_index.yml
+- target: $.components.securitySchemes.Oauth2ClientCredentials
+  description: Flag the placeholder configuration shipped in the production spec.
+  update:
+    x-agent-warning: tokenUrl is the literal string TO_BE_CONFIGURED_IN_INBOX_2_0 and the single scope
+      is named some_scope. These are placeholders left in the published specification, not a usable
+      configuration. Inbox 2.0 client-credentials values are provisioned per customer; scope carries
+      the customer-supplied CRM-Instance-URL. See https://developer.hootsuite.com/reference/oauth2token.
+- target: $.webhooks
+  description: Record the callback authenticity mechanism.
+  update:
+    x-signature: Inbox 2.0 callbacks are signed with the X-Hootsuite-Signature header (declared as the
+      SharedSecret apiKey scheme). This is the only Hootsuite callback surface with a documented authenticity
+      signal - the REST platform webhooks are unsigned. See asyncapi/hootsuite-webhooks.yml.

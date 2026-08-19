@@ -1,0 +1,149 @@
+generated: '2026-08-13'
+method: searched
+source: >-
+  https://developer.hootsuite.com/docs/webhooks,
+  https://developer.hootsuite.com/docs/webhooks-overview,
+  openapi/hootsuite-inbox-api-openapi.yml (top-level `webhooks` block)
+docs:
+- https://developer.hootsuite.com/docs/webhooks
+- https://developer.hootsuite.com/docs/webhooks-overview
+description: >-
+  Hootsuite ships an HTTP webhook event surface on two independent products, and NO AsyncAPI
+  document for either. The REST platform documents four event types in prose; Inbox 2.0 declares
+  six callbacks natively in its OpenAPI 3.1 `webhooks` block, which is the only machine-readable
+  event contract Hootsuite publishes.
+asyncapi:
+  published: false
+  note: >-
+    No AsyncAPI specification exists on any Hootsuite host. Probed /asyncapi.yaml and the
+    api-catalog linkset; neither names one. This catalog is the honest substitute, not a
+    substitute AsyncAPI - nothing was generated on Hootsuite's behalf.
+surfaces:
+- id: rest-platform-webhooks
+  name: Hootsuite Platform Webhooks
+  transport: HTTP POST to a developer-registered callback URL
+  registration: >-
+    Callback URLs are registered per app in the Hootsuite developer portal
+    (App directory -> Developer apps -> [app] -> Security). The portal can also test whether a
+    callback URL has been registered.
+  delivery:
+    ordering: >-
+      Each event carries a `seq_no`, a monotonically increasing sequence number per callback URL.
+      Ping events do not carry a sequence number and do not increment it.
+    failure_handling: >-
+      A callback URL that fails consistently is DISABLED by Hootsuite. It is re-enabled by
+      responding 200 OK to a subsequent com.hootsuite.ping.event.v1 probe.
+    expected_response: 200 OK
+    signing: null
+    retries: not documented
+  envelope: '{ "seq_no": "123", "type": "com.hootsuite.<domain>.event.v1", "data": { ... } }'
+  events:
+  - type: com.hootsuite.ping.event.v1
+    description: >-
+      Liveness probe sent by Hootsuite to test a callback URL, typically after consistent failures.
+      Contents can be ignored; return 200 OK to re-enable the URL.
+    fields: []
+  - type: com.hootsuite.messages.event.v1
+    description: Fired when a scheduled or sent message changes state.
+    fields:
+    - name: state
+      type: string
+    - name: organization.id
+      type: string
+      note: null when the message is not owned by an organization
+    - name: message.id
+      type: string
+    - name: timestamp
+      type: string
+      note: ISO-8601
+    states:
+    - SCHEDULED
+    - PENDING_APPROVAL
+    - APPROVED
+    - SUBMITTED
+    - SENT
+    - SEND_FAILED_PERMANENTLY
+    - DELETED
+    - REJECTED
+    state_notes:
+      SUBMITTED: Message has a video attached that is in the process of being uploaded to the network.
+      SEND_FAILED_PERMANENTLY: Message failed to post to the social network.
+  - type: com.hootsuite.comments.event.v1
+    description: >-
+      Fired when a comment moving through the approvals workflow changes state. Added 2019-03-20.
+    fields:
+    - name: state
+      type: string
+    - name: organization.id
+      type: string
+    - name: comment.id
+      type: string
+    - name: timestamp
+      type: string
+    states:
+    - PENDING_APPROVAL
+    - EXPIRED_APPROVAL
+    - COMPLETED
+    - FAILED
+    - DELETED
+    - REJECTED
+  - type: com.hootsuite.apps.event.v1
+    description: >-
+      Fired when a registered application's installation state changes. Member apps carry a member
+      object; organization apps carry an organization object.
+    fields:
+    - name: state
+      type: string
+    - name: app.id
+      type: string
+    - name: member.id
+      type: string
+      note: member apps only
+    - name: organization.id
+      type: string
+      note: organization apps only
+    states:
+    - INSTALLED
+    - UNINSTALLED
+- id: inbox-2-0-webhooks
+  name: Hootsuite Inbox 2.0 (Sparkcentral) Webhooks
+  transport: HTTP POST to a customer-configured endpoint
+  machine_readable: true
+  spec: openapi/hootsuite-inbox-api-openapi.yml
+  spec_location: top-level `webhooks` block (OpenAPI 3.1)
+  signing:
+    header: X-Hootsuite-Signature
+    scheme: shared secret
+    declared_as: components.securitySchemes.SharedSecret (type apiKey, in header)
+    note: >-
+      This is the only Hootsuite callback surface with a documented authenticity signal. The REST
+      platform webhooks are unsigned.
+  events:
+  - name: crm-attribute-lookup
+    domain: CRM API
+  - name: crm-error-notifications
+    domain: CRM API
+  - name: crm-write-back
+    domain: CRM API
+  - name: vai-conversation-started
+    domain: Virtual Agent API
+  - name: vai-conversation-delegated
+    domain: Virtual Agent API
+  - name: vai-inbound-message-received
+    domain: Virtual Agent API
+    note: >-
+      Carries the messageId required by POST /inbox/v1/virtual-agent/conversations/{conversationId}.
+event_count: 10
+standards:
+  cloudevents: partial
+  cloudevents_note: >-
+    Platform event names follow the CloudEvents reverse-DNS versioned convention and the payload
+    carries `type` and `data`, but the required CloudEvents attributes specversion, id, source and
+    time are absent. Flavored, not conformant.
+gaps:
+- No AsyncAPI document for either surface.
+- REST platform webhooks are unsigned - no HMAC, no signature header, no timestamp anti-replay.
+- Retry policy and backoff are undocumented for both surfaces.
+- >-
+  The REST platform event payloads carry only IDs (message.id, comment.id, app.id). A consumer must
+  call back into the REST API to learn anything about the object that changed.

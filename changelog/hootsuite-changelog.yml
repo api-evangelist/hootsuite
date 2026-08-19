@@ -1,0 +1,124 @@
+generated: '2026-08-13'
+method: searched
+source: https://developer.hootsuite.com/llms.txt (Changelog section) plus each entry fetched as .md
+docs:
+- https://developer.hootsuite.com/changelog
+description: >-
+  Hootsuite runs a developer changelog on its ReadMe-hosted docs site. It is announcement-shaped
+  rather than release-shaped: entries describe product and policy changes in prose, and the ones
+  that matter carry an in-body date, but Hootsuite publishes no version numbers, no per-entry
+  publication date in the markdown export, and no machine-readable feed.
+scheme: none
+current_version: null
+version_note: >-
+  Hootsuite versions in the URI path (v1 / v2) and has never shipped a second major version of the
+  REST API. The only component with a published version history is the iFrame SDK (current 4.1).
+feed:
+  rss: null
+  atom: null
+  json: null
+  note: >-
+    No changelog feed is advertised. The Atlassian Statuspage feeds at
+    https://status.hootsuite.com/history.atom and /history.rss cover incidents, not API changes.
+entry_count: 10
+entries:
+- title: Changes to Facebook metrics
+  date: '2026-06-03'
+  breaking: true
+  category: analytics
+  highlights:
+  - >-
+    Upstream Facebook API changes deprecate a set of profile and post metrics returned by the
+    Hootsuite Public API.
+  - >-
+    Historical data is still returned for dates before 2026-06-03; the affected metrics should not
+    be used going forward.
+  url: https://developer.hootsuite.com/changelog/changes-to-facebook-metrics
+- title: 'Stay Updated: New Media Upload Specs for Social Networks'
+  date: null
+  breaking: false
+  category: media
+  highlights:
+  - >-
+    Media upload dimension, format and size requirements changed across several social networks;
+    developers are pointed at https://developer.hootsuite.com/docs/uploading-media.
+  url: https://developer.hootsuite.com/changelog/updated-media-restrictions
+- title: A New Content Library Experience
+  date: null
+  breaking: false
+  category: product
+  highlights:
+  - New Content Library replaces the previous asset-management surface.
+  - Improved navigation, library creation and workflow management; bug fixes.
+  url: https://developer.hootsuite.com/changelog/a-new-content-library-experience
+- title: Media Library Video Support
+  date: null
+  breaking: false
+  category: media
+  highlights:
+  - Video support added to Media Library apps.
+  url: https://developer.hootsuite.com/changelog/media-library-video-support
+- title: Webhooks
+  date: '2019-03-20'
+  breaking: false
+  category: webhooks
+  additions:
+  - >-
+    Comment events are now surfaced via the configured webhook - triggered for any social profile
+    configured with the prescreen app.
+  prior_entries:
+  - date: '2017-06-01'
+    note: >-
+      Added the SUBMITTED message state for messages carrying video attachments, which take longer
+      to publish. Hootsuite flags this entry as over five years old and for reference only.
+  url: https://developer.hootsuite.com/changelog/webhooks
+- title: iFrame SDK 4.1
+  date: null
+  breaking: true
+  category: sdk
+  highlights:
+  - Publishes the SDK version-history table (v0.6, v2.0 and v4.0 deprecated; v4.1 current).
+  - Deprecated versions remain served from the CDN.
+  url: https://developer.hootsuite.com/changelog/iframe-sdk-41
+- title: 'New SDK functions: New Compose'
+  date: null
+  breaking: false
+  category: sdk
+  additions:
+  - Open New Compose with prefilled text, a pre-selected schedule date, images or video.
+  limitations:
+  - Attaching documents to New Compose is not supported.
+  - Opening New Compose with link shortening is not supported.
+  url: https://developer.hootsuite.com/changelog/new-api-version-new-compose
+- title: Assignments Manager Deprecation
+  date: '2022-12-31'
+  breaking: true
+  category: deprecation
+  highlights:
+  - >-
+    Assignments Manager functionality deprecated as Hootsuite moved to a new social support system
+    in early 2023; apps calling the Assignments Manager SDK function had to be updated before the
+    end of 2022.
+  url: https://developer.hootsuite.com/changelog/assignments-manager-deprecation
+- title: API Updates
+  date: '2022-10-31'
+  breaking: false
+  category: terms
+  highlights:
+  - >-
+    API Terms of Service and Developer Data Processing Addendum updated, effective 2022-10-31, with
+    continued use deemed acceptance.
+  url: https://developer.hootsuite.com/changelog/api-updates-and-assignment-manager-changes
+- title: 10 Year Anniversary of the Hootsuite App Directory
+  date: null
+  breaking: false
+  category: announcement
+  url: https://developer.hootsuite.com/changelog/10-year-anniversary-of-the-hootsuite-app-directory
+gaps:
+- >-
+  Only 4 of 10 entries carry a date anywhere in the document. The changelog cannot be read as a
+  timeline.
+- >-
+  Entries announce breaking changes (Facebook metric deprecations, SDK 4.1 payload changes) without
+  a version number to pin against.
+- No feed, no API, no per-entry timestamp in the markdown export.

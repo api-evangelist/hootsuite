@@ -1,0 +1,970 @@
+{
+  "item": [
+    {
+      "id": "b03b3137-dccc-40b6-b0f8-4bfe3142a7a9",
+      "name": "analytics-api",
+      "description": {
+        "content": "Hootsuite Analytics API",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "6da4d6f5-97a7-4594-abbb-4246be365268",
+          "name": "List Posts and Metrics",
+          "request": {
+            "name": "List Posts and Metrics",
+            "description": {
+              "content": "Fetch posts that have been published on this Social Network, including lifetime metrics for each post.\n`profileId` is a required filter, the others are optional. `lastModified` may start at most 30 days in the past.  `reportingPeriod` may start at most 2 years in the past.\nWhen filtering by `reportingPeriod`, the creation date of the post is used.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "analytics",
+                "posts"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "datatype",
+                  "value": "<string>",
+                  "description": "The datatype to retrieve analytics for."
+                },
+                {
+                  "disabled": false,
+                  "key": "networkId",
+                  "value": "<string>",
+                  "description": "The network type to retrieve analytics for."
+                },
+                {
+                  "disabled": false,
+                  "key": "cursor",
+                  "value": "<string>",
+                  "description": "Cursor for pagination, provided by a previous call."
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of results to return in this page of data."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filters\": {\n    \"profileId\": {\n      \"eq\": \"<string>\",\n      \"in\": [\n        \"<string>\"\n      ]\n    },\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"<date>\",\n        \"until\": \"<date>\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"<date>\",\n        \"until\": \"<date>\"\n      }\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "7bc63fc8-12a1-4d4c-a3de-bdb44221c684",
+              "name": "Posts returned.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "analytics",
+                    "posts"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "datatype",
+                      "value": "ORGANIC"
+                    },
+                    {
+                      "key": "networkId",
+                      "value": "FACEBOOKPAGE"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filters\": {\n    \"profileId\": {\n      \"eq\": \"abc123\",\n      \"in\": [\n        \"abc123\"\n      ]\n    },\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"createdAt\": \"string\",\n      \"profileId\": \"12345678\",\n      \"externalProfileId\": \"string\",\n      \"sourceLink\": \"string\",\n      \"externalId\": \"string\",\n      \"lastRefreshed\": \"string\",\n      \"createdMember\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"photo\": \"string\",\n        \"url\": \"string\",\n        \"displayName\": \"string\",\n        \"location\": \"string\"\n      },\n      \"campaign\": {\n        \"id\": \"string\",\n        \"label\": \"string\"\n      },\n      \"detectedViralAt\": \"string\",\n      \"isViral\": true,\n      \"tags\": [\n        {\n          \"id\": \"string\",\n          \"label\": \"string\"\n        },\n        {\n          \"id\": \"string\",\n          \"label\": \"string\"\n        }\n      ],\n      \"links\": [\n        {\n          \"extendedUrl\": \"string\",\n          \"thumbnailUrl\": \"string\"\n        },\n        {\n          \"extendedUrl\": \"string\",\n          \"thumbnailUrl\": \"string\"\n        }\n      ],\n      \"media\": [\n        {\n          \"mimeType\": \"MEDIA_MUSIC\",\n          \"thumbnailUrl\": \"string\",\n          \"url\": \"string\",\n          \"liveVideo\": true,\n          \"length\": 2337,\n          \"title\": \"string\",\n          \"content\": \"string\",\n          \"highResolutionThumbnailUrl\": \"string\"\n        },\n        {\n          \"mimeType\": \"MEDIA_ALBUM\",\n          \"thumbnailUrl\": \"string\",\n          \"url\": \"string\",\n          \"liveVideo\": false,\n          \"length\": 3298,\n          \"title\": \"string\",\n          \"content\": \"string\",\n          \"highResolutionThumbnailUrl\": \"string\"\n        }\n      ],\n      \"attachmentTypes\": [\n        \"ATTACHMENT_VIDEO\",\n        \"ATTACHMENT_UNKNOWN\"\n      ],\n      \"title\": \"string\",\n      \"content\": \"string\",\n      \"metrics\": {\n        \"key_0\": 1294.271486151203,\n        \"key_1\": 672.264151305636\n      },\n      \"postType\": \"string\",\n      \"metadata\": {\n        \"key_0\": true\n      },\n      \"source\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"photo\": \"string\",\n        \"url\": \"string\",\n        \"displayName\": \"string\",\n        \"location\": \"string\"\n      },\n      \"autoTags\": [\n        {\n          \"id\": \"string\",\n          \"label\": \"string\"\n        },\n        {\n          \"id\": \"string\",\n          \"label\": \"string\"\n        }\n      ]\n    },\n    {\n      \"createdAt\": \"string\",\n      \"profileId\": \"12345678\",\n      \"externalProfileId\": \"string\",\n      \"sourceLink\": \"string\",\n      \"externalId\": \"string\",\n      \"lastRefreshed\": \"string\",\n      \"createdMember\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"photo\": \"string\",\n        \"url\": \"string\",\n        \"displayName\": \"string\",\n        \"location\": \"string\"\n      },\n      \"campaign\": {\n        \"id\": \"string\",\n        \"label\": \"string\"\n      },\n      \"detectedViralAt\": \"string\",\n      \"isViral\": false,\n      \"tags\": [\n        {\n          \"id\": \"string\",\n          \"label\": \"string\"\n        },\n        {\n          \"id\": \"string\",\n          \"label\": \"string\"\n        }\n      ],\n      \"links\": [\n        {\n          \"extendedUrl\": \"string\",\n          \"thumbnailUrl\": \"string\"\n        },\n        {\n          \"extendedUrl\": \"string\",\n          \"thumbnailUrl\": \"string\"\n        }\n      ],\n      \"media\": [\n        {\n          \"mimeType\": \"MEDIA_VIDEO\",\n          \"thumbnailUrl\": \"string\",\n          \"url\": \"string\",\n          \"liveVideo\": true,\n          \"length\": 5391,\n          \"title\": \"string\",\n          \"content\": \"string\",\n          \"highResolutionThumbnailUrl\": \"string\"\n        },\n        {\n          \"mimeType\": \"MEDIA_SWF\",\n          \"thumbnailUrl\": \"string\",\n          \"url\": \"string\",\n          \"liveVideo\": true,\n          \"length\": 5481,\n          \"title\": \"string\",\n          \"content\": \"string\",\n          \"highResolutionThumbnailUrl\": \"string\"\n        }\n      ],\n      \"attachmentTypes\": [\n        \"ATTACHMENT_LINK\",\n        \"ATTACHMENT_ALBUM\"\n      ],\n      \"title\": \"string\",\n      \"content\": \"string\",\n      \"metrics\": {\n        \"key_0\": 742.8018403539149\n      },\n      \"postType\": \"string\",\n      \"metadata\": {\n        \"key_0\": \"string\",\n        \"key_1\": true,\n        \"key_2\": true\n      },\n      \"source\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"photo\": \"string\",\n        \"url\": \"string\",\n        \"displayName\": \"string\",\n        \"location\": \"string\"\n      },\n      \"autoTags\": [\n        {\n          \"id\": \"string\",\n          \"label\": \"string\"\n        },\n        {\n          \"id\": \"string\",\n          \"label\": \"string\"\n        }\n      ]\n    }\n  ],\n  \"metadata\": {\n    \"collectionInfo\": {\n      \"next\": {\n        \"cursor\": \"aWQ9NTAK\"\n      },\n      \"prev\": {\n        \"cursor\": \"aWQ9NTAK\"\n      }\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "643ac850-98ed-4245-8d06-c7abd4e4ccac",
+              "name": "An error occurred.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "analytics",
+                    "posts"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "datatype",
+                      "value": "ORGANIC"
+                    },
+                    {
+                      "key": "networkId",
+                      "value": "FACEBOOKPAGE"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filters\": {\n    \"profileId\": {\n      \"eq\": \"abc123\",\n      \"in\": [\n        \"abc123\"\n      ]\n    },\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"title\": \"invalid-argument\",\n  \"status\": 422,\n  \"type\": \"http://NxtObmftszfPhERufrmhzArMQEedr.bvnaY5dQ\",\n  \"detail\": \"An invalid argument was provided.\",\n  \"instance\": \"https://tGkI.ttzoKKjYZC4RMzDlr0-i,VSjUalk2+aV\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "02fce3b9-3511-42fd-9aa8-1877401a092f",
+          "name": "List Profiles and Metrics",
+          "request": {
+            "name": "List Profiles and Metrics",
+            "description": {
+              "content": "Fetch daily analytics metrics for profiles on this social network.\n`profileId` is a required filter, the others are optional. `lastModified` may start at most 30 days in the past.  `reportingPeriod` may start at most 2 years in the past.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "analytics",
+                "profiles"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "datatype",
+                  "value": "<string>",
+                  "description": "The datatype to retrieve analytics for."
+                },
+                {
+                  "disabled": false,
+                  "key": "networkId",
+                  "value": "<string>",
+                  "description": "The network type to retrieve analytics for."
+                },
+                {
+                  "disabled": false,
+                  "key": "cursor",
+                  "value": "<string>",
+                  "description": "Cursor for pagination, provided by a previous call."
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of results to return in this page of data."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filters\": {\n    \"profileId\": {\n      \"eq\": \"<string>\",\n      \"in\": [\n        \"<string>\"\n      ]\n    },\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"<date>\",\n        \"until\": \"<date>\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"<date>\",\n        \"until\": \"<date>\"\n      }\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "d8e5ad5e-6ce2-4e28-a886-c90d1b0b013c",
+              "name": "Profiles metrics returned.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "analytics",
+                    "profiles"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "datatype",
+                      "value": "ORGANIC"
+                    },
+                    {
+                      "key": "networkId",
+                      "value": "FACEBOOKPAGE"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filters\": {\n    \"profileId\": {\n      \"eq\": \"abc123\",\n      \"in\": [\n        \"abc123\"\n      ]\n    },\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"profileId\": \"12345678\",\n      \"externalProfileId\": \"string\",\n      \"date\": \"2024-04-06\",\n      \"metrics\": {\n        \"key_0\": {\n          \"total\": 4768.480244416526,\n          \"breakdownDimensions\": [\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          ]\n        }\n      }\n    },\n    {\n      \"profileId\": \"12345678\",\n      \"externalProfileId\": \"string\",\n      \"date\": \"2026-07-20\",\n      \"metrics\": {\n        \"key_0\": {\n          \"total\": 2543.93315220662,\n          \"breakdownDimensions\": [\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          ]\n        },\n        \"key_1\": {\n          \"total\": 214.35560421793065,\n          \"breakdownDimensions\": [\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          ]\n        }\n      }\n    }\n  ],\n  \"metadata\": {\n    \"collectionInfo\": {\n      \"next\": {\n        \"cursor\": \"aWQ9NTAK\"\n      },\n      \"prev\": {\n        \"cursor\": \"aWQ9NTAK\"\n      }\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "519eca69-3426-45dd-a3eb-b54da063f0c8",
+              "name": "An error occurred.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "analytics",
+                    "profiles"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "datatype",
+                      "value": "ORGANIC"
+                    },
+                    {
+                      "key": "networkId",
+                      "value": "FACEBOOKPAGE"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filters\": {\n    \"profileId\": {\n      \"eq\": \"abc123\",\n      \"in\": [\n        \"abc123\"\n      ]\n    },\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"title\": \"invalid-argument\",\n  \"status\": 422,\n  \"type\": \"http://NxtObmftszfPhERufrmhzArMQEedr.bvnaY5dQ\",\n  \"detail\": \"An invalid argument was provided.\",\n  \"instance\": \"https://tGkI.ttzoKKjYZC4RMzDlr0-i,VSjUalk2+aV\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0bd7cb01-011a-4d0b-8d43-f153c7bc2de5",
+          "name": "List Paid campaigns, ad sets, or ads",
+          "request": {
+            "name": "List Paid campaigns, ad sets, or ads",
+            "description": {
+              "content": "Returns paid entities for the collection given in the path (`campaigns`, `adsets`, or `ads`). Use query parameters for ad account type, pagination, and datatype; use the request body for filters (ad accounts, time range, etc.)\nnote: In this API, 'adsets' and related response fields map to Facebook ad sets and Twitter ad groups ('adgroups').\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "analytics",
+                "paid",
+                ":adEntityCollection"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "datatype",
+                  "value": "<string>",
+                  "description": "The datatype to retrieve analytics for."
+                },
+                {
+                  "disabled": false,
+                  "key": "adAccountType",
+                  "value": "<string>",
+                  "description": "The ad account type to retrieve analytics for."
+                },
+                {
+                  "disabled": false,
+                  "key": "cursor",
+                  "value": "<string>",
+                  "description": "Cursor for pagination, provided by a previous call."
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of results to return in this page of data."
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "adEntityCollection",
+                  "description": "(Required) Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.\n"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filters\": {\n    \"adAccounts\": [\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      },\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      }\n    ],\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"<date>\",\n        \"until\": \"<date>\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"<date>\",\n        \"until\": \"<date>\"\n      }\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "e21e7e7f-b581-44e6-abd8-b0145f8f9052",
+              "name": "data successfully returned for the selected paid entity collection.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "analytics",
+                    "paid",
+                    ":adEntityCollection"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "datatype",
+                      "value": "ORGANIC"
+                    },
+                    {
+                      "key": "adAccountType",
+                      "value": "FACEBOOK"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "adEntityCollection",
+                      "description": "(Required) Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.\n"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filters\": {\n    \"adAccounts\": [\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      },\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      }\n    ],\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"adAccountId\": \"string\",\n      \"organizationId\": \"string\",\n      \"externalCampaignId\": \"string\",\n      \"campaignStatus\": \"string\",\n      \"name\": \"string\",\n      \"objective\": \"string\",\n      \"adAccountType\": \"FACEBOOK\",\n      \"currency\": \"string\",\n      \"externalAdAccountId\": \"string\",\n      \"marketingMetadata\": {\n        \"key_0\": 1263,\n        \"key_1\": false\n      },\n      \"createdAt\": \"1967-08-23T22:53:35.082Z\",\n      \"lastModifiedAt\": \"1984-03-13T05:59:24.851Z\",\n      \"hsCollectedAt\": \"1961-11-04T16:14:33.445Z\",\n      \"budget\": {\n        \"daily\": 2023.0335916592824,\n        \"lifetime\": 6181.593691219515\n      },\n      \"lifecycle\": {\n        \"startTime\": \"2011-08-02T11:05:23.330Z\",\n        \"endTime\": \"1996-09-09T19:26:06.266Z\"\n      }\n    },\n    {\n      \"adAccountId\": \"string\",\n      \"organizationId\": \"string\",\n      \"externalCampaignId\": \"string\",\n      \"campaignStatus\": \"string\",\n      \"name\": \"string\",\n      \"objective\": \"string\",\n      \"adAccountType\": \"FACEBOOK\",\n      \"currency\": \"string\",\n      \"externalAdAccountId\": \"string\",\n      \"marketingMetadata\": {\n        \"key_0\": false,\n        \"key_1\": 1315.2627538541105\n      },\n      \"createdAt\": \"1953-02-25T14:05:29.234Z\",\n      \"lastModifiedAt\": \"1962-11-20T05:25:23.206Z\",\n      \"hsCollectedAt\": \"1987-02-16T05:06:02.117Z\",\n      \"budget\": {\n        \"daily\": 9907.896106734992,\n        \"lifetime\": 453.11643762027563\n      },\n      \"lifecycle\": {\n        \"startTime\": \"2005-01-03T06:49:50.419Z\",\n        \"endTime\": \"2018-01-30T23:03:51.599Z\"\n      }\n    }\n  ],\n  \"metadata\": {\n    \"collectionInfo\": {\n      \"next\": {\n        \"cursor\": \"aWQ9NTAK\"\n      },\n      \"prev\": {\n        \"cursor\": \"aWQ9NTAK\"\n      }\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "16a9a800-8460-4e93-9ae6-6e512868f0b7",
+              "name": "An error occurred.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "analytics",
+                    "paid",
+                    ":adEntityCollection"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "datatype",
+                      "value": "ORGANIC"
+                    },
+                    {
+                      "key": "adAccountType",
+                      "value": "FACEBOOK"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "adEntityCollection",
+                      "description": "(Required) Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.\n"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filters\": {\n    \"adAccounts\": [\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      },\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      }\n    ],\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"title\": \"invalid-argument\",\n  \"status\": 422,\n  \"type\": \"http://NxtObmftszfPhERufrmhzArMQEedr.bvnaY5dQ\",\n  \"detail\": \"An invalid argument was provided.\",\n  \"instance\": \"https://tGkI.ttzoKKjYZC4RMzDlr0-i,VSjUalk2+aV\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "da04c2b5-860e-4b9e-9e09-89a78c78ef70",
+          "name": "List Metrics for paid campaigns, ad sets, or ads",
+          "request": {
+            "name": "List Metrics for paid campaigns, ad sets, or ads",
+            "description": {
+              "content": "Fetch daily metrics for the collection given in the path (`campaigns`,`adsets`, or `ads`) on the ad account  in the request body.\nUse query parameters for ad account type, limit and pagination, and use the request body for filters (ad accounts, time range, etc.) note: In this API, 'adsets' and related response fields map to Facebook ad sets and Twitter ad groups ('adgroups').\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "analytics",
+                "paid",
+                ":adEntityCollection",
+                "metrics"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "datatype",
+                  "value": "<string>",
+                  "description": "The datatype to retrieve analytics for."
+                },
+                {
+                  "disabled": false,
+                  "key": "adAccountType",
+                  "value": "<string>",
+                  "description": "The ad account type to retrieve analytics for."
+                },
+                {
+                  "disabled": false,
+                  "key": "cursor",
+                  "value": "<string>",
+                  "description": "Cursor for pagination, provided by a previous call."
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of results to return in this page of data."
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "adEntityCollection",
+                  "description": "(Required) Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.\n"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filters\": {\n    \"adAccounts\": [\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      },\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      }\n    ],\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"<date>\",\n        \"until\": \"<date>\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"<date>\",\n        \"until\": \"<date>\"\n      }\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "77ab92b5-8b83-45ba-a952-2c6b2e3e8319",
+              "name": "Paid metrics returned",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "analytics",
+                    "paid",
+                    ":adEntityCollection",
+                    "metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "datatype",
+                      "value": "ORGANIC"
+                    },
+                    {
+                      "key": "adAccountType",
+                      "value": "FACEBOOK"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "adEntityCollection",
+                      "description": "(Required) Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.\n"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filters\": {\n    \"adAccounts\": [\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      },\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      }\n    ],\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"adAccountId\": \"string\",\n      \"organizationId\": \"string\",\n      \"externalCampaignId\": \"string\",\n      \"adAccountType\": \"FACEBOOK\",\n      \"externalAdAccountId\": \"string\",\n      \"date\": \"2021-05-03\",\n      \"metrics\": {\n        \"key_0\": 4419.982837937373,\n        \"key_1\": 8255.743793340936,\n        \"key_2\": 5318.9647002470065\n      }\n    },\n    {\n      \"adAccountId\": \"string\",\n      \"organizationId\": \"string\",\n      \"externalCampaignId\": \"string\",\n      \"adAccountType\": \"FACEBOOK\",\n      \"externalAdAccountId\": \"string\",\n      \"date\": \"1987-12-06\",\n      \"metrics\": {\n        \"key_0\": 8305.046828133552\n      }\n    }\n  ],\n  \"metadata\": {\n    \"collectionInfo\": {\n      \"next\": {\n        \"cursor\": \"aWQ9NTAK\"\n      },\n      \"prev\": {\n        \"cursor\": \"aWQ9NTAK\"\n      }\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b19b6fbf-b42e-47c4-bd1b-4b5218c9411c",
+              "name": "An error occurred.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "analytics",
+                    "paid",
+                    ":adEntityCollection",
+                    "metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "datatype",
+                      "value": "ORGANIC"
+                    },
+                    {
+                      "key": "adAccountType",
+                      "value": "FACEBOOK"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "adEntityCollection",
+                      "description": "(Required) Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.\n"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filters\": {\n    \"adAccounts\": [\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      },\n      {\n        \"adAccountId\": \"<string>\",\n        \"organizationId\": \"<string>\"\n      }\n    ],\n    \"lastModified\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    },\n    \"reportingPeriod\": {\n      \"timespan\": {\n        \"since\": \"2025-01-01\",\n        \"until\": \"2025-02-28\"\n      }\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"title\": \"invalid-argument\",\n  \"status\": 422,\n  \"type\": \"http://NxtObmftszfPhERufrmhzArMQEedr.bvnaY5dQ\",\n  \"detail\": \"An invalid argument was provided.\",\n  \"instance\": \"https://tGkI.ttzoKKjYZC4RMzDlr0-i,VSjUalk2+aV\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://platform.hootsuite.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "scope",
+        "value": "offline analytics:read"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "https://platform.hootsuite.com/oauth2/token"
+      },
+      {
+        "key": "authUrl",
+        "value": "https://platform.hootsuite.com/oauth2/auth"
+      },
+      {
+        "key": "grant_type",
+        "value": "authorization_code"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "3a6dfc71-ec2c-4ef9-8425-ba78f0c8ed41",
+    "name": "Hootsuite Analytics REST API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Hootsuite Analytics REST API\n\n\nContact Support:\n Email: dev.support@hootsuite.com",
+      "type": "text/plain"
+    }
+  }
+}
