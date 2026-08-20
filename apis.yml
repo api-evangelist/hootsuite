@@ -31,6 +31,19 @@ accessModel:
     shortener API and organization apps for prescreen components are Enterprise-only.
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/hootsuite.png
 tags:
+- Social-Media
+- Social Media Management
+- Marketing
+- Content Scheduling
+- Analytics
+- Engagement
+- Social Listening
+- Employee Advocacy
+- Customer Service
+- SCIM
+- Authentication
+- Webhook
+tags_raw:
 - Social Media
 - Social Media Management
 - Marketing
@@ -59,6 +72,16 @@ apis:
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
   tags:
+  - Social-Media
+  - Message
+  - Scheduling
+  - Approvals
+  - Profiles
+  - Members
+  - Team
+  - SCIM
+  - Authentication
+  tags_raw:
   - Social Media
   - Messages
   - Scheduling
@@ -131,6 +154,13 @@ apis:
   humanURL: https://developer.hootsuite.com/docs/inbox-overview
   baseURL: https://platform.hootsuite.com/inbox/v1
   tags:
+  - Customer Service
+  - Messaging
+  - Virtual Agents
+  - CRM
+  - Real-time Metrics
+  - Webhook
+  tags_raw:
   - Customer Service
   - Messaging
   - Virtual Agents
