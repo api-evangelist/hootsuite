@@ -12,6 +12,18 @@ description: Hootsuite is a social media management platform that lets organizat
   API — all authenticated with OAuth 2.0. It also serves an RFC 9727 API catalog, RFC 8414
   authorization server metadata and RFC 9728 protected resource metadata.
 type: Index
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: freemium-api
   onboarding: self-serve
