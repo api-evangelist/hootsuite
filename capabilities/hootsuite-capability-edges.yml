@@ -1,0 +1,48 @@
+slug: hootsuite
+provider: Hootsuite
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Media, Entertainment & Telecom Content
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 3
+edges:
+- tag: real_time_metrics_rest_api
+  spec_file: hootsuite-real-time-metrics-rest-api-api-openapi.yml
+  capability_id: BC-430.30
+  capability_id_l1: BC-430
+  capability_name: Contact Centre Operations Management
+  confidence: 0.82
+  evidence: metricsAverageFirstResponseTime  Average first response time; metricsAgentAvailability  Agent
+    availability; metricsContactsWaitingInQueue  Contacts waiting in queue
+  reason: Classic contact-centre operational metrics — response/handle times, agent availability, queue
+    wait — for the social inbox. Squarely Contact Centre Operations Management; some case could be made
+    for feedback/reporting but the metrics are agent- and queue-centric.
+- tag: Messages
+  spec_file: hootsuite-messages-api-openapi.yml
+  capability_id: BC-400.60
+  capability_id_l1: BC-400
+  capability_name: Digital Marketing Management
+  confidence: 0.8
+  evidence: POST /v1/messages  scheduleMessage  Schedule messages; POST /v1/messages/{messageId}/approve  approveMessage;
+    schemas FacebookPageTargeting, LinkedInCompanyTargeting
+  reason: Scheduling, approving and publishing social posts with platform targeting options is social
+    media publishing — digital marketing management. Vendor description confirms 'schedule posts ... with
+    collaboration, approval, and governance workflows'.
+- tag: analytics-api
+  spec_file: hootsuite-analytics-api-api-openapi.yml
+  capability_id: BC-400.60
+  capability_id_l1: BC-400
+  capability_name: Digital Marketing Management
+  confidence: 0.7
+  evidence: POST /v1/analytics/posts  listPosts  List Posts and Metrics; POST /v1/analytics/paid/{adEntityCollection}/metrics  List
+    Metrics for paid campaigns, ad sets, or ads
+  reason: Performance metrics for organic social posts, profiles and paid social campaigns — measurement
+    of digital/paid social marketing. Could alternatively sit under Marketing Operations measurement,
+    hence 0.7.

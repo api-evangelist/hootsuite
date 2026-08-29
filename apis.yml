@@ -1201,6 +1201,9 @@ apis:
   - type: APIReference
     url: https://amplify.hootsuite.com/api-docs
 common:
+- type: CapabilityMap
+  url: capabilities/hootsuite-capability-edges.yml
+  name: Hootsuite Business Capability Map
 - type: Overlay
   url: overlays/hootsuite-rest-api-overlay.yaml
 - type: Overlay
