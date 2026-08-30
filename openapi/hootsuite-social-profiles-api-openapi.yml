@@ -1,0 +1,255 @@
+openapi: 3.2.0
+info:
+  description: "[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/eeda0fcdf55ea26bd0ec#?env%5BHootsuite%5D=W3sidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJ1cmwiLCJ2YWx1ZSI6Imh0dHBzOi8vcGxhdGZvcm0uaG9vdHN1aXRlLmNvbSJ9LHsidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJhdXRob3JpemF0aW9uX3VybCIsInZhbHVlIjoiaHR0cHM6Ly9wbGF0Zm9ybS5ob290c3VpdGUuY29tL29hdXRoMi9hdXRoIn0seyJ0eXBlIjoidGV4dCIsImVuYWJsZWQiOnRydWUsImtleSI6InRva2VuX3VybCIsInZhbHVlIjoiaHR0cHM6Ly9wbGF0Zm9ybS5ob290c3VpdGUuY29tL29hdXRoMi90b2tlbiJ9LHsidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJjbGllbnRfaWQiLCJ2YWx1ZSI6IiJ9LHsidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJjbGllbnRfc2VjcmV0IiwidmFsdWUiOiIifV0=)\n# Introduction\nThe Hootsuite API is built on REST principles and uses JSON as a data interchange format.\n### Base URL\nAll URLs referenced in this document use the following base: https://platform.hootsuite.com. The Hootsuite API is served over HTTPS to ensure data privacy.\n### Request Format\nThe Hootsuite API supports the following HTTP verbs:\n| Verb       | Description  |\n|--------|------|\n| GET    | GET requests retrieve resources. GET requests with query parameters should be [URL encoded](https://en.wikipedia.org/wiki/Percent-encoding).  |\n| POST   | POST requests create or update resources. POST requests can partially update a resource by passing a subset of the fields that should be updated. To remove a single field set it to null. POST requests should always set content-type and character encoding to: application/json;charset=utf-8. |\n| DELETE | DELETE requests delete resources. Delete requests return a 200 OK with an empty data envelope if the request was successful.|\n### Response Format\nAll responses are returned in JSON. The response is wrapped in a top level data envelope which is an object or array depending on whether a single item or a collection is returned. If a single item is returned the data field will be an object. If a collection is returned the field will be an array.\nIf the response was unsuccessful an errors array will be returned. Responses that partially fail will return both a data and errors object.\nA single item response:\n```\n{\n  \"data\": {},\n  \"errors\": [{},{},{}]\n}\n```\nA collection response:\n```\n{\n  \"data\": [{},{},{}],\n  \"errors\": [{},{},{}]\n  \"metadata\": {}\n}\n```\n### HTTP Response Codes\nThe Hootsuite API uses HTTP status codes to indicate the status of your request.\n|Code |Description |\n|---|---|\n|200 OK|Resource was successfully created, updated, deleted or retrieved.|\n|400 Bad Request|Invalid request, possibly due to missing parameters|\n|401 Unauthorized|Missing or invalid authentication|\n|403 Forbidden|Access denied|\n|404 Not Found|Requested resource does not exist|\n|429 Too Many Requests|Rate Limit Exceeded. Please contact dev.support@hootsuite.com for assistance|\n|500 Server Error|Unexpected error occurred on the server|\n### API Error Handling\nError responses are returned with the following fields. Note, the schema for OAuth2 error responses are different and comply with the RFC. Please refer to the Authorization endpoint documentation for details.\n|Field|Description|\n|---|---|\n|code|Unique number indicating type of error|\n|message|Description of error|\n|id|Unique id for tracing purposes|\n|resource|(optional) type and id are used to point to the field(s) that caused the error|\n```\n{\n  \"errors\": [\n    {\n      \"code\" : 1234,\n      \"message\": \"Could not create message for social profile\",\n      \"id\" : \"f7d32670-4e6a-48c0-a2a7-87803536a712\",\n      \"resource\": {\n        \"type\":\"socialProfile\",\n        \"id\":\"7534653235\"\n      }\n    }\n  ]\n}\n```\n### Error Codes\nHere is a list of error codes and descriptions returned by our APIs:\n|Code|Description|\n|---|---|\n|1000|Missing or duplicate access token|\n|1001|Invalid access token|\n|1002|Invalid API key|\n|1003|Account plan limit exceeded|\n|1004|API plan limit exceeded|\n|1005|Token could not be retrieved|\n|1006|Token removal failed|\n|1007|The client could not be authenticated due to missing or invalid client credentials|\n|1008|Resource Owner authentication failed|\n|1009|Invalid grant_type|\n|1010|Invalid OAuth request|\n|1011|Duplicate OAuth parameters|\n|1012|Invalid authorization code|\n|1013|Must be confidential client|\n|1014|Unauthorized JWT user|\n|1015|Client registration could not be deleted|\n|1016|Client info could not be retrieved|\n|1017|Client info could not be updated|\n|1018|Client could not be registered|\n|1019|A registration type must be selected|\n|1020|Client key could not be deleted|\n|1021|The id_token values could not be retrieved|\n|1022|id_token could not be registered|\n|1023|id_token could not be removed therefore user logout could not be executed|\n|1024|Token could not be revoked|\n|1025|Token could not be registered|\n|1026|Non-valid parameter list for this operation|\n|1027|Missing authorization code|\n|1028|Authorization code could not be validated|\n|1029|id_token could not be validated|\n|1030|The client is not authorized to execute a status check|\n|1031|Invalid oauth parameters|\n|1032|Token could not be validated|\n|1033|The requested scope is not valid|\n|1034|The session is not valid|\n|1035|Missing oauth_token parameter|\n|1036|oauth_token invalid or expired|\n|1037|The required scope to access this endpoint was not granted by the user|\n|1038|token_type_hint is not supported|\n|1039|Client not authorized to revoke token|\n|1040|oauth_consumer_key invalid or expired|\n|1041|The token may not have been revoked due to an unknown error|\n|1042|Missing oauth_signature|\n|1043|Too many requests|\n|1044|Invalid oauth_signature_method|\n|1100|Invalid JSON schema|\n|1201|Not authorized to make changes to organization|\n|2000|Invalid member password|\n|2001|Invalid member email|\n|2002|Invalid member name (please enter name between 2 and 100 chars in length)|\n|2003|Invalid member default timezone|\n|2004|Invalid initials|\n|2005|Missing member name|\n|2006|Missing member email|\n|2007|Missing member password|\n|2008|No more available seats in organization|\n|2303|Invalid organization ID|\n|2304|Invalid member ID|\n|2305|Missing member ID|\n|2306|Missing social profile ID|\n|3002|Team name has to be between 2-200 characters|\n|3003|Unable to find an organization with that ID|\n|3004|Missing team ID|\n|3005|Invalid team ID|\n|3006|Team name has to be unique in the organization|\n|3008|Member is not seated in the organization|\n|3010|Email is already in use|\n|3020|Invalid cursor format|\n|3021|Invalid social network type|\n|3301|Payment member can’t be removed from the organization|\n|4000|Schema validation failed|\n|4001|Resource not found|\n|4002|Insufficient permissions to view organization members|\n|4003|Insufficient permissions to view member permissions|\n|4004|Insufficient permissions to view member organizations|\n|4005|Insufficient permissions to view team members|\n|4006|Insufficient permissions to view team|\n|4007|Insufficient permissions to create team|\n|4008|Insufficient permissions to view team social profile|\n|4009|Insufficient organization permissions|\n|4010|Insufficient permissions to view organization teams|\n|4303|Member does not exist in organization|\n|5000|An unknown error occurred|\n|5001|HTTP method not permitted|\n|5002|Unsupported operation|\n|9000|An internal error occurred|\n|40001|Social profile isn’t owned by organization (required for posting messages with tags)|\n|40003|You have attempted to delete a message that cannot be deleted in its current state|\n|40004|Only attachments from http://static.ow.ly or http://ow.ly/i/ are currently allowed|\n|40005|Insufficient permission to create new message tags|\n|40019|Message state filter not supported|\n|40020|Specified date range is too large|\n|40021|Uploaded media is not yet ready to be used (further processing required)|\n|40022|Invalid boolean for includeUnscheduledReviewMsgs flag|\n|40023|Twitter only allows 1 network per message|\n|40024|Posting to Facebook Groups is no longer supported|\n|40025|Scheduled message limit reached|\n"
+  version: '1.0'
+  title: Hootsuite REST Social Profiles API
+  contact:
+    email: dev.support@hootsuite.com
+  license:
+    name: Hootsuite Developer Terms and API License Agreement
+    url: https://hootsuite.com/legal/dev-api-terms
+servers:
+- url: https://platform.hootsuite.com
+security:
+- OAuth2: []
+tags:
+- name: Social Profiles
+  description: A social profile is a publishing channel on a social network account.
+paths:
+  /v1/socialProfiles:
+    get:
+      tags:
+      - Social Profiles
+      operationId: getSocialProfiles
+      summary: Retrieve social profiles
+      description: Retrieves the social profiles that the authenticated user has access to.
+      parameters:
+      - $ref: '#/components/parameters/bearerToken'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/SocialProfilesResponseEnvelope'
+        '400':
+          description: Bad Request
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+  /v1/socialProfiles/{socialProfileId}:
+    get:
+      tags:
+      - Social Profiles
+      operationId: getSocialProfile
+      summary: Retrieve social profile
+      description: Retrieve a social profile. Requires BASIC_USAGE permission on the social profile.
+      parameters:
+      - $ref: '#/components/parameters/bearerToken'
+      - name: socialProfileId
+        in: path
+        description: The social profile ID
+        required: true
+        example: 115185509
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/SocialProfileResponseEnvelope'
+        '400':
+          description: Bad Request
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+  /v1/socialProfiles/{socialProfileId}/teams:
+    get:
+      tags:
+      - Social Profiles
+      operationId: getSocialProfileTeams
+      summary: Retrieve social profile's teams
+      description: Retrieves a list of team IDs with access to a social profile. Requires BASIC_USAGE permission on the social profile or ORG_MANAGE_SOCIAL_PROFILE permission on the organization that owns the social profile.
+      parameters:
+      - $ref: '#/components/parameters/bearerToken'
+      - name: socialProfileId
+        in: path
+        description: The social profile ID
+        required: true
+        example: 115185509
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/SocialProfileTeamsResponseEnvelope'
+        '400':
+          description: Bad Request
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+        '401':
+          description: Unauthorized (Insufficient Permissions to View Profile)
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+        '404':
+          description: Not Found
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+          description: An error code indicating the type of error that occurred.
+          example: 1234
+        message:
+          type: string
+          description: A description of error.
+          example: An error message
+        id:
+          type: string
+          description: A unique error id for tracing purposes
+          example: f7d32670-4e6a-48c0-a2a7-87803536a712
+        resource:
+          type: object
+          description: A reference to the resource in error
+          title: ResourceReference
+          properties:
+            type:
+              type: string
+              description: The resource type.
+              example: socialProfile
+            id:
+              type: string
+              description: The resource ID.
+              example: '7534653235'
+    SocialProfilesResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialProfile'
+      description: The response data wrapper for a social profile.
+    SocialProfileTeamsResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamId'
+      description: The response data wrapper for a team.
+    ErrorsResponseEnvelope:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: The errors response envelope.
+          items:
+            $ref: '#/components/schemas/Error'
+    TeamId:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The team ID.
+          example: '1998554224'
+    SocialProfileResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SocialProfile'
+      description: The response data wrapper for a social profile.
+    SocialProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The social profile ID.
+          example: '115185509'
+        type:
+          type: string
+          description: The social network the profile belongs to.
+          example: FACEBOOK
+          enum:
+          - FACEBOOK
+          - FACEBOOKPAGE
+          - INSTAGRAM
+          - INSTAGRAMBUSINESS
+          - LINKEDIN
+          - LINKEDINCOMPANY
+          - PINTEREST
+          - THREADS
+          - TIKTOKBUSINESS
+          - TWITTER
+          - WHATSAPP
+          - YOUTUBECHANNEL
+        socialNetworkId:
+          type: string
+          description: The ID for user on the social network.
+          example: '1261768027866378'
+        socialNetworkUsername:
+          type: string
+          description: The username used on the social network. This field will be **null** if the social network type is *TWITTER*.
+          example: Pammy The Dog
+        avatarUrl:
+          type: string
+          description: Link to the avatar used by user on the social network (if present). This field will be **null** if the social network type is *TWITTER*.
+          example: https://scontent.xx.fbcdn.net/v/t1.0-1/c59.0.200.200/p300x500/10354686_10151114552801856_220324501106153455_n.jpg?oh=375abcd2474f9fe943242bfe9c313bc2&oe=590D5D25"
+        owner:
+          type: string
+          description: Key representing who owns this profile the member or the organization the member is a part of.
+          example: MEMBER
+          enum:
+          - MEMBER
+          - ORGANIZATION
+        ownerId:
+          type: string
+          description: The owner ID. Either a member ID or an organization ID.
+          example: '2147516921'
+        isReauthRequired:
+          type: integer
+          description: 1 indicates that this social profile is disconnected and needs to be reconnected, 0 shows the social profile is in a connected state.
+          example: 0
+  parameters:
+    bearerToken:
+      in: header
+      name: Authorization
+      description: A bearer token string used for authentication
+      required: true
+      schema:
+        type: string
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://platform.hootsuite.com/oauth2/auth
+          tokenUrl: https://platform.hootsuite.com/oauth2/token
+          scopes:
+            offline: Request refresh tokens
+            analytics:read: Request analytics API access
+    Basic_Auth:
+      type: http
+      scheme: basic
+x-provenance:
+  generated: '2026-08-13'
+  method: searched
+  source: https://apidocs.hootsuite.com/docs/api/swagger.yaml
+  note: First-party Hootsuite REST API contract. Discovered from the ReDoc loader at https://platform.hootsuite.com/docs/api/index.html (spec-url ./swagger.yaml) and confirmed as the canonical service-desc link in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog. Published as Swagger 2.0; converted to OpenAPI 3.0 with swagger2openapi 7 for this working copy. The verbatim Swagger 2.0 source is kept at openapi/_original/hootsuite-rest-api-swagger.yaml.
+  ownership: host platform.hootsuite.com, info.title "Hootsuite REST API", contact dev.support@hootsuite.com - the contract identifies itself as Hootsuite's.

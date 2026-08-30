@@ -1,0 +1,3099 @@
+openapi: 3.2.0
+info:
+  description: "[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/eeda0fcdf55ea26bd0ec#?env%5BHootsuite%5D=W3sidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJ1cmwiLCJ2YWx1ZSI6Imh0dHBzOi8vcGxhdGZvcm0uaG9vdHN1aXRlLmNvbSJ9LHsidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJhdXRob3JpemF0aW9uX3VybCIsInZhbHVlIjoiaHR0cHM6Ly9wbGF0Zm9ybS5ob290c3VpdGUuY29tL29hdXRoMi9hdXRoIn0seyJ0eXBlIjoidGV4dCIsImVuYWJsZWQiOnRydWUsImtleSI6InRva2VuX3VybCIsInZhbHVlIjoiaHR0cHM6Ly9wbGF0Zm9ybS5ob290c3VpdGUuY29tL29hdXRoMi90b2tlbiJ9LHsidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJjbGllbnRfaWQiLCJ2YWx1ZSI6IiJ9LHsidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJjbGllbnRfc2VjcmV0IiwidmFsdWUiOiIifV0=)\n# Introduction\nThe Hootsuite API is built on REST principles and uses JSON as a data interchange format.\n### Base URL\nAll URLs referenced in this document use the following base: https://platform.hootsuite.com. The Hootsuite API is served over HTTPS to ensure data privacy.\n### Request Format\nThe Hootsuite API supports the following HTTP verbs:\n| Verb       | Description  |\n|--------|------|\n| GET    | GET requests retrieve resources. GET requests with query parameters should be [URL encoded](https://en.wikipedia.org/wiki/Percent-encoding).  |\n| POST   | POST requests create or update resources. POST requests can partially update a resource by passing a subset of the fields that should be updated. To remove a single field set it to null. POST requests should always set content-type and character encoding to: application/json;charset=utf-8. |\n| DELETE | DELETE requests delete resources. Delete requests return a 200 OK with an empty data envelope if the request was successful.|\n### Response Format\nAll responses are returned in JSON. The response is wrapped in a top level data envelope which is an object or array depending on whether a single item or a collection is returned. If a single item is returned the data field will be an object. If a collection is returned the field will be an array.\nIf the response was unsuccessful an errors array will be returned. Responses that partially fail will return both a data and errors object.\nA single item response:\n```\n{\n  \"data\": {},\n  \"errors\": [{},{},{}]\n}\n```\nA collection response:\n```\n{\n  \"data\": [{},{},{}],\n  \"errors\": [{},{},{}]\n  \"metadata\": {}\n}\n```\n### HTTP Response Codes\nThe Hootsuite API uses HTTP status codes to indicate the status of your request.\n|Code |Description |\n|---|---|\n|200 OK|Resource was successfully created, updated, deleted or retrieved.|\n|400 Bad Request|Invalid request, possibly due to missing parameters|\n|401 Unauthorized|Missing or invalid authentication|\n|403 Forbidden|Access denied|\n|404 Not Found|Requested resource does not exist|\n|429 Too Many Requests|Rate Limit Exceeded. Please contact dev.support@hootsuite.com for assistance|\n|500 Server Error|Unexpected error occurred on the server|\n### API Error Handling\nError responses are returned with the following fields. Note, the schema for OAuth2 error responses are different and comply with the RFC. Please refer to the Authorization endpoint documentation for details.\n|Field|Description|\n|---|---|\n|code|Unique number indicating type of error|\n|message|Description of error|\n|id|Unique id for tracing purposes|\n|resource|(optional) type and id are used to point to the field(s) that caused the error|\n```\n{\n  \"errors\": [\n    {\n      \"code\" : 1234,\n      \"message\": \"Could not create message for social profile\",\n      \"id\" : \"f7d32670-4e6a-48c0-a2a7-87803536a712\",\n      \"resource\": {\n        \"type\":\"socialProfile\",\n        \"id\":\"7534653235\"\n      }\n    }\n  ]\n}\n```\n### Error Codes\nHere is a list of error codes and descriptions returned by our APIs:\n|Code|Description|\n|---|---|\n|1000|Missing or duplicate access token|\n|1001|Invalid access token|\n|1002|Invalid API key|\n|1003|Account plan limit exceeded|\n|1004|API plan limit exceeded|\n|1005|Token could not be retrieved|\n|1006|Token removal failed|\n|1007|The client could not be authenticated due to missing or invalid client credentials|\n|1008|Resource Owner authentication failed|\n|1009|Invalid grant_type|\n|1010|Invalid OAuth request|\n|1011|Duplicate OAuth parameters|\n|1012|Invalid authorization code|\n|1013|Must be confidential client|\n|1014|Unauthorized JWT user|\n|1015|Client registration could not be deleted|\n|1016|Client info could not be retrieved|\n|1017|Client info could not be updated|\n|1018|Client could not be registered|\n|1019|A registration type must be selected|\n|1020|Client key could not be deleted|\n|1021|The id_token values could not be retrieved|\n|1022|id_token could not be registered|\n|1023|id_token could not be removed therefore user logout could not be executed|\n|1024|Token could not be revoked|\n|1025|Token could not be registered|\n|1026|Non-valid parameter list for this operation|\n|1027|Missing authorization code|\n|1028|Authorization code could not be validated|\n|1029|id_token could not be validated|\n|1030|The client is not authorized to execute a status check|\n|1031|Invalid oauth parameters|\n|1032|Token could not be validated|\n|1033|The requested scope is not valid|\n|1034|The session is not valid|\n|1035|Missing oauth_token parameter|\n|1036|oauth_token invalid or expired|\n|1037|The required scope to access this endpoint was not granted by the user|\n|1038|token_type_hint is not supported|\n|1039|Client not authorized to revoke token|\n|1040|oauth_consumer_key invalid or expired|\n|1041|The token may not have been revoked due to an unknown error|\n|1042|Missing oauth_signature|\n|1043|Too many requests|\n|1044|Invalid oauth_signature_method|\n|1100|Invalid JSON schema|\n|1201|Not authorized to make changes to organization|\n|2000|Invalid member password|\n|2001|Invalid member email|\n|2002|Invalid member name (please enter name between 2 and 100 chars in length)|\n|2003|Invalid member default timezone|\n|2004|Invalid initials|\n|2005|Missing member name|\n|2006|Missing member email|\n|2007|Missing member password|\n|2008|No more available seats in organization|\n|2303|Invalid organization ID|\n|2304|Invalid member ID|\n|2305|Missing member ID|\n|2306|Missing social profile ID|\n|3002|Team name has to be between 2-200 characters|\n|3003|Unable to find an organization with that ID|\n|3004|Missing team ID|\n|3005|Invalid team ID|\n|3006|Team name has to be unique in the organization|\n|3008|Member is not seated in the organization|\n|3010|Email is already in use|\n|3020|Invalid cursor format|\n|3021|Invalid social network type|\n|3301|Payment member can’t be removed from the organization|\n|4000|Schema validation failed|\n|4001|Resource not found|\n|4002|Insufficient permissions to view organization members|\n|4003|Insufficient permissions to view member permissions|\n|4004|Insufficient permissions to view member organizations|\n|4005|Insufficient permissions to view team members|\n|4006|Insufficient permissions to view team|\n|4007|Insufficient permissions to create team|\n|4008|Insufficient permissions to view team social profile|\n|4009|Insufficient organization permissions|\n|4010|Insufficient permissions to view organization teams|\n|4303|Member does not exist in organization|\n|5000|An unknown error occurred|\n|5001|HTTP method not permitted|\n|5002|Unsupported operation|\n|9000|An internal error occurred|\n|40001|Social profile isn’t owned by organization (required for posting messages with tags)|\n|40003|You have attempted to delete a message that cannot be deleted in its current state|\n|40004|Only attachments from http://static.ow.ly or http://ow.ly/i/ are currently allowed|\n|40005|Insufficient permission to create new message tags|\n|40019|Message state filter not supported|\n|40020|Specified date range is too large|\n|40021|Uploaded media is not yet ready to be used (further processing required)|\n|40022|Invalid boolean for includeUnscheduledReviewMsgs flag|\n|40023|Twitter only allows 1 network per message|\n|40024|Posting to Facebook Groups is no longer supported|\n|40025|Scheduled message limit reached|\n"
+  version: '1.0'
+  title: Hootsuite REST Messages API
+  contact:
+    email: dev.support@hootsuite.com
+  license:
+    name: Hootsuite Developer Terms and API License Agreement
+    url: https://hootsuite.com/legal/dev-api-terms
+servers:
+- url: https://platform.hootsuite.com
+security:
+- OAuth2: []
+tags:
+- name: Messages
+paths:
+  /v1/messages:
+    post:
+      tags:
+      - Messages
+      operationId: scheduleMessage
+      summary: Schedule messages
+      description: Schedules a message to send on one or more social profiles (except Pinterest). Returns an array of uniquely identifiable messages (one per social profile requested).<br/><br/>Scheduling a message to Pinterest can not be bundled with any other social profiles.
+      parameters:
+      - $ref: '#/components/parameters/bearerToken'
+      requestBody:
+        content:
+          application/json;charset=utf-8:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/SocialProfileMessagesResponseEnvelope'
+        '400':
+          description: Bad Request
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+    get:
+      tags:
+      - Messages
+      operationId: retrieveMessages
+      summary: Retrieve outbound messages
+      description: 'Outbound messages are messages that are scheduled or were previously sent. This endpoint returns outbound messages sorted by increasing scheduled send time. Messages pending approval, including those created by and/or actionable by the given user, will also be returned via this API.
+
+
+        Messages returned can be filtered by social profile or the current state of the message. If more than 50 results are returned a cursor will be automatically created to paginate the results.
+
+
+        Query Parameters must be [URL encoded](https://en.wikipedia.org/wiki/Percent-encoding). For example:
+
+
+        ```
+
+        ?startTime=2020-01-01T00%3A00%3A00Z
+
+        &endTime=2020-01-15T17%3A55%3A01Z
+
+        &socialProfileIds=1234
+
+        &state=SCHEDULED
+
+        &limit=5
+
+        ```
+
+
+        To specify multiple social profiles, use the following [syntax](http://stackoverflow.com/questions/6243051/how-to-pass-an-array-within-a-query-string):
+
+
+        ```
+
+        ?socialProfileIds=1234&socialProfileIds=5678
+
+        ```
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/bearerToken'
+      - name: startTime
+        in: query
+        description: The start date range of messages to be returned. In [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+        required: true
+        example: 2020-01-01 00:00:00+00:00
+        schema:
+          type: string
+      - name: endTime
+        in: query
+        description: The end date range of messages to be returned. In [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format. Must not be later than 4 weeks from startTime.
+        required: true
+        example: 2020-01-15 17:55:01+00:00
+        schema:
+          type: string
+      - name: state
+        in: query
+        description: A filter to return messages with in the matching state. Allowed values are PENDING_APPROVAL, REJECTED, SENT, SCHEDULED and SEND_FAILED_PERMANENTLY.
+        required: false
+        example: SCHEDULED
+        schema:
+          type: string
+      - name: socialProfileIds
+        in: query
+        description: A filter to return messages for certain social profiles.
+        required: false
+        example: '115185509'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: Maximum number of messages to be returned in the response. Defaults to 50 if not specified. Maximum allowable limit is 100.
+        required: false
+        schema:
+          type: integer
+      - name: cursor
+        in: query
+        description: Cursor to a specific page in the result set. Defaults to the first page.
+        required: false
+        schema:
+          type: string
+      - name: includeUnscheduledReviewMsgs
+        in: query
+        description: Flag to retrieve unscheduled (Send Now) review messages on top of scheduled ones retrieved from time range query.
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/SocialProfileMessagesResponseEnvelope'
+        '400':
+          description: Bad Request
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+  /v1/messages/{messageId}:
+    get:
+      tags:
+      - Messages
+      operationId: retrieveMessage
+      summary: Retrieve message
+      description: 'Retrieves a message. A message is always associated with a single social profile. Messages might be unavailable for a brief time during upload to social networks.
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/bearerToken'
+      - name: messageId
+        in: path
+        description: The message ID.
+        required: true
+        example: 4138476039
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/SocialProfileMessageResponseEnvelope'
+        '400':
+          description: Bad Request
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+    delete:
+      tags:
+      - Messages
+      operationId: deleteMessage
+      summary: Delete message
+      description: Deletes a message. A message is always associated with a single social profile.
+      parameters:
+      - $ref: '#/components/parameters/bearerToken'
+      - name: messageId
+        in: path
+        description: The message ID.
+        required: true
+        example: 4138476039
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+  /v1/messages/{messageId}/approve:
+    post:
+      tags:
+      - Messages
+      operationId: approveMessage
+      summary: Approve message
+      description: Approve a message.
+      parameters:
+      - $ref: '#/components/parameters/bearerToken'
+      - name: messageId
+        in: path
+        description: The message ID.
+        required: true
+        example: 4138476039
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=utf-8:
+            schema:
+              $ref: '#/components/schemas/ApproveMessageRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/EmptyDataEnvelope'
+        '400':
+          description: Bad Request
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+  /v1/messages/{messageId}/reject:
+    post:
+      tags:
+      - Messages
+      operationId: rejectMessage
+      summary: Reject message
+      description: Reject a message.
+      parameters:
+      - $ref: '#/components/parameters/bearerToken'
+      - name: messageId
+        in: path
+        description: The message ID.
+        required: true
+        example: 4138476039
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json;charset=utf-8:
+            schema:
+              $ref: '#/components/schemas/RejectMessageRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/EmptyDataEnvelope'
+        '400':
+          description: Bad Request
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+  /v1/messages/{messageId}/history:
+    get:
+      tags:
+      - Messages
+      operationId: getMessageHistory
+      summary: Get message review history
+      description: Gets a message's prescreening review history.
+      parameters:
+      - $ref: '#/components/parameters/bearerToken'
+      - name: messageId
+        in: path
+        description: The message ID.
+        required: true
+        example: 4138476039
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/MessageReviewResponseEnvelope'
+        '400':
+          description: Bad Request
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+        '404':
+          description: Not Found
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ErrorsResponseEnvelope'
+components:
+  schemas:
+    MessageReviewResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Actions'
+    FacebookPageTargeting:
+      description: Targeting options for Facebook Page. Note that recently Facebook has deprecated feed targeting fields `ageMax`, `genders`, and `locales`.
+      type: object
+      properties:
+        ageMin:
+          type: integer
+          description: Minimum age to target the message at. If used, must be value of 13, 17, 18, 19, 21.
+          example: 45
+        education:
+          type: array
+          description: Education level to target the message at.
+          items:
+            type: string
+            example: collegeGrad
+            enum:
+            - highSchool
+            - college
+            - collegeGrad
+        interestedIn:
+          type: array
+          description: Interested in preferences to target the message at.
+          items:
+            type: string
+            example: female
+            enum:
+            - male
+            - female
+        relationshipStatus:
+          type: array
+          description: Relationship status to target the message at.
+          items:
+            type: string
+            example: single
+            enum:
+            - single
+            - relationship
+            - married
+            - engaged
+        countries:
+          type: array
+          description: Country to target the message at.
+          items:
+            type: object
+            properties:
+              k:
+                type: string
+                description: The full name of the country being targeted.
+                example: Canada
+              v:
+                type: string
+                description: The 2-digit ISO 3166 format code, as provided by Facebook.
+                example: CA
+        regions:
+          type: array
+          description: Region to target the message at. Note that regions can only be specified when there is exactly one country targeted. Limit 200.
+          items:
+            type: object
+            properties:
+              k:
+                type: string
+                description: The full name of the region being targeted.
+                example: British Columbia
+              v:
+                type: string
+                description: The region key, as provided by Facebook.
+                example: '2'
+        cities:
+          type: array
+          description: City to target the message at. Note that cities can only be specified when there is exactly one country targeted. Limit 250.
+          items:
+            type: object
+            properties:
+              k:
+                type: string
+                description: The full name of the city being targeted.
+                example: Burnaby, BC
+              v:
+                type: string
+                description: The city key, as provided by Facebook.
+                example: '292466'
+        zips:
+          type: array
+          description: Zip/Postal Code to target the message at. Limit 50,000.
+          items:
+            type: object
+            properties:
+              k:
+                type: string
+                description: The name of the zip/postal code being targeted.
+                example: K1S
+              v:
+                type: string
+                description: The zip/postal code key, as provided by Facebook.
+                example: CA:K1S
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+          description: An error code indicating the type of error that occurred.
+          example: 1234
+        message:
+          type: string
+          description: A description of error.
+          example: An error message
+        id:
+          type: string
+          description: A unique error id for tracing purposes
+          example: f7d32670-4e6a-48c0-a2a7-87803536a712
+        resource:
+          type: object
+          description: A reference to the resource in error
+          title: ResourceReference
+          properties:
+            type:
+              type: string
+              description: The resource type.
+              example: socialProfile
+            id:
+              type: string
+              description: The resource ID.
+              example: '7534653235'
+    MediaUrl:
+      type: object
+      properties:
+        thumbnailUrl:
+          type: string
+          description: The thumbnail media URL.
+          example: http://static.ow.ly/photos/thumb/cS5.jpg
+        url:
+          type: string
+          description: The media URL.
+          example: http://static.ow.ly/photos/normal/cS5.jpg
+      description: An ow.ly media URL.
+    SocialProfileMessagesResponseEnvelope:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          description: The data response envelope.
+          items:
+            $ref: '#/components/schemas/SocialProfileMessage'
+        metadata:
+          title: metadata
+          type: object
+          description: The metadata response envelope.
+          properties:
+            cursor:
+              title: cursor
+              type: object
+              description: The cursor to paginate the results. A cursor will be created if the number of results exceeds the limit set in the query parameters.
+              properties:
+                next:
+                  type: string
+                  description: A cursor to the next page of results. This is set to null if no more pages exist.
+                  example: 1577887200000:4138476039:0
+                previous:
+                  type: string
+                  description: A cursor to the previous page of results. This is set to null if no previous pages exist.
+                  example: 1577887200000:4138476039:1
+    Actions:
+      type: object
+      description: An array of the review actions performed on the message.
+      properties:
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewAction'
+    SocialProfileMessage:
+      type: object
+      required:
+      - id
+      - state
+      properties:
+        id:
+          type: string
+          description: The message ID.
+          example: '4138476039'
+        state:
+          type: string
+          description: The message state.
+          example: SCHEDULED
+          enum:
+          - SCHEDULED
+          - SUBMITTED
+          - PENDING_APPROVAL
+          - SENT
+          - SEND_FAILED_PERMANENTLY
+          - REJECTED
+        text:
+          type: string
+          description: The message text to publish.
+          example: 5 trends that will change how we use social media this year http://owl.li/YuNr2
+        socialProfile:
+          title: socialProfileReference
+          type: object
+          description: The social profile that the message will be published to.
+          properties:
+            id:
+              type: string
+              description: The social profile ID.
+              example: '115185509'
+            externalURL:
+              type: string
+              description: The external public URL of the social profile.
+              example: https://www.linkedin.com/in/l-lhs-8654321
+        scheduledSendTime:
+          type: string
+          description: The time the message is scheduled to be sent in UTC time, [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format. Missing or different timezones will not be accepted, to ensure there is no ambiguity about scheduled time. Dates must end with 'Z' to be accepted.
+          example: 2018-10-25 10:35:00+00:00
+        webhookUrls:
+          type: array
+          description: The webhook URL(s) to call to when the message’s state changes.
+          items:
+            type: string
+            example: https://myserver.com/inbound
+        tags:
+          type: array
+          description: The Hootsuite message tags to apply to the message. To set tags the social profile must belong to an organization. Tags are case sensitive. Limited permission members can only use the existing tags for organization and cannot create new ones. See more about message tags at the Hootsuite Help Center.
+          items:
+            type: string
+            example: test_tag
+        targeting:
+          title: targetingOptions
+          type: object
+          description: Social network targeting options to be applied when publishing the message.
+          properties:
+            facebookPage:
+              $ref: '#/components/schemas/FacebookPageTargeting'
+            linkedInCompany:
+              $ref: '#/components/schemas/LinkedInCompanyTargeting'
+        privacy:
+          title: privacyOptions
+          type: object
+          description: Social network privacy options to be applied when publishing the message.
+          properties:
+            facebook:
+              $ref: '#/components/schemas/FacebookPrivacy'
+            linkedIn:
+              $ref: '#/components/schemas/LinkedInPrivacy'
+        location:
+          $ref: '#/components/schemas/Location'
+        emailNotification:
+          type: boolean
+          description: A flag to determine whether email notifications are sent when the message is published.
+          example: true
+        mediaUrls:
+          type: array
+          description: The ow.ly media attached to the message
+          items:
+            $ref: '#/components/schemas/MediaUrl'
+        media:
+          type: array
+          description: The media attached to the message
+          items:
+            $ref: '#/components/schemas/Media'
+        extendedInfo:
+          type: array
+          description: Social profile metadata attached to the message. Only available for Pinterest messages at this time.
+          items:
+            type: object
+            properties:
+              socialProfileType:
+                type: string
+                description: The social profile type that this extendedInfo object is for.
+                example: PINTEREST
+                enum:
+                - PINTEREST
+              socialProfileId:
+                type: string
+                description: The social profile ID that this extendedInfo object is for.
+                example: '123456789'
+              data:
+                type: object
+                description: Social profile specific meta data.
+                properties:
+                  boardId:
+                    type: string
+                    description: Pinterest board ID for Pin
+                    example: '123456789012345678'
+                  destinationUrl:
+                    type: string
+                    description: Website for Pin
+                    example: https://www.hootsuite.com
+        postId:
+          type: string
+          description: The external message ID used by social network for this message. Only set once the message has been published.
+          example: '705207140236001282'
+        postUrl:
+          type: string
+          description: The URL of the message live on the social network. Only set once the message has been published. Only available for Facebook and LinkedIn messages at this time.
+          example: https://www.facebook.com/177463958820/posts/10155617296368821
+        createdByMember:
+          title: memberReference
+          type: object
+          description: The identifier of the member who originally created the message.
+          properties:
+            id:
+              type: string
+              description: ID of member.
+              example: '1389211223'
+        lastUpdatedByMember:
+          title: memberReference
+          type: object
+          description: The identifier of the member who last updated the message.
+          properties:
+            id:
+              type: string
+              description: ID of member.
+              example: '1389211222'
+        sequenceNumber:
+          type: number
+          description: The number representing which step in the approval process the message is on, or null if the message is not subject to approval.
+          example: 3
+        reviewers:
+          type: array
+          description: A list of message reviewers
+          items:
+            $ref: '#/components/schemas/Reviewer'
+    Location:
+      description: The message’s geolocation in decimal degrees for latitude and longitude. Twitter allows users to set the location for a post manually. The location object takes in Decimal Degrees for latitude and longitude. Decimal degrees are an alternative to using degrees, minutes, and seconds (DMS). The values for latitude and longitude are bounded by ±90° and ±180° respectively. Positive latitudes are north of the equator, negative latitudes are south of the equator. Positive longitudes are east of Prime Meridian, negative longitudes are west of the Prime Meridian.<br/>Not supported by Pinterest.
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          description: The latitude in decimal degrees. Must be between -90 to 90.
+          example: 57.64911
+        longitude:
+          type: number
+          format: double
+          description: The longitude in decimal degrees. Must be between -180 to 180.
+          example: 10.40744
+    TargetingOptions:
+      type: object
+      description: Social network targeting options to be applied when publishing the message.
+      properties:
+        facebookPage:
+          $ref: '#/components/schemas/FacebookPageTargeting'
+        linkedInCompany:
+          $ref: '#/components/schemas/LinkedInCompanyTargeting'
+        linkedInV2Company:
+          $ref: '#/components/schemas/LinkedInV2CompanyTargeting'
+    ErrorsResponseEnvelope:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: The errors response envelope.
+          items:
+            $ref: '#/components/schemas/Error'
+    LinkedInPrivacy:
+      type: object
+      properties:
+        visibility:
+          type: array
+          description: LinkedIn visibility rules. At most 1 can be used.
+          items:
+            type: string
+            example: anyone
+            enum:
+            - anyone
+            - connectionsOnly
+    ApproveMessageRequest:
+      type: object
+      required:
+      - sequenceNumber
+      properties:
+        sequenceNumber:
+          type: integer
+          description: The sequence number of the message being approved.
+          example: 11
+        reviewerType:
+          type: string
+          description: 'The actor that will be approving the message. Leaving this field empty will use "EXTERNAL" by default.
+
+
+            Using "MEMBER" requires that you use a member token to approve a message that is pending approval by that member.
+
+            '
+          enum:
+          - EXTERNAL
+          - MEMBER
+    LinkedInCompanyTargeting:
+      description: Targeting options for LinkedIn Company. Legacy field, please do not use.
+      type: object
+      properties:
+        companySize:
+          type: array
+          description: 'Company size to target the message at.
+
+
+            self:             ''Self employed''
+
+
+            1-10:             ''1 to 10 employees''
+
+
+            11-50:            ''11 to 50 employees''
+
+
+            51-200:           ''51 to 200 employees''
+
+
+            201-500:          ''201 to 500 employees''
+
+
+            501-1000:         ''501 to 1000 employees''
+
+
+            1001-5000:        ''1001 to 5000 employees''
+
+
+            5001-10000:       ''5001 to 10000 employees''
+
+
+            10001:            ''10001+ employees''
+
+            '
+          items:
+            type: string
+            example: 51-200
+        geography:
+          type: array
+          description: 'Geography to target the message at.  Valid values:
+
+
+            af: ''Africa''
+
+
+            af.cm: ''Cameroon''
+
+
+            af.dz: ''Algeria''
+
+
+            af.eg: ''Egypt''
+
+
+            af.gh: ''Ghana''
+
+
+            af.ke: ''Kenya''
+
+
+            af.ma: ''Morocco''
+
+
+            af.ng: ''Nigeria''
+
+
+            af.tn: ''Tunisia''
+
+
+            af.tz: ''Tanzania''
+
+
+            af.ug: ''Uganda''
+
+
+            af.za: ''South Africa''
+
+
+            af.za.*.5852: ''Cape Town Area, south Africa''
+
+
+            af.za.*.5855 : ''Durban Area, South Africa''
+
+
+            af.za.*.5862: ''Johannesburg Area, South Africa''
+
+
+            af.zw: ''Zimbabwe''
+
+
+            aq: ''Antarctica''
+
+
+            as: ''Asia''
+
+
+            as.bd: ''Bangladesh''
+
+
+            as.cn: ''China''
+
+
+            as.cn.*.8909: ''Shanghai City, China''
+
+
+            as.cn.*.8910: ''Shenzhen, Guangdong, China''
+
+
+            as.cn.*.8911: ''Beijing City, China''
+
+
+            as.cn.*.8919: ''Guangzhou, Guangdong, China''
+
+
+            as.hk: ''Hong Kong''
+
+
+            as.id: ''Indonesia''
+
+
+            as.id.*.8594: ''Greater Jakarta Area, Indonesia''
+
+
+            as.in: ''India''
+
+
+            as.in.an: ''Andaman & Nicobar Islands''
+
+
+            as.in.ap: ''Andhra Pradesh''
+
+
+            as.in.ap.6508: ''Hyderabad Area, India''
+
+
+            as.in.ar: ''Arunachal Pradesh''
+
+
+            as.in.as: ''Assam''
+
+
+            as.in.br: ''Bihar''
+
+
+            as.in.cg: ''Chattisgarh''
+
+
+            as.in.ch: ''Chandigarh''
+
+
+            as.in.dd: ''Daman & Diu''
+
+
+            as.in.dl: ''Delhi''
+
+
+            as.in.dl.7151: ''New Delhi Area, India''
+
+
+            as.in.dn: ''Dadra & Nagar Haveli''
+
+
+            as.in.ga: ''Goa''
+
+
+            as.in.gj: ''Gujarat''
+
+
+            as.in.gj.6552: ''Vadodara Area, India''
+
+
+            as.in.gj.7065: ''Ahmedabad Area, India''
+
+
+            as.in.hp: ''Himachal Pradesh''
+
+
+            as.in.hr: ''Haryana''
+
+
+            as.in.hr.7391: ''Gurgaon, India''
+
+
+            as.in.jh: ''Jharkhand''
+
+
+            as.in.jk: ''Jammu & Kashmir''
+
+
+            as.in.ka: ''Karnataka''
+
+
+            as.in.ka.7127: ''Bengaluru Area, India''
+
+
+            as.in.kl: ''Kerala''
+
+
+            as.in.kl.6477: ''Cochin Area, India''
+
+
+            as.in.ld: ''Lakshadweep''
+
+
+            as.in.mh: ''Maharashtra''
+
+
+            as.in.mh.6751: ''Nagpur Area, India''
+
+
+            as.in.mh.7150: ''Mumbai Area, India''
+
+
+            as.in.mh.7350: ''Pune Area, India''
+
+
+            as.in.ml: ''Meghalaya''
+
+
+            as.in.mn: ''Manipur''
+
+
+            as.in.mp: ''Madhya Pradesh''
+
+
+            as.in.mp.7382: ''Indore Area, India''
+
+
+            as.in.mz: ''Mizoram''
+
+
+            as.in.nl: ''Nagaland''
+
+
+            as.in.or: ''Orissa''
+
+
+            as.in.pb: ''Punjab''
+
+
+            as.in.pb.6879: ''Chandigarh Area, India''
+
+
+            as.in.py: ''Pondicherry''
+
+
+            as.in.rj: ''Rajasthan''
+
+
+            as.in.rj.7287: ''Jaipur Area, India''
+
+
+            as.in.sk: ''Sikkim''
+
+
+            as.in.tn: ''Tamil Nadu''
+
+
+            as.in.tn.6472: ''Coimbatore Area, India''
+
+
+            as.in.tn.6891: ''Chennai Area, India''
+
+
+            as.in.tr: ''Tripura''
+
+
+            as.in.ul: ''Uttarakhand''
+
+
+            as.in.up: ''Uttar Pradesh''
+
+
+            as.in.up.7093: ''Lucknow Area, India''
+
+
+            as.in.up.7392: ''Noida Area, India''
+
+
+            as.in.wb: ''West Bengal''
+
+
+            as.in.wb.7003: ''Kolkata Area, India''
+
+
+            as.jp: ''Japan''
+
+
+            as.kr: ''Korea''
+
+
+            as.kr.*.7700: ''Gangnam-gu, Seoul, Korea''
+
+
+            as.lk: ''Sri Lanka''
+
+
+            as.my: ''Malaysia''
+
+
+            as.my.*.7945: ''Selangor, Malaysia''
+
+
+            as.my.*.7960: ''Kuala Lumpur, Malaysia''
+
+
+            as.np: ''Nepal''
+
+
+            as.ph: ''Philippines''
+
+
+            as.sg: ''Singapore''
+
+
+            as.th: ''Thailand''
+
+
+            as.tw: ''Taiwan''
+
+
+            as.vn: ''Vietnam''
+
+
+            eu: ''Europe''
+
+
+            eu.at: ''Austria''
+
+
+            eu.be: ''Belgium''
+
+
+            eu.be.*.4918: ''Antwerp Area, Belgium''
+
+
+            eu.be.*.4920: ''Brussels Area, Belgium''
+
+
+            eu.bg: ''Bulgaria''
+
+
+            eu.ch: ''Switzerland''
+
+
+            eu.ch.*.4930: ''Geneva Area, Switzerland''
+
+
+            eu.ch.*.4938: ''Zürich Area, Switzerland''
+
+
+            eu.cz: ''Czech Republic''
+
+
+            eu.de: ''Germany''
+
+
+            eu.de.*.4953: ''Cologne Area, Germany''
+
+
+            eu.de.*.4966: ''Frankfurt Am Main Area, Germany''
+
+
+            eu.de.*.5000: ''Munich Area, Germany''
+
+
+            eu.dk: ''Denmark''
+
+
+            eu.dk.*.5038: ''Copenhagen Area, Denmark''
+
+
+            eu.dk.*.5041: ''Odense Area, Denmark''
+
+
+            eu.dk.*.5044: ''Ålborg Area, Denmark''
+
+
+            eu.dk.*.5045: ''Århus Area, Denmark''
+
+
+            eu.es: ''Spain''
+
+
+            eu.es.*.5064: ''Barcelona Area, Spain''
+
+
+            eu.es.*.5113: ''Madrid Area, Spain''
+
+
+            eu.fi: ''Finland''
+
+
+            eu.fr: ''France''
+
+
+            eu.fr.*.5205: ''Lille Area, France''
+
+
+            eu.fr.*.5210: ''Lyon Area, France''
+
+
+            eu.fr.*.5211: ''Marseille Area, France''
+
+
+            eu.fr.*.5221: ''Nice Area, France''
+
+
+            eu.fr.*.5227: ''Paris Area, France''
+
+
+            eu.fr.*.5249: ''Toulouse Area, France''
+
+
+            eu.gb: ''United Kingdom''
+
+
+            eu.gb.*.4544: ''Birmingham, United Kingdom''
+
+
+            eu.gb.*.4550: ''Brighton, United Kingdom''
+
+
+            eu.gb.*.4552: ''Bristol, United Kingdom''
+
+
+            eu.gb.*.4555: ''Cambridge, United Kingdom''
+
+
+            eu.gb.*.4558: ''Chelmsford, United Kingdom''
+
+
+            eu.gb.*.4562: ''Coventry, United Kingdom''
+
+
+            eu.gb.*.4573: ''London, United Kingdom''
+
+
+            eu.gb.*.4574: ''Edinburgh, United Kingdom''
+
+
+            eu.gb.*.4579: ''Glasgow, United Kingdom''
+
+
+            eu.gb.*.4580: ''Gloucester, United Kingdom''
+
+
+            eu.gb.*.4582: ''Guildford, United Kingdom''
+
+
+            eu.gb.*.4583: ''Harrow, United Kingdom''
+
+
+            eu.gb.*.4586: ''Hemel Hempstead, United Kingdom''
+
+
+            eu.gb.*.4597: ''Kingston upon Thames, United Kingdom''
+
+
+            eu.gb.*.4603: ''Leicester, United Kingdom''
+
+
+            eu.gb.*.4606: ''Leeds, United Kingdom''
+
+
+            eu.gb.*.4608: ''Manchester, United Kingdom''
+
+
+            eu.gb.*.4610: ''Milton Keynes, United Kingdom''
+
+
+            eu.gb.*.4612: ''Newcastle upon Tyne, United Kingdom''
+
+
+            eu.gb.*.4613: ''Nottingham, United Kingdom''
+
+
+            eu.gb.*.4614: ''Northampton, United Kingdom''
+
+
+            eu.gb.*.4618: ''Oxford, United Kingdom''
+
+
+            eu.gb.*.4623: ''Portsmouth, United Kingdom''
+
+
+            eu.gb.*.4625: ''Reading, United Kingdom''
+
+
+            eu.gb.*.4626: ''Redhill, United Kingdom''
+
+
+            eu.gb.*.4628: ''Sheffield, United Kingdom''
+
+
+            eu.gb.*.4632: ''Slough, United Kingdom''
+
+
+            eu.gb.*.4635: ''Southampton, United Kingdom''
+
+
+            eu.gb.*.4644: ''Tonbridge, United Kingdom''
+
+
+            eu.gb.*.4648: ''Twickenham, United Kingdom''
+
+
+            eu.gr: ''Greece''
+
+
+            eu.hr: ''Croatia''
+
+
+            eu.hu: ''Hungary''
+
+
+            eu.ie: ''Ireland''
+
+
+            eu.it: ''Italy''
+
+
+            eu.it.*.5587: ''Bologna Area, Italy''
+
+
+            eu.it.*.5616: ''Milan Area, Italy''
+
+
+            eu.it.*.5636: ''Rome Area, Italy''
+
+
+            eu.it.*.5652: ''Turin Area, Italy''
+
+
+            eu.it.*.5657: ''Venice Area, Italy''
+
+
+            eu.lt: ''Lithuania''
+
+
+            eu.nl: ''Netherlands''
+
+
+            eu.nl.*.5663: ''Almere Stad Area, Netherlands''
+
+
+            eu.nl.*.5664: ''Amsterdam Area, Netherlands''
+
+
+            eu.nl.*.5665: ''Apeldoorn Area, Netherlands''
+
+
+            eu.nl.*.5668: ''Eindhoven Area, Netherlands''
+
+
+            eu.nl.*.5669: ''Enschede Area, Netherlands''
+
+
+            eu.nl.*.5673: ''Groningen Area, Netherlands''
+
+
+            eu.nl.*.5681: ''Nijmegen Area, Netherlands''
+
+
+            eu.nl.*.5688: ''The Hague Area, Netherlands''
+
+
+            eu.nl.*.5690: ''Utrecht Area, Netherlands''
+
+
+            eu.nl.*.5906: ''Breda Area, Netherlands''
+
+
+            eu.nl.*.5907: ''Tilburg Area, Netherlands''
+
+
+            eu.nl.*.5908: ''Rotterdam Area, Netherlands''
+
+
+            eu.nl.*.7417: ''Maastricht Area, Netherlands''
+
+
+            eu.no: ''Norway''
+
+
+            eu.pl: ''Poland''
+
+
+            eu.pt: ''Portugal''
+
+
+            eu.ro: ''Romania''
+
+
+            eu.rs: ''Serbia''
+
+
+            eu.ru: ''Russian Federation''
+
+
+            eu.se: ''Sweden''
+
+
+            eu.sk: ''Slovak Republic''
+
+
+            eu.tr: ''Turkey''
+
+
+            eu.tr.*.7585: ''Istanbul, Turkey''
+
+
+            eu.ua: ''Ukraine''
+
+
+            la: ''Latin America''
+
+
+            la.ar: ''Argentina''
+
+
+            la.bo: ''Bolivia''
+
+
+            la.br: ''Brazil''
+
+
+            la.br.ac: ''Acre''
+
+
+            la.br.al: ''Alagoas''
+
+
+            la.br.am: ''Amazonas''
+
+
+            la.br.ap: ''Amapá''
+
+
+            la.br.ba: ''Bahia''
+
+
+            la.br.ce: ''Ceará''
+
+
+            la.br.df: ''Distrito Federal''
+
+
+            la.br.es: ''Espírito Santo''
+
+
+            la.br.go: ''Goiás''
+
+
+            la.br.ma: ''Maranhão''
+
+
+            la.br.mg: ''Minas Gerais''
+
+
+            la.br.mg.6156: ''Belo Horizonte Area, Brazil''
+
+
+            la.br.ms: ''Mato Grosso do Sul''
+
+
+            la.br.mt: ''Mato Grosso''
+
+
+            la.br.pa: ''Pará''
+
+
+            la.br.pb: ''Paraíba''
+
+
+            la.br.pe: ''Pernambuco''
+
+
+            la.br.pi: ''Piauí''
+
+
+            la.br.pr: ''Paraná''
+
+
+            la.br.pr.6399: ''Curitiba Area, Brazil''
+
+
+            la.br.rj: ''Rio de Janeiro''
+
+
+            la.br.rj.6034: ''Rio de Janeiro Area, Brazil''
+
+
+            la.br.rn: ''Rio Grande do Norte''
+
+
+            la.br.ro: ''Rondônia''
+
+
+            la.br.rr: ''Roraima''
+
+
+            la.br.rs: ''Rio Grande do Sul''
+
+
+            la.br.rs.6467: ''Porto Alegre Area, Brazil''
+
+
+            la.br.sc: ''Santa Catarina''
+
+
+            la.br.se: ''Sergipe''
+
+
+            la.br.sp: ''São Paulo''
+
+
+            la.br.sp.6104: ''Campinas Area, Brazil''
+
+
+            la.br.sp.6368: ''São Paulo Area, Brazil''
+
+
+            la.br.to: ''Tocantins''
+
+
+            la.cl: ''Chile''
+
+
+            la.co: ''Colombia''
+
+
+            la.cr: ''Costa Rica''
+
+
+            la.do: ''Dominican Republic''
+
+
+            la.ec: ''Ecuador''
+
+
+            la.gt: ''Guatemala''
+
+
+            la.mx: ''Mexico''
+
+
+            la.mx.*.5921: ''Mexico City Area, Mexico''
+
+
+            la.mx.*.5955: ''Naucalpan de Juárez Area, Mexico''
+
+
+            la.pa: ''Panama''
+
+
+            la.pe: ''Peru''
+
+
+            la.pr: ''Puerto Rico''
+
+
+            la.tt: ''Trinidad and Tobago''
+
+
+            la.uy: ''Uruguay''
+
+
+            la.ve: ''Venezuela''
+
+
+            me: ''Middle East''
+
+
+            me.ae: ''United Arab Emirates''
+
+
+            me.bh: ''Bahrain''
+
+
+            me.il: ''Israel''
+
+
+            me.jo: ''Jordan''
+
+
+            me.kw: ''Kuwait''
+
+
+            me.pk: ''Pakistan''
+
+
+            me.qa: ''Qatar''
+
+
+            me.sa: ''Saudi Arabia''
+
+
+            na: ''North America''
+
+
+            na.ca: ''Canada''
+
+
+            na.ca.ab: ''Alberta''
+
+
+            na.ca.ab.4872: ''Edmonton, Canada Area''
+
+
+            na.ca.ab.4882: ''Calgary, Canada Area''
+
+
+            na.ca.bc: ''British Columbia''
+
+
+            na.ca.bc.4873: ''British Columbia, Canada''
+
+
+            na.ca.bc.4880: ''Vancouver, Canada Area''
+
+
+            na.ca.mb: ''Manitoba''
+
+
+            na.ca.nb: ''New Brunswick''
+
+
+            na.ca.nl: ''Newfoundland And Labrador''
+
+
+            na.ca.ns: ''Nova Scotia''
+
+
+            na.ca.ns.4874: ''Halifax, Canada Area''
+
+
+            na.ca.nt: ''Northwest Territories''
+
+
+            na.ca.nu: ''Nunavut''
+
+
+            na.ca.on: ''Ontario''
+
+
+            na.ca.on.4864: ''Ontario, Canada''
+
+
+            na.ca.on.4865: ''Kitchener, Canada Area''
+
+
+            na.ca.on.4869: ''London, Canada Area''
+
+
+            na.ca.on.4876: ''Toronto, Canada Area''
+
+
+            na.ca.on.4884: ''Ottawa, Canada Area''
+
+
+            na.ca.pe: ''Prince Edward Island''
+
+
+            na.ca.qc: ''Quebec''
+
+
+            na.ca.qc.4863: ''Montreal, Canada Area''
+
+
+            na.ca.qc.4866: ''Winnipeg, Canada Area''
+
+
+            na.ca.qc.4875: ''Quebec, Canada''
+
+
+            na.ca.sk: ''Saskatchewan''
+
+
+            na.ca.yt: ''Yukon''
+
+
+            na.us: ''United States''
+
+
+            na.us.ak: ''Alaska''
+
+
+            na.us.ak.38: ''Anchorage, Alaska Area''
+
+
+            na.us.al: ''Alabama''
+
+
+            na.us.al.100: ''Birmingham, Alabama Area''
+
+
+            na.us.al.344: ''Huntsville, Alabama Area''
+
+
+            na.us.al.516: ''Mobile, Alabama Area''
+
+
+            na.us.ar: ''Arkansas''
+
+
+            na.us.ar.258: ''Fayetteville, Arkansas Area''
+
+
+            na.us.ar.440: ''Little Rock, Arkansas Area''
+
+
+            na.us.az: ''Arizona''
+
+
+            na.us.az.620: ''Phoenix, Arizona Area''
+
+
+            na.us.az.852: ''Tucson, Arizona Area''
+
+
+            na.us.ca: ''California''
+
+
+            na.us.ca.284: ''Fresno, California Area''
+
+
+            na.us.ca.49: ''Greater Los Angeles Area''
+
+
+            na.us.ca.51: ''Orange County, California Area''
+
+
+            na.us.ca.712: ''Salinas, California Area''
+
+
+            na.us.ca.732: ''Greater San Diego Area''
+
+
+            na.us.ca.748: ''Santa Barbara, California Area''
+
+
+            na.us.ca.812: ''Stockton, California Area''
+
+
+            na.us.ca.82: ''Sacramento, California Area''
+
+
+            na.us.ca.84: ''San Francisco Bay Area''
+
+
+            na.us.co: ''Colorado''
+
+
+            na.us.co.172: ''Colorado Springs, Colorado Area''
+
+
+            na.us.co.267: ''Fort Collins, Colorado Area''
+
+
+            na.us.co.34: ''Greater Denver Area''
+
+
+            na.us.ct: ''Connecticut''
+
+
+            na.us.ct.327: ''Hartford, Connecticut Area''
+
+
+            na.us.ct.552: ''New London/Norwich, Connecticut Area''
+
+
+            na.us.dc: ''District Of Columbia''
+
+
+            na.us.dc.97: ''Washington D.C. Metro Area''
+
+
+            na.us.de: ''Delaware''
+
+
+            na.us.fl: ''Florida''
+
+
+            na.us.fl.202: ''Daytona Beach, Florida Area''
+
+
+            na.us.fl.270: ''Fort Myers, Florida Area''
+
+
+            na.us.fl.271: ''Fort Pierce, Florida Area''
+
+
+            na.us.fl.290: ''Gainesville, Florida Area''
+
+
+            na.us.fl.359: ''Jacksonville, Florida Area''
+
+
+            na.us.fl.398: ''Lakeland, Florida Area''
+
+
+            na.us.fl.490: ''Melbourne, Florida Area''
+
+
+            na.us.fl.56: ''Miami/Fort Lauderdale Area''
+
+
+            na.us.fl.596: ''Orlando, Florida Area''
+
+
+            na.us.fl.751: ''Sarasota, Florida Area''
+
+
+            na.us.fl.824: ''Tallahassee, Florida Area''
+
+
+            na.us.fl.828: ''Tampa/St. Petersburg, Florida Area''
+
+
+            na.us.fl.896: ''West Palm Beach, Florida Area''
+
+
+            na.us.ga: ''Georgia''
+
+
+            na.us.ga.52: ''Greater Atlanta Area''
+
+
+            na.us.ga.60: ''Augusta, Georgia Area''
+
+
+            na.us.ga.752: ''Savannah, Georgia Area''
+
+
+            na.us.hi: ''Hawaii''
+
+
+            na.us.hi.332: ''Hawaiian Islands''
+
+
+            na.us.ia: ''Iowa''
+
+
+            na.us.ia.196: ''Davenport, Iowa Area''
+
+
+            na.us.ia.212: ''Des Moines, Iowa Area''
+
+
+            na.us.id: ''Idaho''
+
+
+            na.us.id.108: ''Boise, Idaho Area''
+
+
+            na.us.il: ''Illinois''
+
+
+            na.us.il.14: ''Greater Chicago Area''
+
+
+            na.us.il.140: ''Urbana-Champaign, Illinois Area''
+
+
+            na.us.il.612: ''Peoria, Illinois Area''
+
+
+            na.us.il.688: ''Rockford, Illinois Area''
+
+
+            na.us.in: ''Indiana''
+
+
+            na.us.in.244: ''Evansville, Indiana Area''
+
+
+            na.us.in.276: ''Fort Wayne, Indiana Area''
+
+
+            na.us.in.348: ''Indianapolis, Indiana Area''
+
+
+            na.us.ks: ''Kansas''
+
+
+            na.us.ks.904: ''Wichita, Kansas Area''
+
+
+            na.us.ky: ''Kentucky''
+
+
+            na.us.ky.428: ''Lexington, Kentucky Area''
+
+
+            na.us.ky.452: ''Louisville, Kentucky Area''
+
+
+            na.us.la: ''Louisiana''
+
+
+            na.us.la.556: ''Greater New Orleans Area''
+
+
+            na.us.la.76: ''Baton Rouge, Louisiana Area''
+
+
+            na.us.ma: ''Massachusetts''
+
+
+            na.us.ma.7: ''Greater Boston Area''
+
+
+            na.us.ma.800: ''Springfield, Massachusetts Area''
+
+
+            na.us.md: ''Maryland''
+
+
+            na.us.md.7416: ''Baltimore, Maryland Area''
+
+
+            na.us.me: ''Maine''
+
+
+            na.us.me.640: ''Portland, Maine Area''
+
+
+            na.us.mi: ''Michigan''
+
+
+            na.us.mi.300: ''Greater Grand Rapids, Michigan Area''
+
+
+            na.us.mi.35: ''Greater Detroit Area''
+
+
+            na.us.mi.372: ''Kalamazoo, Michigan Area''
+
+
+            na.us.mi.404: ''Lansing, Michigan Area''
+
+
+            na.us.mi.696: ''Saginaw, Michigan Area''
+
+
+            na.us.mn: ''Minnesota''
+
+
+            na.us.mn.512: ''Greater Minneapolis-St. Paul Area''
+
+
+            na.us.mo: ''Missouri''
+
+
+            na.us.mo.174: ''Columbia, Missouri Area''
+
+
+            na.us.mo.376: ''Kansas City, Missouri Area''
+
+
+            na.us.mo.704: ''Greater St. Louis Area''
+
+
+            na.us.mo.792: ''Springfield, Missouri Area''
+
+
+            na.us.ms: ''Mississippi''
+
+
+            na.us.ms.356: ''Jackson, Mississippi Area''
+
+
+            na.us.mt: ''Montana''
+
+
+            na.us.nc: ''North Carolina''
+
+
+            na.us.nc.152: ''Charlotte, North Carolina Area''
+
+
+            na.us.nc.312: ''Greensboro/Winston-Salem, North Carolina Area''
+
+
+            na.us.nc.48: ''Asheville, North Carolina Area''
+
+
+            na.us.nc.664: ''Raleigh-Durham, North Carolina Area''
+
+
+            na.us.nc.920: ''Wilmington, North Carolina Area''
+
+
+            na.us.nd: ''North Dakota''
+
+
+            na.us.ne: ''Nebraska''
+
+
+            na.us.ne.436: ''Lincoln, Nebraska Area''
+
+
+            na.us.ne.592: ''Greater Omaha Area''
+
+
+            na.us.nh: ''New Hampshire''
+
+
+            na.us.nj: ''New Jersey''
+
+
+            na.us.nm: ''New Mexico''
+
+
+            na.us.nm.20: ''Albuquerque, New Mexico Area''
+
+
+            na.us.nv: ''Nevada''
+
+
+            na.us.nv.412: ''Las Vegas, Nevada Area''
+
+
+            na.us.nv.672: ''Reno, Nevada Area''
+
+
+            na.us.ny: ''New York''
+
+
+            na.us.ny.128: ''Buffalo/Niagara, New York Area''
+
+
+            na.us.ny.16: ''Albany, New York Area''
+
+
+            na.us.ny.684: ''Rochester, New York Area''
+
+
+            na.us.ny.70: ''Greater New York City Area''
+
+
+            na.us.ny.816: ''Syracuse, New York Area''
+
+
+            na.us.ny.96: ''Ithaca, New York Area''
+
+
+            na.us.oh: ''Ohio''
+
+
+            na.us.oh.184: ''Columbus, Ohio Area''
+
+
+            na.us.oh.200: ''Dayton, Ohio Area''
+
+
+            na.us.oh.21: ''Cincinnati Area''
+
+
+            na.us.oh.28: ''Cleveland/Akron, Ohio Area''
+
+
+            na.us.oh.840: ''Toledo, Ohio Area''
+
+
+            na.us.ok: ''Oklahoma''
+
+
+            na.us.ok.588: ''Oklahoma City, Oklahoma Area''
+
+
+            na.us.ok.856: ''Tulsa, Oklahoma Area''
+
+
+            na.us.or: ''Oregon''
+
+
+            na.us.or.240: ''Eugene, Oregon Area''
+
+
+            na.us.or.79: ''Portland, Oregon Area''
+
+
+            na.us.pa: ''Pennsylvania''
+
+
+            na.us.pa.24: ''Allentown, Pennsylvania Area''
+
+
+            na.us.pa.324: ''Harrisburg, Pennsylvania Area''
+
+
+            na.us.pa.400: ''Lancaster, Pennsylvania Area''
+
+
+            na.us.pa.628: ''Greater Pittsburgh Area''
+
+
+            na.us.pa.756: ''Scranton, Pennsylvania Area''
+
+
+            na.us.pa.77: ''Greater Philadelphia Area''
+
+
+            na.us.ri: ''Rhode Island''
+
+
+            na.us.ri.648: ''Providence, Rhode Island Area''
+
+
+            na.us.sc: ''South Carolina''
+
+
+            na.us.sc.144: ''Charleston, South Carolina Area''
+
+
+            na.us.sc.176: ''Columbia, South Carolina Area''
+
+
+            na.us.sc.316: ''Greenville, South Carolina Area''
+
+
+            na.us.sd: ''South Dakota''
+
+
+            na.us.sd.776: ''Sioux Falls, South Dakota Area''
+
+
+            na.us.tn: ''Tennessee''
+
+
+            na.us.tn.156: ''Chattanooga, Tennessee Area''
+
+
+            na.us.tn.366: ''Johnson City, Tennessee Area''
+
+
+            na.us.tn.384: ''Knoxville, Tennessee Area''
+
+
+            na.us.tn.492: ''Greater Memphis Area''
+
+
+            na.us.tn.536: ''Greater Nashville Area''
+
+
+            na.us.tx: ''Texas''
+
+
+            na.us.tx.232: ''El Paso, Texas Area''
+
+
+            na.us.tx.31: ''Dallas/Fort Worth Area''
+
+
+            na.us.tx.42: ''Houston, Texas Area''
+
+
+            na.us.tx.64: ''Austin, Texas Area''
+
+
+            na.us.tx.724: ''San Antonio, Texas Area''
+
+
+            na.us.ut: ''Utah''
+
+
+            na.us.ut.652: ''Provo, Utah Area''
+
+
+            na.us.ut.716: ''Greater Salt Lake City Area''
+
+
+            na.us.va: ''Virginia''
+
+
+            na.us.va.154: ''Charlottesville, Virginia Area''
+
+
+            na.us.va.572: ''Norfolk, Virginia Area''
+
+
+            na.us.va.676: ''Richmond, Virginia Area''
+
+
+            na.us.va.680: ''Roanoke, Virginia Area''
+
+
+            na.us.vt: ''Vermont''
+
+
+            na.us.vt.130: ''Burlington, Vermont Area''
+
+
+            na.us.wa: ''Washington''
+
+
+            na.us.wa.784: ''Spokane, Washington Area''
+
+
+            na.us.wa.91: ''Greater Seattle Area''
+
+
+            na.us.wi: ''Wisconsin''
+
+
+            na.us.wi.308: ''Green Bay, Wisconsin Area''
+
+
+            na.us.wi.46: ''Oshkosh, Wisconsin Area''
+
+
+            na.us.wi.472: ''Madison, Wisconsin Area''
+
+
+            na.us.wi.63: ''Greater Milwaukee Area''
+
+
+            na.us.wv: ''West Virginia''
+
+
+            na.us.wy: ''Wyoming''
+
+
+            oc: ''Oceania''
+
+
+            oc.au: ''Australia''
+
+
+            oc.au.*.4886: ''Adelaide Area, Australia''
+
+
+            oc.au.*.4893: ''Canberra Area, Australia''
+
+
+            oc.au.*.4900: ''Melbourne Area, Australia''
+
+
+            oc.au.*.4905: ''Perth Area, Australia''
+
+
+            oc.au.*.4909: ''Brisbane Area, Australia''
+
+
+            oc.au.*.4910: ''Sydney Area, Australia''
+
+
+            oc.nz: ''New Zealand''
+
+            '
+          items:
+            type: string
+            example: as.jp
+        industry:
+          type: array
+          description: 'Industry to target the message at.
+
+
+            63: ''Agriculture - Farming''
+
+
+            64: ''Agriculture - Ranching''
+
+
+            65: ''Agriculture - Dairy''
+
+
+            66: ''Agriculture - Fishery''
+
+
+            35: ''Arts - Motion Pictures and Film''
+
+
+            37: ''Arts - Museums and Institutions''
+
+
+            38: ''Arts - Fine Art''
+
+
+            39: ''Arts - Performing Arts''
+
+
+            99: ''Arts - Design''
+
+
+            111: ''Arts - Arts and Crafts''
+
+
+            115: ''Arts - Music''
+
+
+            136: ''Arts - Photography''
+
+
+            140: ''Arts - Graphic Design''
+
+
+            48: ''Construction - Construction''
+
+
+            49: ''Construction - Building Materials''
+
+
+            50: ''Construction - Architecture & Planning''
+
+
+            51: ''Construction - Civil Engineering''
+
+
+            18: ''Consumer Goods - Cosmetics''
+
+
+            19: ''Consumer Goods - Apparel & Fashion''
+
+
+            20: ''Consumer Goods - Sporting Goods''
+
+
+            21: ''Consumer Goods - Tobacco''
+
+
+            22: ''Consumer Goods - Supermarkets''
+
+
+            23: ''Consumer Goods - Food Production''
+
+
+            24: ''Consumer Goods - Consumer Electronics''
+
+
+            25: ''Consumer Goods - Consumer Goods''
+
+
+            26: ''Consumer Goods - Furniture''
+
+
+            27: ''Consumer Goods - Retail''
+
+
+            133: ''Consumer Goods - Wholesale''
+
+
+            134: ''Consumer Goods - Import and Export''
+
+
+            142: ''Consumer Goods - Wine and Spirits''
+
+
+            143: ''Consumer Goods - Luxury Goods & Jewelry''
+
+
+            11: ''Corporate - Management Consulting''
+
+
+            80: ''Corporate - Marketing and Advertising''
+
+
+            97: ''Corporate - Market Research''
+
+
+            98: ''Corporate - Public Relations and Communications''
+
+
+            104: ''Corporate - Staffing and Recruiting''
+
+
+            105: ''Corporate - Professional Training & Coaching''
+
+
+            121: ''Corporate - Security and Investigations''
+
+
+            122: ''Corporate - Facilities Services''
+
+
+            123: ''Corporate - Outsourcing/Offshoring''
+
+
+            137: ''Corporate - Human Resources''
+
+
+            138: ''Corporate - Business Supplies and Equipment''
+
+
+            67: ''Educational - Primary/Secondary Education''
+
+
+            68: ''Educational - Higher Education''
+
+
+            69: ''Educational - Education Management''
+
+
+            70: ''Educational - Research''
+
+
+            132: ''Educational - E-Learning''
+
+
+            41: ''Finance - Banking''
+
+
+            42: ''Finance - Insurance''
+
+
+            43: ''Finance - Financial Services''
+
+
+            44: ''Finance - Real Estate''
+
+
+            45: ''Finance - Investment Banking''
+
+
+            46: ''Finance - Investment Management''
+
+
+            47: ''Finance - Accounting''
+
+
+            106: ''Finance - Venture Capital & Private Equity''
+
+
+            128: ''Finance - Commercial Real Estate''
+
+
+            129: ''Finance - Capital Markets''
+
+
+            71: ''Government - Military''
+
+
+            72: ''Government - Legislative Office''
+
+
+            73: ''Government - Judiciary''
+
+
+            74: ''Government - International Affairs''
+
+
+            75: ''Government - Government Administration''
+
+
+            76: ''Government - Executive Office''
+
+
+            77: ''Government - Law Enforcement''
+
+
+            78: ''Government - Public Safety''
+
+
+            79: ''Government - Public Policy''
+
+
+            107: ''Government - Political Organization''
+
+
+            148: ''Government - Government Relations''
+
+
+            1:  ''High Tech - Defense & Space''
+
+
+            3:  ''High Tech - Computer Hardware''
+
+
+            4:  ''High Tech - Computer Software''
+
+
+            5:  ''High Tech - Computer Networking''
+
+
+            6:  ''High Tech - Internet''
+
+
+            7:  ''High Tech - Semiconductors''
+
+
+            8:  ''High Tech - Telecommunications''
+
+
+            96: ''High Tech - Information Technology and Services''
+
+
+            114: ''High Tech - Nanotechnology''
+
+
+            118: ''High Tech - Computer & Network Security''
+
+
+            119: ''High Tech - Wireless''
+
+
+            9:  ''Legal - Law Practice''
+
+
+            10: ''Legal - Legal Services''
+
+
+            120: ''Legal - Alternative Dispute Resolution''
+
+
+            52: ''Manufacturing - Aviation & Aerospace''
+
+
+            53: ''Manufacturing - Automotive''
+
+
+            54: ''Manufacturing - Chemicals''
+
+
+            55: ''Manufacturing - Machinery''
+
+
+            56: ''Manufacturing - Mining & Metals''
+
+
+            57: ''Manufacturing - Oil & Energy''
+
+
+            58: ''Manufacturing - Shipbuilding''
+
+
+            59: ''Manufacturing - Utilities''
+
+
+            60: ''Manufacturing - Textiles''
+
+
+            61: ''Manufacturing - Paper & Forest Products''
+
+
+            62: ''Manufacturing - Railroad Manufacture''
+
+
+            112: ''Manufacturing - Electrical/Electronic Manufacturing''
+
+
+            117: ''Manufacturing - Plastics''
+
+
+            135: ''Manufacturing - Mechanical or Industrial Engineering''
+
+
+            144: ''Manufacturing - Renewables & Environment''
+
+
+            145: ''Manufacturing - Glass, Ceramics & Concrete''
+
+
+            146: ''Manufacturing - Packaging and Containers''
+
+
+            147: ''Manufacturing - Industrial Automation''
+
+
+            36: ''Media - Broadcast Media''
+
+
+            81: ''Media - Newspapers''
+
+
+            82: ''Media - Publishing''
+
+
+            83: ''Media - Printing''
+
+
+            103: ''Media - Writing and Editing''
+
+
+            113: ''Media - Online Media''
+
+
+            126: ''Media - Media Production''
+
+
+            127: ''Media - Animation''
+
+
+            12: ''Medical - Biotechnology''
+
+
+            13: ''Medical - Medical Practice''
+
+
+            14: ''Medical - Hospital & Health Care''
+
+
+            15: ''Medical - Pharmaceuticals''
+
+
+            16: ''Medical - Veterinary''
+
+
+            17: ''Medical - Medical Devices''
+
+
+            124: ''Medical - Health, Wellness and Fitness''
+
+
+            125: ''Medical - Alternative Medicine''
+
+
+            139: ''Medical - Mental Health Care''
+
+
+            91: ''Non-profit - Consumer Services''
+
+
+            100: ''Non-profit - Non-profit Organization Management''
+
+
+            101: ''Non-profit - Fund-Raising''
+
+
+            102: ''Non-profit - Program Development''
+
+
+            130: ''Non-profit - Think Tanks''
+
+
+            131: ''Non-profit - Philanthropy''
+
+
+            141: ''Non-profit - International Trade and Development''
+
+
+            28: ''Recreational - Entertainment''
+
+
+            29: ''Recreational - Gambling & Casinos''
+
+
+            30: ''Recreational - Leisure, Travel & Tourism''
+
+
+            31: ''Recreational - Hospitality''
+
+
+            32: ''Recreational - Restaurants''
+
+
+            33: ''Recreational - Sports''
+
+
+            34: ''Recreational - Food & Beverages''
+
+
+            40: ''Recreational - Recreational Facilities and Services''
+
+
+            109: ''Recreational - Computer Games''
+
+
+            110: ''Recreational - Events Services''
+
+
+            84: ''Service - Information Services''
+
+
+            85: ''Service - Libraries''
+
+
+            86: ''Service - Environmental Services''
+
+
+            88: ''Service - Individual & Family Services''
+
+
+            89: ''Service - Religious Institutions''
+
+
+            90: ''Service - Civic & Social Organization''
+
+
+            108: ''Service - Translation and Localization''
+
+
+            87: ''Transportation - Package/Freight Delivery''
+
+
+            92: ''Transportation - Transportation/Trucking/Railroad''
+
+
+            93: ''Transportation - Warehousing''
+
+
+            94: ''Transportation - Airlines/Aviation''
+
+
+            95: ''Transportation - Maritime''
+
+
+            116: ''Transportation - Logistics and Supply Chain''
+
+            '
+          items:
+            type: string
+            example: '41'
+        jobFunction:
+          type: array
+          description: 'Job function to target the message at.
+
+
+            acad: ''Research''
+
+
+            acct: ''Accounting''
+
+
+            admn: ''Administrative''
+
+
+            bd:   ''Business Development''
+
+
+            buy:  ''Purchasing''
+
+
+            cnsl: ''Consulting''
+
+
+            cre:  ''Arts and Design''
+
+
+            css:  ''Community and Social Services''
+
+
+            edu:  ''Education''
+
+
+            eng:  ''Engineering''
+
+
+            ent:  ''Entrepreneurship''
+
+
+            finc: ''Finance''
+
+
+            hr:   ''Human Resources''
+
+
+            it:   ''Information Technology''
+
+
+            lgl:  ''Legal''
+
+
+            med:  ''Healthcare Services''
+
+
+            mktg: ''Marketing''
+
+
+            mps:  ''Military and Protective Services''
+
+
+            ops:  ''Operations''
+
+
+            ppm:  ''Program and Project Management''
+
+
+            pr:   ''Media and Communication''
+
+
+            prod: ''Product Management''
+
+
+            qa:   ''Quality Assurance''
+
+
+            re:   ''Real Estate''
+
+
+            sale: ''Sales''
+
+
+            supp: ''Support''
+
+            '
+          items:
+            type: string
+            example: qa
+        seniority:
+          type: array
+          description: 'Seniority to target the message at.
+
+
+            c:  ''Chief X Officer''
+
+
+            d:  ''Director''
+
+
+            en: ''Entry''
+
+
+            ic: ''Senior''
+
+
+            m:  ''Manager''
+
+
+            o:  ''Owner''
+
+
+            p:  ''Partner''
+
+
+            tr: ''Training''
+
+
+            up: ''Unpaid''
+
+
+            vp: ''Vice President''
+
+            '
+          items:
+            type: string
+            example: en
+    LinkedInV2CompanyTargeting:
+      description: Targeting options for LinkedIn Company V2.
+      type: object
+      properties:
+        locations:
+          type: array
+          description: "Locations to target the message at, expected format of urn:li:geo:{CODE}. [Geo Locations reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/standardized-data/locations/geo), \n[Geo Typeahead Locations reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/standardized-data/locations/geo-typeahead?tabs=http)\n"
+          items:
+            type: string
+          example:
+          - urn:li:geo:103644278
+          - urn:li:geo:102095887
+        staffCountRanges:
+          type: array
+          description: 'Staff count to target the message at, expected format of SIZE_{VALUES}.
+
+            Valid values: SIZE_1, SIZE_2_TO_10, SIZE_11_TO_50, SIZE_51_TO_200, SIZE_201_TO_500, SIZE_501_TO_1000,
+
+            SIZE_1001_TO_5000, SIZE_5001_TO_10000, SIZE_10001_OR_MORE
+
+            [Staff count codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/company-size-codes)
+
+            '
+          items:
+            type: string
+          example:
+          - SIZE_1
+          - SIZE_51_TO_200
+          - SIZE_10001_OR_MORE
+        seniorities:
+          type: array
+          description: 'Seniorities to target the message at, expected format of urn:li:seniority:{CODE}. [Seniorities codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/seniority-codes)
+
+            '
+          items:
+            type: string
+          example:
+          - urn:li:seniority:1
+          - urn:li:seniority:2
+        industries:
+          type: array
+          description: 'Industries to target the message at, expected format of urn:li:industry:{CODE}. [Industries codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/industry-codes-v2)
+
+            '
+          items:
+            type: string
+          example:
+          - urn:li:industry:1
+          - urn:li:industry:2
+        interfaceLocales:
+          type: array
+          description: 'Languages to target the message at, expected format of {"country":"COUNTRY","language":"language"}. [Language codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/language-codes)
+
+            Languages can be interpreted as this format: language_COUNTRY, replace in request as necessary.
+
+            '
+          items:
+            type: object
+          example:
+          - country: US
+            language: en
+          - country: ES
+            language: es
+    RejectMessageRequest:
+      type: object
+      required:
+      - reason
+      - sequenceNumber
+      properties:
+        reason:
+          type: string
+          description: The rejection reason to be displayed to the creator of the message.
+          example: Message contains profanity
+        sequenceNumber:
+          type: integer
+          description: The sequence number of the message being rejected.
+          example: 11
+        reviewerType:
+          type: string
+          description: 'The actor that will be rejecting the message. Leaving this field empty will use "EXTERNAL" by default.
+
+
+            Using "MEMBER" requires that you use a member token to reject a message that is pending approval by that member.
+
+            '
+          enum:
+          - EXTERNAL
+          - MEMBER
+    ReviewAction:
+      type: object
+      properties:
+        actorType:
+          type: string
+          description: The type of actor who performed this review action.
+          example: MEMBER
+          enum:
+          - MEMBER
+          - SYSTEM
+          - EXTERNAL_REVIEW_V1
+        actorId:
+          type: string
+          description: The ID of the actor that performed this review action.
+          example: '12345678'
+        actionType:
+          type: string
+          description: The action performed.
+          example: CREATE
+          enum:
+          - CREATE
+          - APPROVE
+          - REJECT
+          - DELETE
+          - RESET
+          - EDIT
+          - EXPIRE
+          - SEND
+          - SCHEDULE
+          - SENDFAIL
+          - SCHEDULEFAIL
+        timestamp:
+          type: string
+          description: The time the review action was performed. Timezone is UTC.
+          example: 2017-02-15 18:51:13+00:00
+    Message:
+      type: object
+      properties:
+        text:
+          type: string
+          description: The message text to publish.
+          example: 5 trends that will change how we use social media this year http://owl.li/YuNr2
+        socialProfileIds:
+          type: array
+          description: The social profiles that the message will be posted to.
+          items:
+            type: string
+            example: '115185509'
+        scheduledSendTime:
+          type: string
+          description: The time the message is scheduled to be sent in UTC time, [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format. Missing or different timezones will not be accepted, to ensure there is no ambiguity about scheduled time. Dates must end with 'Z' to be accepted.
+          example: 2020-01-01 14:00:00+00:00
+        webhookUrls:
+          type: array
+          description: The webhook URL(s) to call to when the message’s state changes.
+          items:
+            type: string
+            example: https://myserver.com/inbound
+        tags:
+          type: array
+          description: The Hootsuite message tags to apply to the message. To set tags the social profile must belong to an organization. Tags are case sensitive. Limited permission members can only use the existing tags for organization and cannot create new ones. See more about message tags at the Hootsuite Help Center.<br/>Not supported by Pinterest.
+          items:
+            type: string
+            example: test_tag
+        targeting:
+          $ref: '#/components/schemas/TargetingOptions'
+        privacy:
+          $ref: '#/components/schemas/PrivacyOptions'
+        location:
+          $ref: '#/components/schemas/Location'
+        emailNotification:
+          type: boolean
+          description: A flag to determine whether email notifications are sent when the message is published.
+          example: true
+        mediaUrls:
+          type: array
+          description: The ow.ly media to attach to the message
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                description: The media URL.
+                example: http://static.ow.ly/photos/normal/cS5.jpg
+        media:
+          type: array
+          description: The media to attach to the message
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The media ID.
+                example: aHR0cDovL2V4YW1wbGUub3Jn
+              videoOptions:
+                type: object
+                description: The metadata to set for a video.
+                properties:
+                  facebook:
+                    type: object
+                    description: Facebook video metadata. Optional.
+                    properties:
+                      title:
+                        type: string
+                        description: The video title
+                        example: My Video
+                      category:
+                        type: string
+                        description: The video category
+                        example: ENTERTAINMENT
+                        enum:
+                        - BEAUTY_FASHION
+                        - BUSINESS
+                        - CARS_TRUCKS
+                        - COMEDY
+                        - CUTE_ANIMALS
+                        - ENTERTAINMENT
+                        - FAMILY
+                        - FOOD_HEALTH
+                        - HOME
+                        - LIFESTYLE
+                        - MUSIC
+                        - NEWS
+                        - POLITICS
+                        - SCIENCE
+                        - SPORTS
+                        - TECHNOLOGY
+                        - VIDEO_GAMING
+                        - OTHER
+        extendedInfo:
+          type: array
+          description: Object used to send social profile metadata. Only available for Pinterest messages at this time.
+          items:
+            type: object
+            properties:
+              socialProfileType:
+                type: string
+                description: The social profile type that this extendedInfo object is for.
+                example: PINTEREST
+                enum:
+                - PINTEREST
+              socialProfileId:
+                type: string
+                description: The social profile ID that this extendedInfo object is for.
+                example: '123456789'
+              data:
+                type: object
+                description: Social profile specific metadata.
+                properties:
+                  boardId:
+                    type: string
+                    description: Pinterest board ID for Pin
+                    example: '123456789012345678'
+                  destinationUrl:
+                    type: string
+                    description: Website for Pin
+                    example: https://www.hootsuite.com
+    PrivacyOptions:
+      type: object
+      description: Social network privacy options to be applied when publishing the message.
+      properties:
+        facebook:
+          $ref: '#/components/schemas/FacebookPrivacy'
+        linkedIn:
+          $ref: '#/components/schemas/LinkedInPrivacy'
+    EmptyDataEnvelope:
+      type: object
+      properties:
+        data:
+          description: The data response envelope.
+          type: object
+    FacebookPrivacy:
+      type: object
+      properties:
+        visibility:
+          type: array
+          description: Facebook visibility rules. At most 1 can be used.
+          items:
+            type: string
+            example: everyone
+            enum:
+            - everyone
+            - friends
+            - friendsOfFriends
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The media ID.
+          example: aHR0cDovL2V4YW1wbGUub3Jn
+        thumbnailId:
+          type: string
+          description: The thumbnail media ID.
+          example: aHR0cDovL2V4YW1wbGUtMDAwMS5vcmc=
+        videoOptions:
+          type: object
+          description: The metadata to set for a video.
+          properties:
+            facebook:
+              type: object
+              description: Facebook video metadata. Optional.
+              properties:
+                title:
+                  type: string
+                  description: The video title
+                  example: My Video
+                category:
+                  type: string
+                  description: The video category
+                  example: ENTERTAINMENT
+                  enum:
+                  - BEAUTY_FASHION
+                  - BUSINESS
+                  - CARS_TRUCKS
+                  - COMEDY
+                  - CUTE_ANIMALS
+                  - ENTERTAINMENT
+                  - FAMILY
+                  - FOOD_HEALTH
+                  - HOME
+                  - LIFESTYLE
+                  - MUSIC
+                  - NEWS
+                  - POLITICS
+                  - SCIENCE
+                  - SPORTS
+                  - TECHNOLOGY
+                  - VIDEO_GAMING
+                  - OTHER
+      description: The media attached to the message.
+    SocialProfileMessageResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SocialProfileMessage'
+      description: The response data wrapper for a social profile message
+    Reviewer:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The reviewer member ID.
+          example: 22421144
+        type:
+          type: string
+          description: The reviewer type
+          example: MESSAGE_LEVEL
+          enum:
+          - MESSAGE_LEVEL
+          - TEAM
+          - MEMBER
+          - EXTERNAL
+          - SYSTEM
+          - ADMIN_AND_EDITOR
+          - ORGANIZATION
+      description: Member that was requested to approve the message
+  parameters:
+    bearerToken:
+      in: header
+      name: Authorization
+      description: A bearer token string used for authentication
+      required: true
+      schema:
+        type: string
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://platform.hootsuite.com/oauth2/auth
+          tokenUrl: https://platform.hootsuite.com/oauth2/token
+          scopes:
+            offline: Request refresh tokens
+            analytics:read: Request analytics API access
+    Basic_Auth:
+      type: http
+      scheme: basic
+x-provenance:
+  generated: '2026-08-13'
+  method: searched
+  source: https://apidocs.hootsuite.com/docs/api/swagger.yaml
+  note: First-party Hootsuite REST API contract. Discovered from the ReDoc loader at https://platform.hootsuite.com/docs/api/index.html (spec-url ./swagger.yaml) and confirmed as the canonical service-desc link in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog. Published as Swagger 2.0; converted to OpenAPI 3.0 with swagger2openapi 7 for this working copy. The verbatim Swagger 2.0 source is kept at openapi/_original/hootsuite-rest-api-swagger.yaml.
+  ownership: host platform.hootsuite.com, info.title "Hootsuite REST API", contact dev.support@hootsuite.com - the contract identifies itself as Hootsuite's.

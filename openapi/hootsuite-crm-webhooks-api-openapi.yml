@@ -1,0 +1,431 @@
+openapi: 3.2.0
+info:
+  title: Inbox 2.0 API Reference CRM Webhooks API
+  description: Inbox 2.0 API Reference
+  version: v1
+  x-logo:
+    url: static/hootsuite-logo.png
+  contact:
+    email: dev.support@hootsuite.com
+  license:
+    name: Hootsuite Developer Terms and API License Agreement
+    url: https://hootsuite.com/legal/dev-api-terms
+servers:
+- url: https://platform.hootsuite.com
+  description: Inbox 2.0 production server
+security:
+- bearer-token: []
+tags:
+- name: crm_webhooks
+  x-displayName: Webhooks
+  description: "### Webhook authentication\n\nWhen receiving data from Inbox 2.0, we provide two authentication options. Both mechanisms are in place so that you can make sure the request originates from Inbox 2.0.\n\n#### Shared secret\n\nIf you choose the shared secret authentication method, a secret will be generated for you. This secret allows you to calculate the signature to verify that the call originated from Inbox 2.0. With this mechanism, every single request from Inbox 2.0 contains the `X-Hootsuite-Signature` header. Here's an example of a request:\n\n```shell\ncurl -X POST https://my-webhook-url \\\n  -H 'content-type : application/json' \\\n  -H 'accept: application/json' \\\n  -H 'X-Hootsuite-Signature: e6f93239a06e46ae9654fc9ad2fb4e1cc4eb213830a0d94e711570c047e43c57' \\\n  -d '{\n        \"version\": 2,\n        \"contactProfile\": {\n          \"id\": \"a7a20053-9c54-11eb-a89f-47717a44c639\"\n        },\n        \"contactAttributes\": [\n          {\"attribute\": \"email\", \"value\": \"fj@example.com\"}\n        ]\n      }'\n```\n\nThe signature is generated using the `HMAC-SHA256` algorithm with the shared secret and the request body. \nUse your secret to calculate the signature and compare with the given signature. \nBoth the secret key you received and the signature are encoded as hexadecimal strings. \nMake sure to convert the shared secret from its hexadecimal representation to its binary format before using it. \nMost languages come with libraries out of the box to verify this signature. \nFor example, here's how it looks in JavaScript:\n\n```javascript\nconst crypto = require(\"crypto\");\nconst secret = \"...\"; // do not share!\nconst expectedSignature = request.headers[\"X-Hootsuite-Signature\"];\nconst actualSignature = crypto\n    .createHmac(\"sha256\", Buffer.from(secret, \"hex\"))\n    .update(request.body, \"utf-8\")\n    .digest(\"hex\");\nif (actualSignature !== expectedSignature) {\n    throw new createError.Unauthorized(\"X-Hootsuite-Signature wrong\");\n}\nconsole.log(JSON.parse(request.body).email);\n```\n\n#### OAuth\n\nIf your endpoints support OAuth2, you can configure your client credentials, a Token URL, and, optionally, a Scope in Inbox 2.0.\n\nWe use the OAuth2 Client Credentials flow to authenticate against your CRM. The Token URL is the endpoint where we can authenticate with these credentials and retrieve an access token. To do the actual lookup, write back, or notification requests, we use the token in the Authorization Header to authenticate.\n"
+paths: {}
+webhooks:
+  crm-attribute-lookup:
+    post:
+      summary: Contact attribute lookup
+      description: "Inbox 2.0 CRM integration allows you to pull customer contact data from CRMs or other internal business applications into Inbox 2.0. To integrate your CRM with Inbox 2.0, you need to provide an HTTPS endpoint for lookups.\n\n### Create contact attributes\n\n1.  In Inbox 2.0, go to `Admin settings`, expand `Agent Workspace`, select `Contact attributes`, and then select `Add attribute`.\n2.  Select `Managed by CRM`. The CRM is the source of truth for these attributes. After they are imported into Inbox 2.0, they only change when the value changes in the CRM.\n3.  Identify lookup attributes by selecting `Use as lookup attribute`. These are used by the CRM to find a customer's data. For example, if you want to find a customer by email address, create an attribute called \"Email\" and designate it as a lookup. When the request is made from Inbox 2.0 to your CRM, the lookup fields are included in the request body.\n4.  In the `Unique identifier` box, enter an alias for the lookup attribute. This is used to map the response from your system to the attribute.\n\n### Configure integration URL\n\nTo pull data from your CRM into Inbox 2.0, you need to implement a POST endpoint that accepts a JSON request and returns a JSON response. The request contains the lookup attributes, and the response should contain the contact data from your CRM.\n\nAfter the endpoint is implemented, configure it as the lookup URL:\n\n1.  Go to `Admin settings`.\n2.  Expand `Integration and APIs`.\n3.  Select `CRM`.\n\n### Handle the request\n\nWhen the endpoint in your system is ready and configured in Inbox 2.0, and one or more lookup attributes have been identified, you can make a request via the `Lookup` button in the conversation view.\nThis will trigger the CRM attribute lookup event.\n\nAfter you've done the lookup in your system, pass attributes back to Inbox 2.0 as a JSON response. The keys in the attributes object correspond to the aliases that were previously added in Inbox 2.0. If a CRM managed attribute is missing from the object or the key has a `null` value, its value is deleted in Inbox 2.0. Inbox 2.0 expects the response in this format:\n\n```json\n{\n    \"autoConfirm\": false,\n    \"contactAttributes\": [\n        {\"attribute\": \"email\", \"value\": \"fj@example.com\"},\n        {\"attribute\": \"id\", \"value\": \"98765432\"},\n        {\"attribute\": \"first_name\", \"value\": \"Fred\"},\n        {\"attribute\": \"last_name\", \"value\": \"Jones\"},\n        {\"attribute\": \"last_order_number\", null}\n    ]\n}\n```\n\n### Asynchronous Response\nYou can also return a 200 OK back without a body and call our REST api to send back the result of the lookup request.\nCall the following REST endpoint:\n\n```bash\ncurl --request PUT 'https://platform.hootsuite.com/inbox/v2/contact/{contactProfileId}/contact-attributes' \\\n--header 'content-type: application/json' \\\n--header 'Authorization: BEARER <token>' \\\n--data-raw '{\n              \"autoConfirm\": false,\n              \"contactAttributes\": [\n                {\"attribute\": \"email\", \"value\": \"fj@example.com\"},\n                {\"attribute\": \"id\", \"value\": \"98765432\"},\n                {\"attribute\": \"first_name\", \"value\": \"Fred\"},\n                {\"attribute\": \"last_name\", \"value\": \"Jones\"},\n                {\"attribute\": \"last_order_number\", null}\n              ]\n            }'\n```\n\n### Confirm your attributes\n\nThe CRM attributes sent back in the response must be confirmed before they are saved in Inbox 2.0. There are two ways to do that:\n\n  -   Select the `Confirm` button when you see the CRM attributes displayed in Inbox 2.0 after the lookup request.\n  -   Add an `autoConfirm` field to the response.\n\nThe `autoConfirm` field tells Inbox 2.0 to automatically save the attributes without having to use the `Confirm` button.\n"
+      operationId: crmAttributeLookup
+      security:
+      - Oauth2ClientCredentials: []
+      - SharedSecret: []
+      tags:
+      - crm_webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: JSON object containing the lookup attributes
+              additionalProperties:
+                type: string
+            example:
+              my-customer-id: '123'
+      responses:
+        '200':
+          description: 'Returns the attributes to be updated in Inbox 2.0.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrmLookupAttributesResponse'
+        4xx:
+          description: 'Lookup failed
+
+            '
+        5xx:
+          description: 'Lookup failed
+
+            '
+  crm-error-notifications:
+    post:
+      summary: Contact attribute lookup error notifications event
+      description: "When attribute update validation errors occur, Inbox 2.0 sends a request to the configured notification URL.\n\n### Configure notification URL\n\nWhen you send your CRM managed contact attributes, Inbox 2.0 does some validation on the response. To see validation errors, we've provided a way to send notifications from Inbox 2.0 to your system. You need to provide a POST endpoint that accepts a JSON request body. Configure a notification URL on the same screen where you configured a lookup URL:\n\n  1.  Go to `Admin settings`.\n  2.  Expand `Integration and APIs`.\n  3.  Select `CRM`.\n\n### Handle the request\n\nWhen validation errors occur, Inbox 2.0 sends a request to the configured notification URL. A request [looks like this](#operation/crmAttributeLookupValidationErrorNotification).\n\nThe request contains these two fields:\n\n  -   eventType\n  -   messages: an array of explicit error messages\n\nThe following are the event types that can be sent by Inbox 2.0.\n\n| Event type        | Description                                                 |\n|-------------------|-------------------------------------------------------------|\n| DATA_IMPORT_ERROR | Error occurred while pulling data from the CRM to Inbox 2.0. |\n\nThe response to this request can be a 204. Inbox 2.0 does not expect anything in the response body.\n"
+      operationId: crmContactAttributeLookupErrorNotification
+      security:
+      - Oauth2ClientCredentials: []
+      - SharedSecret: []
+      tags:
+      - crm_webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrmErrorNotificationsRequest'
+      responses:
+        '204':
+          description: 'To indicate that the notification was received successfully
+
+            '
+        4xx:
+          description: 'Could not process notification
+
+            '
+        5xx:
+          description: 'Could not process notification
+
+            '
+  crm-write-back:
+    post:
+      summary: 'CRM write back event
+
+        '
+      description: "# CRM write back\n\nYou can be notified whenever a conversation has taken place in Inbox 2.0 (`CONVERSATION_RESOLVED`) or an agent has set a current conversation to Pending (`CONVERSATION_SET_TO_PENDING`). This allows you to save conversation details to your existing CRM system. Other use cases include triggering CSAT surveys, case creation, and expanded customer insights from social media profiles.\n\n### Configure write back URL\n\nTo push data from Inbox 2.0 into your CRM, you need to implement a POST endpoint that accepts a JSON request and returns a JSON response. The request contains write back payload, and the response's status code represents your ability to parse the payload and the CRM's ability to ingest the data.\n\nConfigure the endpoint as the `Write Back URL`:\n\n  1.  Go to `Admin settings`.\n  2.  Expand `Integration and APIs`.\n  3.  Select `CRM`.\n\n### Handle the request\n\nWhen the endpoint in your system is ready and configured in Inbox 2.0, and relevant events occur within Inbox 2.0, requests are sent to the configured endpoint. All decoded write back payloads have the following fields:\n\n  -   `type`: A string that defines what kind of write back request is being processed. Used to suggest the structure of the `data` field.\n  -   `version`: A number designating the version of the `type` of request. Used to mark changes to the `data` field structure.\n  -   `idempotencyKey`: A string that uniquely identifies each event to write back. Used to help ensure that each request is processed only once.\n  -   `data`: An object that contains structured data for the specific `type` of write back. For example, a `CONVERSATION_RESOLVED` type event has fields such as `medium`, `channel`, `messages`\\*, `notes`, `topics`, `contactProfile`\\*, `attributes`\\*, and `agent`, among others.\n\n  `*` Applies to all mediums except Twitter. Twitter handle, tweets, and direct message transcripts, and Twitter medium contact attributes (Twitter name, number of followers, etc.), are not sent in the payload, to conform to Twitter's data use policies.\n\n### CONVERSATION_RESOLVED and CONVERSATION_SET_TO_PENDING events\n\nEvents with a type of either `CONVERSATION_RESOLVED` or `CONVERSATION_SET_TO_PENDING` have the structure defined.\n\n### Write back retry\n\nIf the write back request times out or the endpoint returns a non-success (2XX) status code, Inbox 2.0 retries with exponential backoffs. The requests are sent again with a delay of 1, 2, 4, 8, 16, and 32 hours after each retry (a total of 6 requests), as long as the request does not succeed. If the request still has not succeeded after 6 requests, we store the failed request details for future reference. We recommend that you inspect the endpoint logs regularly to ensure that write back requests are properly processed the first time. To distinguish between unique events, each request is given an Idempotency key.\n\n### Idempotency key\n\nThe write back requests from Inbox 2.0 make use of an Idempotency key, which allows the write back endpoint to ensure it processes each request once. This key helps when requests are sent multiple times during the retry schedule, so the endpoint can handle requests in an idempotent way. The key is unique per request.\n"
+      operationId: crmWriteBack
+      security:
+      - Oauth2ClientCredentials: []
+      - SharedSecret: []
+      tags:
+      - crm_webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrmWriteBackRequest'
+      responses:
+        2xx:
+          description: 'The response status code represents your ability to parse the payload and the CRM''s ability to ingest the data.
+
+            '
+        4xx:
+          description: 'The response status code represents your ability to parse the payload and the CRM''s ability to ingest the data. Any non-2XX response status code will be retried.
+
+            '
+        5xx:
+          description: 'The response status code represents your ability to parse the payload and the CRM''s ability to ingest the data. Any non-2XX response status code will be retried.
+
+            '
+components:
+  schemas:
+    CrmWriteBackRequest:
+      type: object
+      description: The request contains write back payload.
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: '2022-03-28T09:43:26.635984618Z'
+        idempotencyKey:
+          type: string
+          description: A string that uniquely identifies each event. Used to help ensure that each request is processed only once.
+          example: 6ebc6a78-d9e9-48be-b172-51eda40b7af8
+        version:
+          type: integer
+          description: 'A number designating the version of the `type` of request. Used to mark changes to the `data` field structure.
+
+            '
+          example: 1
+        type:
+          type: string
+          enum:
+          - CONVERSATION_RESOLVED
+          - CONVERSATION_SET_TO_PENDING
+          example: CONVERSATION_RESOLVED
+        data:
+          type: object
+          properties:
+            conversation:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 0ad42eef-a806-11eb-9642-f1ceb2f21def
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: '2022-03-28T09:42:27.004817183Z'
+                previousStatus:
+                  type: string
+                  enum:
+                  - new
+                  - pending
+                  - resolved
+                  example: resolved
+                currentStatus:
+                  type: string
+                  enum:
+                  - new
+                  - pending
+                  - resolved
+                  example: resolved
+            medium:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: fb
+            channel:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 0-02534c5ac04-000-261ad914
+                name:
+                  type: string
+                  example: Inbox 2.0 support channel
+            agent:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: '11599'
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Smith
+                email:
+                  type: string
+                  example: john.smith@hootsuite.com
+            contactProfile:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 693ed54b-a426-11eb-9363-cffd945b4b2f
+                mediumContactProfileId:
+                  type: string
+                  example: bb7b0f8f00cc989b97f0725b
+                primaryIdentifier:
+                  type: string
+                  example: John Smith
+                secondaryIdentifier:
+                  type: string
+                  example: '+32439487192'
+                pictureUrl:
+                  type: string
+                  example: https://example.com/my-picture.png
+            statusUpdatedReason:
+              type: string
+              example: 5fd023f6-2e66-11eb-be07-092841b0717d - Response Not Required
+            statusUpdatedComment:
+              type: string
+              example: not a question
+            messages:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  direction:
+                    type: string
+                    enum:
+                    - INBOUND
+                    - OUTBOUND
+                  text:
+                    type: string
+                example:
+                - id: 0ad20c0d-a806-11eb-9642-f799d0e531de
+                  direction: INBOUND
+                  text: I have a question
+                - id: 10664516-a806-11eb-9642-fbd9d431bd78
+                  direction: OUTBOUND
+                  text: How can I help you?
+            contactAttributes:
+              type: array
+              items:
+                type: object
+                properties:
+                  attribute:
+                    type: string
+                    example: null
+                  value:
+                    type: string
+                  source:
+                    type: string
+                    enum:
+                    - AGENT
+                    - MEDIUM
+                    - CRM_CONFIRMED
+              example:
+              - attribute: company
+                value: My company
+                source: AGENT
+              - attribute: fb-profile-name
+                value: John Smith
+                source: MEDIUM
+              - attribute: fb-profile-image
+                value: https://image.com/sticky/default_profile_images/default_profile_normal.png
+                source: MEDIUM
+              - attribute: email
+                value: john.smith@hootsuite.com
+                source: CRM_CONFIRMED
+              - attribute: first_name
+                value: John
+                source: CRM_CONFIRMED
+              - attribute: last_name
+                value: Smith
+                source: CRM_CONFIRMED
+              - attribute: company
+                value: Hootsuite
+                source: CRM_CONFIRMED
+            notes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  text:
+                    type: string
+                  creationUser:
+                    type: string
+                  creationTimestamp:
+                    type: string
+                    format: date-time
+              example:
+              - id: 8080a48b-3c70-11e1-8931-1e8999d73ad2
+                text: Here's a note on the conversation!
+                creationUser: 0-019bd608cfc-001-0c6a2f5b
+                creationTimestamp: '2018-06-28T00:17:09+00:00'
+            topics:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+              example:
+              - id: aa33389d-8a6a-11e8-b0d0-61f12b43ea29
+                name: Redeem Rewards
+              - id: ee089cc2-8a6a-11e8-b0d0-942d249592dc
+                name: Account Rewards
+    CrmErrorNotificationsRequest:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          example: 2
+        eventType:
+          type: string
+          enum:
+          - DATA_IMPORT_ERROR
+        messages:
+          type: array
+          description: an array of explicit error messages
+          items:
+            type: string
+          example:
+          - testMessage1 key:testKey1 value:testValue1
+          - testMessage2 key:testKey2 value:testValue2
+    CrmLookupAttributesResponse:
+      type: object
+      properties:
+        autoConfirm:
+          type: boolean
+          description: 'The `autoConfirm` field tells Inbox 2.0 to automatically save the attributes without having to use the `Confirm` button.
+
+            '
+        contactAttributes:
+          type: array
+          description: Array of JSON objects containing the lookup attributes
+          items:
+            additionalProperties:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                value:
+                  type: string
+      example:
+        autoConfirm: true
+        contactAttributes:
+        - attribute: email
+          value: fj@example.com
+        - attribute: id
+          value: '98765432'
+        - attribute: first_name
+          value: Fred
+        - attribute: last_name
+          value: Jones
+        - attribute: last_order_number
+          value: null
+  securitySchemes:
+    bearer-token:
+      type: http
+      scheme: bearer
+    basic-auth:
+      type: http
+      scheme: basic
+    Oauth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: TO_BE_CONFIGURED_IN_INBOX_2_0
+          scopes:
+            some_scope: TO_BE_CONFIGURED_IN_INBOX_2_0
+    SharedSecret:
+      type: apiKey
+      in: header
+      name: X-Hootsuite-Signature
+x-provenance:
+  generated: '2026-08-13'
+  method: searched
+  source: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
+  note: Verbatim first-party OpenAPI 3.1 for the Hootsuite Inbox 2.0 API (formerly Sparkcentral), linked as service-desc for anchor https://platform.hootsuite.com/inbox/v1/ in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog.
+  ownership: servers[] https://platform.hootsuite.com, contact dev.support@hootsuite.com, license "Hootsuite Developer Terms and API License Agreement" - Hootsuite's own contract.
+x-tagGroups:
+- name: General
+  tags:
+  - rest-api-authentication
+- name: CRM API
+  tags:
+  - crm_introduction
+  - crm_webhooks
+  - crm_rest_api
+- name: Virtual Agent API
+  tags:
+  - vai_introduction
+  - vai_webhooks
+  - vai_rest_api
+- name: Real-time metrics API
+  tags:
+  - real_time_metrics_introduction
+  - real_time_metrics_rest_api
+- name: User Presence API
+  tags:
+  - user_presence_introduction
+  - user_presence_rest_api
+- name: Queue API
+  tags:
+  - queue_introduction
+  - queue_rest_api
+- name: Proactive messaging API
+  tags:
+  - proactive_messaging_introduction
+  - proactive_messaging_rest_api
+- name: Messenger SDK
+  tags:
+  - messenger_introduction
+  - messenger_web_sdk

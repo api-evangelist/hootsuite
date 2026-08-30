@@ -1,0 +1,190 @@
+openapi: 3.2.0
+info:
+  title: Inbox 2.0 API Reference Rest API Authentication API
+  description: Inbox 2.0 API Reference
+  version: v1
+  x-logo:
+    url: static/hootsuite-logo.png
+  contact:
+    email: dev.support@hootsuite.com
+  license:
+    name: Hootsuite Developer Terms and API License Agreement
+    url: https://hootsuite.com/legal/dev-api-terms
+servers:
+- url: https://platform.hootsuite.com
+  description: Inbox 2.0 production server
+security:
+- bearer-token: []
+tags:
+- name: rest-api-authentication
+  x-displayName: REST API authentication
+  description: "Follow the steps below to make an authenticated API request.\n\n# 1. Request client credentials\n\n### Step 1: Create your OAuth 2.0 app\nFollow [these steps](https://developer.hootsuite.com/docs/getting-started-with-the-rest-api) to set up your app and retrieve your client credentials (`client_id` and `client_secret`):\n\n### Step 2: Retrieve the appId of your newly created app\n1. Go to your [Hootsuite Developer Apps](https://hootsuite.com/developers/my-apps) dashboard.\n2. Select `edit` for your newly created app.\n3. You can find the appId in the `appId` parameter of the browser URL. Ex: `https://hootsuite.com/developers/my-apps/app-directory/app/edit?appId=XXXXXX`\n\n### Step 3: Retrieve the organization ID of your Hootsuite organization\n1. Sign in into your [Hootsuite account](https://hootsuite.com).\n2. Select `My profile > Manage accounts and teams`.\n3. Select `Teams` for your organization.\n5. You can find the organization ID in the id query parameter in your browser's address bar.\n```\nhttps://hootsuite.com/dashboard#/organizations/teams/?id=<your_organization_id>\n```\n\n### Step 4: Request to link your organization to your app\n1. Add a member to your org that is not a paying member\n2. Make sure they have at least admin permission level\n3. Send an email to the Development Support Team to link your organization to your app:\n  - To: `dev.support@hootsuite.com`\n  - Include: \n   - the `appId` you retrieved in *Step 2*\n   - the `organization ID` you retrieved in *Step 3*\n   - the `member ID` of the non-paying admin member\n4. Wait for the Development Support Team to link your app to your organization.\n\n\n# 2. Generate an access token\n\nWhen the developer app is correctly set up, you can use your `client_id` and `client_secret` to retrieve an `access_token` to make authorized API requests.\nWhen the `access_token` expires, use the [/oauth2/token](#operation/oauthToken) to generate a new token.\n\nThis endpoint requires that you pass in your client credentials (`client_id` and `client_secret`) using the HTTP Basic authentication scheme as described in the [OAuth 2.0 specification](https://datatracker.ietf.org/doc/html/rfc6749#section-2.3.1).\nIncluding your client credentials in the request-body is not supported.\n\nWhen the `access_token` expires, the API returns a 401 unauthorized. The client can automate this by generating a new access\ntoken and replaying the failed request with the fresh access token, as described in the following section.\n\n\n\n# 3. Include the access token as a bearer token Authorization header\n\nAdd the bearer token in the Authorization header\n\n```text\nAuthorization: Bearer <your_access_token>\n```\n\nExample request with token\n\n```shell\n$ curl -X GET https://platform.hootsuite.com/inbox/v1/reporting/metrics/agent-availability \\ \n   -H 'Authorization: Bearer oZy8FDUHEiZ0mh0j4rUwOT9t5yHouTzBDsn-x_GROB0.rz-pMQzh-1F6VIGwnJZMBwH3SRwDfEHE4CRi-AClpcg'\n```\n"
+paths:
+  /oauth2/token:
+    post:
+      tags:
+      - rest-api-authentication
+      summary: OAuth2 Token
+      operationId: oauthToken
+      description: "[OAuth2 Token](https://tools.ietf.org/html/rfc6749#section-3.2) endpoint.\n \nThis endpoint requires that you pass in your client credentials using the HTTP Basic authentication scheme as outlined in the [spec](https://tools.ietf.org/html/rfc6749#section-2.3.1).\nIncluding your client credentials in the request-body is not supported.\n"
+      parameters:
+      - name: Authorization
+        in: header
+        description: A base64-encoded client_id:client_secret string used for authentication.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+              - grant_type
+              - organization_id
+              properties:
+                grant_type:
+                  type: string
+                  description: The OAuth2 grant_type used. Must be set to *organization_app*.
+                  enum:
+                  - organization_app
+                organization_id:
+                  type: string
+                  description: The id of your organization. The organization must be linked to your app.
+              example:
+                grant_type: organization_app
+                organization_id: 900002
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/OAuth2BearerToken'
+        '401':
+          description: Unauthorized
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/OAuthError'
+      security:
+      - basic-auth: []
+components:
+  schemas:
+    OAuth2BearerToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: 'The token used to authorize requests. This should be added to requests as an authorization header: `Authorization: Bearer oZy8FDUHEiZ0mh0j4rUwOT9t5yHouTzBDsn-x_GROB0.rz-pMQzh-1F6VIGwnJZMBwH3SRwDfEHE4CRi-AClpcg`
+
+            '
+          example: oZy8FDUHEiZ0mh0j4rUwOT9t5yHouTzBDsn-x_GROB0.rz-pMQzh-1F6VIGwnJZMBwH3SRwDfEHE4CRi-AClpcg
+        token_Type:
+          type: string
+          description: The token type to be used in the authorization header. This will always be *bearer* for client credentials grant.
+          example: bearer
+        expires_in:
+          type: number
+          description: The number of seconds until the token expires (1 hour)
+          example: 3599
+    OAuthError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error code indicating the type of error that occurred. Should be used in conjunction with HTTP status.
+          enum:
+          - request_unauthorized
+          - request_forbidden
+          - invalid_request
+          - unauthorized_client
+          - access_denied
+          - unsupported_response_type
+          - invalid_scope
+          - server_error
+          - temporarily_unavailable
+          - unsupported_grant_type
+          - invalid_grant
+          - invalid_client
+          - unknown_error
+          - not_found
+          - invalid_state
+          - misconfiguration
+          - insufficient_entropy
+          - invalid_token
+          - token_signature_mismatch
+          - token_expired
+          - scope_not_granted
+          - token_claim
+          - token_inactive
+        error_description:
+          type: string
+          description: A description of error.
+          example: An error message
+        error_hint:
+          type: string
+          description: A helpful hint about the error.
+          example: Make sure that the various parameters are correct, be aware of case sensitivity and trim your parameters.
+        status_code:
+          type: number
+          description: The status code
+          example: 401
+  securitySchemes:
+    bearer-token:
+      type: http
+      scheme: bearer
+    basic-auth:
+      type: http
+      scheme: basic
+    Oauth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: TO_BE_CONFIGURED_IN_INBOX_2_0
+          scopes:
+            some_scope: TO_BE_CONFIGURED_IN_INBOX_2_0
+    SharedSecret:
+      type: apiKey
+      in: header
+      name: X-Hootsuite-Signature
+x-provenance:
+  generated: '2026-08-13'
+  method: searched
+  source: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
+  note: Verbatim first-party OpenAPI 3.1 for the Hootsuite Inbox 2.0 API (formerly Sparkcentral), linked as service-desc for anchor https://platform.hootsuite.com/inbox/v1/ in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog.
+  ownership: servers[] https://platform.hootsuite.com, contact dev.support@hootsuite.com, license "Hootsuite Developer Terms and API License Agreement" - Hootsuite's own contract.
+x-tagGroups:
+- name: General
+  tags:
+  - rest-api-authentication
+- name: CRM API
+  tags:
+  - crm_introduction
+  - crm_webhooks
+  - crm_rest_api
+- name: Virtual Agent API
+  tags:
+  - vai_introduction
+  - vai_webhooks
+  - vai_rest_api
+- name: Real-time metrics API
+  tags:
+  - real_time_metrics_introduction
+  - real_time_metrics_rest_api
+- name: User Presence API
+  tags:
+  - user_presence_introduction
+  - user_presence_rest_api
+- name: Queue API
+  tags:
+  - queue_introduction
+  - queue_rest_api
+- name: Proactive messaging API
+  tags:
+  - proactive_messaging_introduction
+  - proactive_messaging_rest_api
+- name: Messenger SDK
+  tags:
+  - messenger_introduction
+  - messenger_web_sdk

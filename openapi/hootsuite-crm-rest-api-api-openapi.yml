@@ -1,0 +1,152 @@
+openapi: 3.2.0
+info:
+  title: Inbox 2.0 API Reference CRM Rest API
+  description: Inbox 2.0 API Reference
+  version: v1
+  x-logo:
+    url: static/hootsuite-logo.png
+  contact:
+    email: dev.support@hootsuite.com
+  license:
+    name: Hootsuite Developer Terms and API License Agreement
+    url: https://hootsuite.com/legal/dev-api-terms
+servers:
+- url: https://platform.hootsuite.com
+  description: Inbox 2.0 production server
+security:
+- bearer-token: []
+tags:
+- name: crm_rest_api
+  x-displayName: REST API
+  description: "If you want to update contact attributes asynchronously, you'll need to call the Contact API.\nWhen calling the Contact API, the client needs to be authenticated.\n\nThe [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client. \n"
+paths:
+  /inbox/v2/contact/{contactProfileId}/contact-attributes:
+    put:
+      tags:
+      - crm_rest_api
+      summary: Set contact attributes
+      operationId: crmSetContactAttributes
+      description: 'Update the contact attributes of a contact profile.
+
+        '
+      parameters:
+      - in: path
+        name: contactProfileId
+        schema:
+          type: string
+        required: true
+        description: Id of the contact profile that you want to update.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrmLookupAttributesResponse'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: The request is malformed.
+        '401':
+          description: 'Unauthorized: when using an invalid or expired access token.
+
+            '
+        '404':
+          description: 'Contact profile not found in organization
+
+            '
+components:
+  schemas:
+    CrmLookupAttributesResponse:
+      type: object
+      properties:
+        autoConfirm:
+          type: boolean
+          description: 'The `autoConfirm` field tells Inbox 2.0 to automatically save the attributes without having to use the `Confirm` button.
+
+            '
+        contactAttributes:
+          type: array
+          description: Array of JSON objects containing the lookup attributes
+          items:
+            additionalProperties:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                value:
+                  type: string
+      example:
+        autoConfirm: true
+        contactAttributes:
+        - attribute: email
+          value: fj@example.com
+        - attribute: id
+          value: '98765432'
+        - attribute: first_name
+          value: Fred
+        - attribute: last_name
+          value: Jones
+        - attribute: last_order_number
+          value: null
+  securitySchemes:
+    bearer-token:
+      type: http
+      scheme: bearer
+    basic-auth:
+      type: http
+      scheme: basic
+    Oauth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: TO_BE_CONFIGURED_IN_INBOX_2_0
+          scopes:
+            some_scope: TO_BE_CONFIGURED_IN_INBOX_2_0
+    SharedSecret:
+      type: apiKey
+      in: header
+      name: X-Hootsuite-Signature
+x-provenance:
+  generated: '2026-08-13'
+  method: searched
+  source: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
+  note: Verbatim first-party OpenAPI 3.1 for the Hootsuite Inbox 2.0 API (formerly Sparkcentral), linked as service-desc for anchor https://platform.hootsuite.com/inbox/v1/ in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog.
+  ownership: servers[] https://platform.hootsuite.com, contact dev.support@hootsuite.com, license "Hootsuite Developer Terms and API License Agreement" - Hootsuite's own contract.
+x-tagGroups:
+- name: General
+  tags:
+  - rest-api-authentication
+- name: CRM API
+  tags:
+  - crm_introduction
+  - crm_webhooks
+  - crm_rest_api
+- name: Virtual Agent API
+  tags:
+  - vai_introduction
+  - vai_webhooks
+  - vai_rest_api
+- name: Real-time metrics API
+  tags:
+  - real_time_metrics_introduction
+  - real_time_metrics_rest_api
+- name: User Presence API
+  tags:
+  - user_presence_introduction
+  - user_presence_rest_api
+- name: Queue API
+  tags:
+  - queue_introduction
+  - queue_rest_api
+- name: Proactive messaging API
+  tags:
+  - proactive_messaging_introduction
+  - proactive_messaging_rest_api
+- name: Messenger SDK
+  tags:
+  - messenger_introduction
+  - messenger_web_sdk

@@ -1,0 +1,304 @@
+openapi: 3.2.0
+info:
+  title: Inbox 2.0 API Reference Vai Rest API
+  description: Inbox 2.0 API Reference
+  version: v1
+  x-logo:
+    url: static/hootsuite-logo.png
+  contact:
+    email: dev.support@hootsuite.com
+  license:
+    name: Hootsuite Developer Terms and API License Agreement
+    url: https://hootsuite.com/legal/dev-api-terms
+servers:
+- url: https://platform.hootsuite.com
+  description: Inbox 2.0 production server
+security:
+- bearer-token: []
+tags:
+- name: vai_rest_api
+  x-displayName: REST API
+  description: "If you want to send the replies asynchronously or manipulate the conversation in your fulfillment code, you'll need to\ncall the Virtual Agent REST API. \n\nThe [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client. \n"
+paths:
+  /inbox/v1/virtual-agent/conversations/{conversationId}:
+    post:
+      tags:
+      - vai_rest_api
+      summary: Manipulate conversation
+      operationId: vaiManipulateConversation
+      description: 'This allows you to manipulate the conversation in the same way you would when responding to a webhook request. You can
+
+        send a reply, add a topic, and/or hand off the conversation. Each property in the body is optional. If you only want to
+
+        send a message, you can send `{"sendMessage": {"text": "Hi!"}}`. If you want to apply a topic and complete, but not send
+
+        a message, you can, for example, send `{"applyTopics":["Spam"], "complete": "RESOLVED"}`.
+
+
+        Note that only topics that match a topic in the platform exactly (case insensitive) will be applied to the conversation.
+
+        Non-existing topics are ignored. Currently, no fuzzy matching will occur and typographical errors will result in a
+
+        non-existing topic.
+
+
+        The same applies to tags. Only tags that match a tag in the platform exactly (case
+
+        insensitive) will be applied to a specific message. Non-existing tags are ignored. You must specify the `messageId` when using the REST
+
+        API. The `messageId` is part of every `INBOUND_MESSAGE_RECEIVED` event.
+
+
+        If you want to send an attachment, you must first upload the attachment in a separate
+
+        call (`PUT /inbox/v1/virtual-agent/conversations/{conversationId}/attachments/{filename}`), and then use the file name when
+
+        sending the message (`{"sendMessage": {"attachment": ""}}`).
+
+
+        If the contact already has a value saved for the attribute definition with a particular alias, the update will be
+
+        ignored. If any of the attribute definitions are configured as CRM lookup values, a CRM lookup is performed after the
+
+        attributes are set. For the best performance, we recommend setting contact attributes along with the response to
+
+        indicate that the conversation is completed. Note that the virtual agent will not receive the new attributes from the
+
+        CRM response until the next `CONVERSATION_STARTED` or `CONVERSATION_DELEGATED` event is received for a conversation with
+
+        a contact.
+
+        '
+      parameters:
+      - in: path
+        name: conversationId
+        schema:
+          type: string
+        required: true
+        description: Id of the conversation to manipulate. This can be retrieved from the webhook payload.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationManipulation'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: The request is malformed.
+        '401':
+          description: 'Unauthorized: when using an invalid or expired access token.
+
+            '
+        '404':
+          description: 'The conversation id does not exist or is no longer assigned to the virtual agent.
+
+            '
+  /inbox/v1/virtual-agent/conversations/{conversationId}/attachments/{filename}:
+    post:
+      tags:
+      - vai_rest_api
+      summary: Upload attachments
+      operationId: vaiUploadConversationAttachment
+      description: "This allows you to upload an attachment that you can send in a conversation. You need to upload the attachment first,\nand then you can send a message with text and an attachment. For example, if you upload an attachment\nto `/inbox/v1/virtual-agent/conversations/attachments/cat.jpg`, you can send that attachment by sending\n\n```json\n{\n  \"sendMessage\": {\n    \"text\": \"This is a cat!\",\n    \"attachment\": \"cat.jpg\"\n  }\n}\n```\n\nto `/inbox/v1/virtual-agent/conversations/{conversationId}`. The file name should be unique within a conversation and is visible to the contact\nif they download your attachment.\n\nThe `Content-Type` header should contain the correct mime-type of the attachment (such as `image/jpeg`).\nThe `Content-Length` header should contain the size of the attachment in bytes. Attachments should be fewer than 10\nmegabytes to prevent error.\n"
+      parameters:
+      - in: path
+        name: conversationId
+        schema:
+          type: string
+        required: true
+        description: ID of the conversation to manipulate. This can be retrieved from the webhook payload.
+      - in: path
+        name: filename
+        schema:
+          type: string
+        required: true
+        description: Filename of the attachment. The filename can only contain uppercase and lowercase letters, numbers, -, _ and .
+      - in: header
+        name: Content-Type
+        schema:
+          type: string
+        required: true
+        description: mime-type of the attachment.
+      - in: header
+        name: Content-Length
+        schema:
+          type: string
+        required: true
+        description: Size of the attachment in bytes.
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: 'The attachment is uploaded and ready to use in your conversation. Note: after uploading the attachment to Inbox 2.0,
+
+            you still need to specifically send it to the contact
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 'The request is malformed. This can happen because the filename contains an invalid character, or because the attachment
+
+            type cannot be sent to the medium.
+
+            '
+        '401':
+          description: 'Unauthorized: when using an invalid or expired access token.
+
+            '
+        '404':
+          description: 'The conversation id does not exist or is no longer assigned to the virtual agent.
+
+            '
+components:
+  schemas:
+    Message:
+      type: object
+      properties:
+        text:
+          type: string
+          example: Hi! How can I help you?
+        attachment:
+          type: string
+          example: funny_cat.gif
+      description: 'The messages you want to send
+
+        '
+    ConversationManipulation:
+      type: object
+      properties:
+        indicateTyping:
+          type: string
+          enum:
+          - START
+          - STOP
+          description: 'Indicate whether you are typing
+
+            '
+        sendMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+          description: 'The messages you want to send
+
+            '
+        sendMessage:
+          $ref: '#/components/schemas/Message'
+          description: 'The message you want to send
+
+            '
+        applyTopics:
+          type: array
+          items:
+            type: string
+          example:
+          - Hotel Reservation
+          description: 'The topics you want to apply to the conversation
+
+            '
+        applyTags:
+          type: array
+          items:
+            type: string
+          example:
+          - Happy
+          description: 'The tag you want to apply to the latest message
+
+            '
+        applyConversationNotes:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+                example: Some note to add
+          description: 'The notes you want to apply to the conversation
+
+            '
+        setContactAttributes:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            account_number: '19758293529351'
+          description: 'The attributes you want to apply to the contact. The key should match "^[a-zA-Z0-9_]+$"
+
+            '
+        complete:
+          type: string
+          enum:
+          - HANDOVER
+          - RESOLVED
+          description: 'Finish a conversation by handing it off to a human agent or by marking the conversation resolved
+
+            '
+  securitySchemes:
+    bearer-token:
+      type: http
+      scheme: bearer
+    basic-auth:
+      type: http
+      scheme: basic
+    Oauth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: TO_BE_CONFIGURED_IN_INBOX_2_0
+          scopes:
+            some_scope: TO_BE_CONFIGURED_IN_INBOX_2_0
+    SharedSecret:
+      type: apiKey
+      in: header
+      name: X-Hootsuite-Signature
+x-provenance:
+  generated: '2026-08-13'
+  method: searched
+  source: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
+  note: Verbatim first-party OpenAPI 3.1 for the Hootsuite Inbox 2.0 API (formerly Sparkcentral), linked as service-desc for anchor https://platform.hootsuite.com/inbox/v1/ in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog.
+  ownership: servers[] https://platform.hootsuite.com, contact dev.support@hootsuite.com, license "Hootsuite Developer Terms and API License Agreement" - Hootsuite's own contract.
+x-tagGroups:
+- name: General
+  tags:
+  - rest-api-authentication
+- name: CRM API
+  tags:
+  - crm_introduction
+  - crm_webhooks
+  - crm_rest_api
+- name: Virtual Agent API
+  tags:
+  - vai_introduction
+  - vai_webhooks
+  - vai_rest_api
+- name: Real-time metrics API
+  tags:
+  - real_time_metrics_introduction
+  - real_time_metrics_rest_api
+- name: User Presence API
+  tags:
+  - user_presence_introduction
+  - user_presence_rest_api
+- name: Queue API
+  tags:
+  - queue_introduction
+  - queue_rest_api
+- name: Proactive messaging API
+  tags:
+  - proactive_messaging_introduction
+  - proactive_messaging_rest_api
+- name: Messenger SDK
+  tags:
+  - messenger_introduction
+  - messenger_web_sdk

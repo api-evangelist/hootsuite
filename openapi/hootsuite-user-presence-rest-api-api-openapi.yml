@@ -1,0 +1,140 @@
+openapi: 3.2.0
+info:
+  title: Inbox 2.0 API Reference User Presence Rest API
+  description: Inbox 2.0 API Reference
+  version: v1
+  x-logo:
+    url: static/hootsuite-logo.png
+  contact:
+    email: dev.support@hootsuite.com
+  license:
+    name: Hootsuite Developer Terms and API License Agreement
+    url: https://hootsuite.com/legal/dev-api-terms
+servers:
+- url: https://platform.hootsuite.com
+  description: Inbox 2.0 production server
+security:
+- bearer-token: []
+tags:
+- name: user_presence_rest_api
+  x-displayName: REST API
+  description: 'When calling the User Presence API, the client needs to be authenticated.
+
+
+    The [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client.
+
+    '
+paths:
+  /inbox/v1/user-presence/online-agents:
+    get:
+      tags:
+      - user_presence_rest_api
+      summary: Online Agents
+      operationId: onlineAgents
+      description: 'List of all currently online agents.
+
+        '
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlineAgentsResponse'
+        '401':
+          description: 'Unauthorized: when using an invalid or expired access token.
+
+            '
+components:
+  schemas:
+    OnlineAgentsResponse:
+      type: object
+      properties:
+        agents:
+          type: array
+          items:
+            type: object
+            required:
+            - id
+            - userPresence
+            - statusChangedAt
+            properties:
+              id:
+                type: string
+              userPresence:
+                type: string
+                enum:
+                - AWAY
+                - AVAILABLE
+              awayStateId:
+                type: string
+              statusChangedAt:
+                type: string
+                format: date-time
+      example:
+        agents:
+        - id: e7553889-d775-11ec-9dc9-4e81c846c8b4
+          userPresence: AVAILABLE
+          statusChangedAt: '2022-05-19T13:16:33.413Z'
+        - id: f7553884-d876-11ec-3dc5-4e81684ac8bb
+          userPresence: AWAY
+          awayStateId: e75893ea-d775-11ec-9dc9-4e81c846c8b4
+          statusChangedAt: '2022-05-19T13:17:34.414Z'
+  securitySchemes:
+    bearer-token:
+      type: http
+      scheme: bearer
+    basic-auth:
+      type: http
+      scheme: basic
+    Oauth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: TO_BE_CONFIGURED_IN_INBOX_2_0
+          scopes:
+            some_scope: TO_BE_CONFIGURED_IN_INBOX_2_0
+    SharedSecret:
+      type: apiKey
+      in: header
+      name: X-Hootsuite-Signature
+x-provenance:
+  generated: '2026-08-13'
+  method: searched
+  source: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
+  note: Verbatim first-party OpenAPI 3.1 for the Hootsuite Inbox 2.0 API (formerly Sparkcentral), linked as service-desc for anchor https://platform.hootsuite.com/inbox/v1/ in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog.
+  ownership: servers[] https://platform.hootsuite.com, contact dev.support@hootsuite.com, license "Hootsuite Developer Terms and API License Agreement" - Hootsuite's own contract.
+x-tagGroups:
+- name: General
+  tags:
+  - rest-api-authentication
+- name: CRM API
+  tags:
+  - crm_introduction
+  - crm_webhooks
+  - crm_rest_api
+- name: Virtual Agent API
+  tags:
+  - vai_introduction
+  - vai_webhooks
+  - vai_rest_api
+- name: Real-time metrics API
+  tags:
+  - real_time_metrics_introduction
+  - real_time_metrics_rest_api
+- name: User Presence API
+  tags:
+  - user_presence_introduction
+  - user_presence_rest_api
+- name: Queue API
+  tags:
+  - queue_introduction
+  - queue_rest_api
+- name: Proactive messaging API
+  tags:
+  - proactive_messaging_introduction
+  - proactive_messaging_rest_api
+- name: Messenger SDK
+  tags:
+  - messenger_introduction
+  - messenger_web_sdk
