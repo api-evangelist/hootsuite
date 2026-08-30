@@ -245,7 +245,8 @@ apis:
     authenticate your client.
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
-  tags:
+  tags: []
+  tags_raw:
   - crm_rest_api
   properties:
   - type: OpenAPI
@@ -316,7 +317,8 @@ apis:
     \ to authenticate."
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
-  tags:
+  tags: []
+  tags_raw:
   - crm_webhooks
   properties:
   - type: OpenAPI
@@ -363,6 +365,8 @@ apis:
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
   tags:
+  - Me
+  tags_raw:
   - me
   properties:
   - type: OpenAPI
@@ -501,6 +505,8 @@ apis:
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
   tags:
+  - Message
+  tags_raw:
   - Messages
   properties:
   - type: OpenAPI
@@ -547,6 +553,8 @@ apis:
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
   tags:
+  - Organization
+  tags_raw:
   - Organizations
   properties:
   - type: OpenAPI
@@ -631,7 +639,8 @@ apis:
     ]\n```"
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
-  tags:
+  tags: []
+  tags_raw:
   - proactive_messaging_rest_api
   properties:
   - type: OpenAPI
@@ -682,7 +691,8 @@ apis:
     authenticate your client.
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
-  tags:
+  tags: []
+  tags_raw:
   - queue_rest_api
   properties:
   - type: OpenAPI
@@ -733,7 +743,8 @@ apis:
     authenticate your client.
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
-  tags:
+  tags: []
+  tags_raw:
   - real_time_metrics_rest_api
   properties:
   - type: OpenAPI
@@ -945,6 +956,8 @@ apis:
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
   tags:
+  - Team
+  tags_raw:
   - Teams
   properties:
   - type: OpenAPI
@@ -995,7 +1008,8 @@ apis:
     authenticate your client.
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
-  tags:
+  tags: []
+  tags_raw:
   - user_presence_rest_api
   properties:
   - type: OpenAPI
@@ -1043,7 +1057,8 @@ apis:
     \ section contains more details on how to authenticate your client."
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
-  tags:
+  tags: []
+  tags_raw:
   - vai_rest_api
   properties:
   - type: OpenAPI
@@ -1159,7 +1174,8 @@ apis:
     \  with {}, upload an attachment using a PUT request, and then send the attachment using a POST request."
   humanURL: https://developer.hootsuite.com/docs/api-overview
   baseURL: https://platform.hootsuite.com/v1
-  tags:
+  tags: []
+  tags_raw:
   - vai_webhooks
   properties:
   - type: OpenAPI
