@@ -18,7 +18,12 @@ security:
 tags:
 - name: vai_rest_api
   x-displayName: REST API
-  description: "If you want to send the replies asynchronously or manipulate the conversation in your fulfillment code, you'll need to\ncall the Virtual Agent REST API. \n\nThe [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client. \n"
+  description: 'If you want to send the replies asynchronously or manipulate the conversation in your fulfillment code, you''ll need to
+
+    call the Virtual Agent REST API.
+
+
+    The REST API authentication section contains more details on how to authenticate your client.'
 paths:
   /inbox/v1/virtual-agent/conversations/{conversationId}:
     post:
@@ -66,9 +71,7 @@ paths:
 
         CRM response until the next `CONVERSATION_STARTED` or `CONVERSATION_DELEGATED` event is received for a conversation with
 
-        a contact.
-
-        '
+        a contact.'
       parameters:
       - in: path
         name: conversationId
@@ -104,7 +107,40 @@ paths:
       - vai_rest_api
       summary: Upload attachments
       operationId: vaiUploadConversationAttachment
-      description: "This allows you to upload an attachment that you can send in a conversation. You need to upload the attachment first,\nand then you can send a message with text and an attachment. For example, if you upload an attachment\nto `/inbox/v1/virtual-agent/conversations/attachments/cat.jpg`, you can send that attachment by sending\n\n```json\n{\n  \"sendMessage\": {\n    \"text\": \"This is a cat!\",\n    \"attachment\": \"cat.jpg\"\n  }\n}\n```\n\nto `/inbox/v1/virtual-agent/conversations/{conversationId}`. The file name should be unique within a conversation and is visible to the contact\nif they download your attachment.\n\nThe `Content-Type` header should contain the correct mime-type of the attachment (such as `image/jpeg`).\nThe `Content-Length` header should contain the size of the attachment in bytes. Attachments should be fewer than 10\nmegabytes to prevent error.\n"
+      description: 'This allows you to upload an attachment that you can send in a conversation. You need to upload the attachment first,
+
+        and then you can send a message with text and an attachment. For example, if you upload an attachment
+
+        to `/inbox/v1/virtual-agent/conversations/attachments/cat.jpg`, you can send that attachment by sending
+
+
+        ```json
+
+        {
+
+        "sendMessage": {
+
+        "text": "This is a cat!",
+
+        "attachment": "cat.jpg"
+
+        }
+
+        }
+
+        ```
+
+
+        to `/inbox/v1/virtual-agent/conversations/{conversationId}`. The file name should be unique within a conversation and is visible to the contact
+
+        if they download your attachment.
+
+
+        The `Content-Type` header should contain the correct mime-type of the attachment (such as `image/jpeg`).
+
+        The `Content-Length` header should contain the size of the attachment in bytes. Attachments should be fewer than 10
+
+        megabytes to prevent error.'
       parameters:
       - in: path
         name: conversationId
@@ -262,12 +298,6 @@ components:
       type: apiKey
       in: header
       name: X-Hootsuite-Signature
-x-provenance:
-  generated: '2026-08-13'
-  method: searched
-  source: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
-  note: Verbatim first-party OpenAPI 3.1 for the Hootsuite Inbox 2.0 API (formerly Sparkcentral), linked as service-desc for anchor https://platform.hootsuite.com/inbox/v1/ in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog.
-  ownership: servers[] https://platform.hootsuite.com, contact dev.support@hootsuite.com, license "Hootsuite Developer Terms and API License Agreement" - Hootsuite's own contract.
 x-tagGroups:
 - name: General
   tags:

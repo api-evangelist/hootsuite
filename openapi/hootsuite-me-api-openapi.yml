@@ -11,7 +11,7 @@ servers:
 - url: https://platform.hootsuite.com
 tags:
 - description: Operations that you can do related with your authenticated member
-  name: me
+  name: Me
 paths:
   /me/:
     get:
@@ -32,7 +32,7 @@ paths:
                 $ref: '#/components/schemas/MemberResponse'
       summary: Gets the member information
       tags:
-      - me
+      - Me
     servers:
     - url: https://platform.hootsuite.com/amplify/v1
   /me/messages:
@@ -60,7 +60,7 @@ paths:
                 $ref: '#/components/schemas/MessageResponse'
       summary: Create message using the authenticated member
       tags:
-      - me
+      - Me
     servers:
     - url: https://platform.hootsuite.com/amplify/v1
   /me/organizations:
@@ -82,7 +82,7 @@ paths:
                 $ref: '#/components/schemas/OrgListModel'
       summary: Retrieve authenticated members's organizations
       tags:
-      - me
+      - Me
     servers:
     - url: https://platform.hootsuite.com/amplify/v1
   /me/topics:
@@ -104,7 +104,7 @@ paths:
                 $ref: '#/components/schemas/TopicListModel'
       summary: Retrieve authenticated members's topics
       tags:
-      - me
+      - Me
     post:
       operationId: post_topics
       parameters:
@@ -129,7 +129,7 @@ paths:
                 $ref: '#/components/schemas/TopicModel'
       summary: Creates a new topic on the member's organization
       tags:
-      - me
+      - Me
     servers:
     - url: https://platform.hootsuite.com/amplify/v1
   /me/utms/deobfuscate:
@@ -160,13 +160,13 @@ paths:
                 $ref: '#/components/schemas/ConversionModel'
       summary: Converts obfuscated member IDs back into member IDs
       tags:
-      - me
+      - Me
     servers:
     - url: https://platform.hootsuite.com/amplify/v1
   /v1/me:
     get:
       tags:
-      - me
+      - Me
       operationId: retrieveMe
       summary: Retrieve authenticated member
       description: Retrieves authenticated member.
@@ -192,7 +192,7 @@ paths:
   /v1/me/organizations:
     get:
       tags:
-      - me
+      - Me
       operationId: retrieveMeOrganizations
       summary: Retrieve authenticated member's organizations
       description: Retrieves the organizations that the authenticated member is in.
@@ -218,7 +218,7 @@ paths:
   /v1/me/socialProfiles:
     get:
       tags:
-      - me
+      - Me
       operationId: getMySocialProfiles
       summary: Retrieve authenticated member's social profiles
       description: Retrieves the social media profiles that the authenticated user has BASIC_USAGE permissions on.
@@ -244,7 +244,7 @@ paths:
   /v1/me/adAccounts:
     get:
       tags:
-      - me
+      - Me
       operationId: getMyAdAccounts
       summary: Retrieve authenticated member's ad accounts
       description: Retrieves the ad accounts that the authenticated user has permissions on.
@@ -276,6 +276,43 @@ paths:
     - url: https://platform.hootsuite.com
 components:
   schemas:
+    DeobfuscatePostBody:
+      properties:
+        ids:
+          description: Obfuscated memberIDs (max 500 per request)
+          example: '[ "ABCDEF", "DEFGHI", "GHIJKL"]'
+          items:
+            type: string
+          type: array
+      type: object
+    ConversionModel:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ObfuscationsToMemberIDs'
+          type: array
+      type: object
+    ShareableNetworks:
+      properties:
+        facebook:
+          example: true
+          type: boolean
+        facebookpage:
+          example: true
+          type: boolean
+        instagram:
+          example: false
+          type: boolean
+        linkedin:
+          example: true
+          type: boolean
+        tiktokbusiness:
+          example: true
+          type: boolean
+        twitter:
+          example: true
+          type: boolean
+      type: object
     TikTokPrivacySettings:
       properties:
         allowComments:
@@ -294,68 +331,50 @@ components:
           example: true
           type: boolean
       type: object
-    TopicPostBody:
+    Organization:
       properties:
-        name:
-          description: Name of the topic
-          example: sports
+        enabledNetworks:
+          $ref: '#/components/schemas/enabledNetworks'
+        hootId:
+          description: Hootsuite organization ID
+          example: 123456
+          type: integer
+        id:
+          description: ID of the organization
+          example: 59d6df3c6bc0160ba6e15f73
           type: string
-        privacy:
-          description: Privacy of the topic
-          enum:
-          - opened
-          - closed
-          example: opened
+        name:
+          description: Name of the organization
+          example: Hootsuite Inc.
           type: string
       type: object
-    MessagePostData:
-      allOf:
-      - $ref: '#/components/schemas/MessageCore'
-      - properties:
-          isEditable:
-            default: false
-            description: Should this message be editable?
-            example: false
-            type: boolean
-          isNativeShareEnabled:
-            default: false
-            description: Should native share be allowed for the posts in this org?
-            example: false
-            type: boolean
-          isPublished:
-            default: false
-            description: Has this message been published?
-            example: false
-            type: boolean
-          isSuggested:
-            default: false
-            description: Whether a message is a suggestion. Message will default to a draft post
-            example: false
-            type: boolean
-          photoUriBase64:
-            description: Base 64 image URL
-            example: data:image/gif;base64,R0lGODlhEAAQAM...
+    Member:
+      properties:
+        email:
+          example: john.doe@hootsuite.com
+          type: string
+        name:
+          description: Member's name
+          example: John Doe
+          type: string
+        roles:
+          description: Member's roles
+          example:
+          - subscriber
+          - content_admin
+          items:
             type: string
-          srcNetwork:
-            default: ''
-            description: Network where we are posting this message from
-            type: string
-          srcUser:
-            default: ''
-            description: When the message has been shared by Twitter or Facebook, this field will contain the original user that shared the post
-            example: twitter_techie
-            type: string
-          suggestionReason:
-            default: ''
-            description: Reason why this message was suggested
-            type: string
-        type: object
-    TopicListModel:
+          type: array
+      type: object
+    MemberResponse:
       properties:
         data:
-          items:
-            $ref: '#/components/schemas/Topic'
-          type: array
+          $ref: '#/components/schemas/Member'
+      type: object
+    MessageResponse:
+      properties:
+        data:
+          $ref: '#/components/schemas/Message'
       type: object
     Attachment:
       properties:
@@ -393,90 +412,10 @@ components:
           example: opened
           type: string
       type: object
-    PrivacySettings:
-      properties:
-        tiktokbusiness:
-          allOf:
-          - $ref: '#/components/schemas/TikTokPrivacySettings'
-          description: TikTok-specific privacy settings
-      type: object
-    MessageResponse:
-      properties:
-        data:
-          $ref: '#/components/schemas/Message'
-      type: object
-    enabledNetworks:
-      properties:
-        facebook:
-          example: true
-          type: boolean
-        facebookpage:
-          example: true
-          type: boolean
-        hootsuite:
-          example: true
-          type: boolean
-        instagram:
-          example: false
-          type: boolean
-        linkedin:
-          example: true
-          type: boolean
-        tiktokbusiness:
-          example: true
-          type: boolean
-        twitter:
-          example: true
-          type: boolean
-      type: object
-    ObfuscationsToMemberIDs:
-      properties:
-        memberID:
-          description: Employee memberID
-          example: '123456'
-          type: string
-        obfuscatedID:
-          description: Obfuscated memberID
-          example: ABCDEF
-          type: string
-      type: object
     TopicModel:
       properties:
         data:
           $ref: '#/components/schemas/Topic'
-      type: object
-    MemberResponse:
-      properties:
-        data:
-          $ref: '#/components/schemas/Member'
-      type: object
-    ShareableNetworks:
-      properties:
-        facebook:
-          example: true
-          type: boolean
-        facebookpage:
-          example: true
-          type: boolean
-        instagram:
-          example: false
-          type: boolean
-        linkedin:
-          example: true
-          type: boolean
-        tiktokbusiness:
-          example: true
-          type: boolean
-        twitter:
-          example: true
-          type: boolean
-      type: object
-    OrgListModel:
-      properties:
-        data:
-          items:
-            $ref: '#/components/schemas/Organization'
-          type: array
       type: object
     MessageCore:
       properties:
@@ -533,6 +472,97 @@ components:
         videoAttachment:
           type: object
       type: object
+    MessagePostData:
+      allOf:
+      - $ref: '#/components/schemas/MessageCore'
+      - properties:
+          isEditable:
+            default: false
+            description: Should this message be editable?
+            example: false
+            type: boolean
+          isNativeShareEnabled:
+            default: false
+            description: Should native share be allowed for the posts in this org?
+            example: false
+            type: boolean
+          isPublished:
+            default: false
+            description: Has this message been published?
+            example: false
+            type: boolean
+          isSuggested:
+            default: false
+            description: Whether a message is a suggestion. Message will default to a draft post
+            example: false
+            type: boolean
+          photoUriBase64:
+            description: Base 64 image URL
+            example: data:image/gif;base64,R0lGODlhEAAQAM...
+            type: string
+          srcNetwork:
+            default: ''
+            description: Network where we are posting this message from
+            type: string
+          srcUser:
+            default: ''
+            description: When the message has been shared by Twitter or Facebook, this field will contain the original user that shared the post
+            example: twitter_techie
+            type: string
+          suggestionReason:
+            default: ''
+            description: Reason why this message was suggested
+            type: string
+        type: object
+    enabledNetworks:
+      properties:
+        facebook:
+          example: true
+          type: boolean
+        facebookpage:
+          example: true
+          type: boolean
+        hootsuite:
+          example: true
+          type: boolean
+        instagram:
+          example: false
+          type: boolean
+        linkedin:
+          example: true
+          type: boolean
+        tiktokbusiness:
+          example: true
+          type: boolean
+        twitter:
+          example: true
+          type: boolean
+      type: object
+    ObfuscationsToMemberIDs:
+      properties:
+        memberID:
+          description: Employee memberID
+          example: '123456'
+          type: string
+        obfuscatedID:
+          description: Obfuscated memberID
+          example: ABCDEF
+          type: string
+      type: object
+    TopicPostBody:
+      properties:
+        name:
+          description: Name of the topic
+          example: sports
+          type: string
+        privacy:
+          description: Privacy of the topic
+          enum:
+          - opened
+          - closed
+          example: opened
+          type: string
+      type: object
     Message:
       allOf:
       - $ref: '#/components/schemas/MessageCore'
@@ -568,198 +598,27 @@ components:
             example: http://ow.ly/fjzz30fU6EK
             type: string
         type: object
-    ConversionModel:
+    PrivacySettings:
+      properties:
+        tiktokbusiness:
+          allOf:
+          - $ref: '#/components/schemas/TikTokPrivacySettings'
+          description: TikTok-specific privacy settings
+      type: object
+    OrgListModel:
       properties:
         data:
           items:
-            $ref: '#/components/schemas/ObfuscationsToMemberIDs'
+            $ref: '#/components/schemas/Organization'
           type: array
       type: object
-    DeobfuscatePostBody:
-      properties:
-        ids:
-          description: Obfuscated memberIDs (max 500 per request)
-          example: '[ "ABCDEF", "DEFGHI", "GHIJKL"]'
-          items:
-            type: string
-          type: array
-      type: object
-    Member:
-      properties:
-        email:
-          example: john.doe@hootsuite.com
-          type: string
-        name:
-          description: Member's name
-          example: John Doe
-          type: string
-        roles:
-          description: Member's roles
-          example:
-          - subscriber
-          - content_admin
-          items:
-            type: string
-          type: array
-      type: object
-    Organization:
-      properties:
-        enabledNetworks:
-          $ref: '#/components/schemas/enabledNetworks'
-        hootId:
-          description: Hootsuite organization ID
-          example: 123456
-          type: integer
-        id:
-          description: ID of the organization
-          example: 59d6df3c6bc0160ba6e15f73
-          type: string
-        name:
-          description: Name of the organization
-          example: Hootsuite Inc.
-          type: string
-      type: object
-    MemberSocialProfiles:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The social profile ID.
-          example: '115185509'
-    AdAccounts:
-      type: object
-      properties:
-        ad_accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdAccount'
-    MemberResponseEnvelope:
-      type: object
+    TopicListModel:
       properties:
         data:
-          $ref: '#/components/schemas/Member_2'
-    MeOrganization:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The organization ID
-          example: '626731'
-        name:
-          type: string
-          description: The organization display name
-          example: Test Organization
-        logoUrl:
-          type: string
-          description: URL of the organization logo
-          example: https://assets.hootsuite.com/avatars_production/organization/12345_owl.gif
-    Error:
-      type: object
-      properties:
-        code:
-          type: number
-          description: An error code indicating the type of error that occurred.
-          example: 1234
-        message:
-          type: string
-          description: A description of error.
-          example: An error message
-        id:
-          type: string
-          description: A unique error id for tracing purposes
-          example: f7d32670-4e6a-48c0-a2a7-87803536a712
-        resource:
-          type: object
-          description: A reference to the resource in error
-          title: ResourceReference
-          properties:
-            type:
-              type: string
-              description: The resource type.
-              example: socialProfile
-            id:
-              type: string
-              description: The resource ID.
-              example: '7534653235'
-    AdAccount:
-      type: object
-      properties:
-        ad_account_id:
-          type: string
-          description: Hootsuite internal ad account Id
-        social_network:
-          $ref: '#/components/schemas/adAccountsSocialNetwork'
-        external_id:
-          description: Id of the social network
-          type: string
-        name:
-          description: ad account name
-          type: string
-        status:
-          type: integer
-          format: int32
-          description: Network-dependent account status. Meta, raw account_status integer. Twitter, 1 (usable) or -1 (not usable).
-        currency_code:
-          type: string
-          description: currency code for the ad account
-        timezone:
-          type: string
-          description: time zone for the ad account
-        business_id:
-          type: string
-          description: Owning business ID on the social network (e.g. Meta Business Manager ID). Empty when not provided.
-        can_access_api:
-          type: boolean
-          description: true if the account can be used for ads API operations (status == 1).
-        social_profile_id:
-          type: string
-          description: hootsuite social profile Id that is usable with the ad account
-        social_profile_token_status:
-          type: integer
-          format: int64
-          description: hootsuite social profile token status
-        has_payment_method:
-          type: boolean
-          description: ad account has payment method
-        extended_info:
-          type: object
-          title: Optional. SocialNetwork dependent additional account information
-        native_status:
-          $ref: '#/components/schemas/adAccountsNativeStatus'
-    adAccountsNativeStatus:
-      type: string
-      enum:
-      - STATUS_UNKNOWN
-      - FB_STATUS_ACTIVE
-      - FB_STATUS_DISABLED
-      - FB_STATUS_UNSETTLED
-      - FB_STATUS_PENDING_RISK_REVIEW
-      - FB_STATUS_PENDING_SETTLEMENT
-      - FB_STATUS_IN_GRACE_PERIOD
-      - FB_STATUS_PENDING_CLOSURE
-      - FB_STATUS_CLOSED
-      - FB_STATUS_ANY_ACTIVE
-      - FB_STATUS_ANY_CLOSED
-      - TW_STATUS_ACCEPTED
-      - TW_STATUS_REJECTED
-      - TW_STATUS_UNDER_REVIEW
-      default: STATUS_UNKNOWN
-    OrganizationMemberSocialProfilesResponseEnvelope:
-      type: object
-      properties:
-        data:
-          type: array
-          description: The data response envelope.
           items:
-            $ref: '#/components/schemas/MemberSocialProfiles'
-    MeOrganizationsResponseEnvelope:
-      type: object
-      properties:
-        data:
+            $ref: '#/components/schemas/Topic'
           type: array
-          description: The data response envelope.
-          items:
-            $ref: '#/components/schemas/MeOrganization'
+      type: object
     Member_2:
       type: object
       required:
@@ -825,6 +684,89 @@ components:
           - ru
           - th
           - tr
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+          description: An error code indicating the type of error that occurred.
+          example: 1234
+        message:
+          type: string
+          description: A description of error.
+          example: An error message
+        id:
+          type: string
+          description: A unique error id for tracing purposes
+          example: f7d32670-4e6a-48c0-a2a7-87803536a712
+        resource:
+          type: object
+          description: A reference to the resource in error
+          title: ResourceReference
+          properties:
+            type:
+              type: string
+              description: The resource type.
+              example: socialProfile
+            id:
+              type: string
+              description: The resource ID.
+              example: '7534653235'
+    AdAccounts:
+      type: object
+      properties:
+        ad_accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdAccount'
+    MemberSocialProfiles:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The social profile ID.
+          example: '115185509'
+    OrganizationMemberSocialProfilesResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          description: The data response envelope.
+          items:
+            $ref: '#/components/schemas/MemberSocialProfiles'
+    MeOrganization:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The organization ID
+          example: '626731'
+        name:
+          type: string
+          description: The organization display name
+          example: Test Organization
+        logoUrl:
+          type: string
+          description: URL of the organization logo
+          example: https://assets.hootsuite.com/avatars_production/organization/12345_owl.gif
+    adAccountsNativeStatus:
+      type: string
+      enum:
+      - STATUS_UNKNOWN
+      - FB_STATUS_ACTIVE
+      - FB_STATUS_DISABLED
+      - FB_STATUS_UNSETTLED
+      - FB_STATUS_PENDING_RISK_REVIEW
+      - FB_STATUS_PENDING_SETTLEMENT
+      - FB_STATUS_IN_GRACE_PERIOD
+      - FB_STATUS_PENDING_CLOSURE
+      - FB_STATUS_CLOSED
+      - FB_STATUS_ANY_ACTIVE
+      - FB_STATUS_ANY_CLOSED
+      - TW_STATUS_ACCEPTED
+      - TW_STATUS_REJECTED
+      - TW_STATUS_UNDER_REVIEW
+      default: STATUS_UNKNOWN
     ErrorsResponseEnvelope:
       type: object
       properties:
@@ -833,6 +775,19 @@ components:
           description: The errors response envelope.
           items:
             $ref: '#/components/schemas/Error'
+    MeOrganizationsResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          description: The data response envelope.
+          items:
+            $ref: '#/components/schemas/MeOrganization'
+    MemberResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Member_2'
     adAccountsSocialNetwork:
       type: string
       enum:
@@ -840,6 +795,51 @@ components:
       - FACEBOOK
       - TWITTER
       default: UNKNOWN
+    AdAccount:
+      type: object
+      properties:
+        ad_account_id:
+          type: string
+          description: Hootsuite internal ad account Id
+        social_network:
+          $ref: '#/components/schemas/adAccountsSocialNetwork'
+        external_id:
+          description: Id of the social network
+          type: string
+        name:
+          description: ad account name
+          type: string
+        status:
+          type: integer
+          format: int32
+          description: Network-dependent account status. Meta, raw account_status integer. Twitter, 1 (usable) or -1 (not usable).
+        currency_code:
+          type: string
+          description: currency code for the ad account
+        timezone:
+          type: string
+          description: time zone for the ad account
+        business_id:
+          type: string
+          description: Owning business ID on the social network (e.g. Meta Business Manager ID). Empty when not provided.
+        can_access_api:
+          type: boolean
+          description: true if the account can be used for ads API operations (status == 1).
+        social_profile_id:
+          type: string
+          description: hootsuite social profile Id that is usable with the ad account
+        social_profile_token_status:
+          type: integer
+          format: int64
+          description: hootsuite social profile token status
+        has_payment_method:
+          type: boolean
+          description: ad account has payment method
+        extended_info:
+          type: object
+          title: Optional. SocialNetwork dependent additional account information
+        native_status:
+          $ref: '#/components/schemas/adAccountsNativeStatus'
   parameters:
     bearerToken:
       in: header

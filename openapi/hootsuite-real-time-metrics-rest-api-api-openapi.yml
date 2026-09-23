@@ -21,9 +21,7 @@ tags:
   description: 'When calling the Real-time Metrics API, the client needs to be authenticated.
 
 
-    The [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client.
-
-    '
+    The REST API authentication section contains more details on how to authenticate your client.'
 paths:
   /inbox/v1/reporting/metrics/inbound-message-volume:
     post:
@@ -31,9 +29,7 @@ paths:
       - real_time_metrics_rest_api
       summary: Inbound message volume
       operationId: metricsInboundMessageVolume
-      description: 'A count of inbound messages based on applied filters.
-
-        '
+      description: A count of inbound messages based on applied filters.
       requestBody:
         content:
           application/json:
@@ -67,9 +63,7 @@ paths:
       - real_time_metrics_rest_api
       summary: Outbound message volume
       operationId: metricsOutboundMessageVolume
-      description: 'A count of outbound messages based on applied filters.
-
-        '
+      description: A count of outbound messages based on applied filters.
       requestBody:
         content:
           application/json:
@@ -103,9 +97,7 @@ paths:
       - real_time_metrics_rest_api
       summary: Average first response time
       operationId: metricsAverageFirstResponseTime
-      description: 'The average time in seconds to the first response to an inbound message.
-
-        '
+      description: The average time in seconds to the first response to an inbound message.
       requestBody:
         content:
           application/json:
@@ -156,9 +148,7 @@ paths:
       - real_time_metrics_rest_api
       summary: Average conversation response time
       operationId: metricsAverageConversationResponseTime
-      description: 'The average time in seconds for a response to an inbound message except the first response.
-
-        '
+      description: The average time in seconds for a response to an inbound message except the first response.
       requestBody:
         content:
           application/json:
@@ -209,9 +199,7 @@ paths:
       - real_time_metrics_rest_api
       summary: Resolved with reply
       operationId: metricsResolvedWithReply
-      description: 'The number of messages that have been resolved with at least one reply.
-
-        '
+      description: The number of messages that have been resolved with at least one reply.
       requestBody:
         content:
           application/json:
@@ -249,9 +237,7 @@ paths:
 
         of conversation open and conversation pend/resolve. For Average Handle Time to be calculated, there must be an outbound
 
-        between open and pend/resolve event.
-
-        '
+        between open and pend/resolve event.'
       requestBody:
         content:
           application/json:
@@ -277,9 +263,7 @@ paths:
       - real_time_metrics_rest_api
       summary: Agent availability
       operationId: metricsAgentAvailability
-      description: 'The number of agents available or away. You can filter by teams.
-
-        '
+      description: The number of agents available or away. You can filter by teams.
       requestBody:
         content:
           application/json:
@@ -304,9 +288,7 @@ paths:
       - real_time_metrics_rest_api
       summary: Contacts waiting in queue
       operationId: metricsContactsWaitingInQueue
-      description: 'The number of contacts waiting in the queue for a response.
-
-        '
+      description: The number of contacts waiting in the queue for a response.
       requestBody:
         content:
           application/json:
@@ -342,9 +324,7 @@ paths:
       operationId: metricsLongestWaitTimeInQueue
       description: 'The current longest time in seconds that a contact is waiting for a response. If no mediumId filter is provided, the
 
-        messages sent in any connected mediums will be included.
-
-        '
+        messages sent in any connected mediums will be included.'
       requestBody:
         content:
           application/json:
@@ -374,73 +354,22 @@ paths:
             '
 components:
   schemas:
-    GroupByInterval:
+    TeamId:
       type: string
-      enum:
-      - MINUTE
-      - HOUR
-      - DAY
-      - MONTH
-      - YEAR
-      - HOUR_BY_DAY
-      description: 'An interval to group results by. No more than 60 intervals can be requested per request. For example, when selecting `minute`, the requested time range cannot be longer than 1 hour
+      description: 'Filter by team identifier
 
         '
-    From:
-      type: string
-      description: 'An `ISO-8601` date time marking the inclusive start of the result. Must be URL encoded. The `from` filter can be a maximum of 14 days in the past.
-
-        '
-    ChannelId:
-      type: string
-      description: 'Filter by channel identifier (to obtain a list of your channel IDs, contact a Inbox 2.0 representative)
-
-        '
-    TotalResolvedConversationsRequest:
-      type: object
-      required:
-      - from
-      properties:
-        from:
-          $ref: '#/components/schemas/From'
-        to:
-          $ref: '#/components/schemas/To'
-        mediumIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/MediumId'
-        channelIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/ChannelId'
-        teamIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/TeamId'
-        groupBy:
-          type: string
-          enum:
-          - TEAM
-    Timezone:
-      type: string
-      description: 'The `timezone` to be used in conjunction with`groupByInterval`, e.g. America/Los_Angeles. Must be URL encoded. If no `timezone` is provided, the default ''UTC'' timezone is used
-
-        '
-    AgentAvailabilityRequest:
+    TimeSeriesDataPoint:
       type: object
       properties:
-        teamIds:
-          type: array
-          items:
-            type: string
-          description: 'Filter by teams
-
-            '
-        userPresenceStatus:
+        timestamp:
           type: string
-          enum:
-          - AWAY
-          - AVAILABLE
+          format: date-time
+        value:
+          type: object
+          oneOf:
+          - $ref: '#/components/schemas/GroupedMetricResponse'
+          - $ref: '#/components/schemas/NumberMetricResponse'
     TotalMessagesRequest:
       type: object
       required:
@@ -462,6 +391,26 @@ components:
             $ref: '#/components/schemas/ChannelId'
         groupByInterval:
           $ref: '#/components/schemas/GroupByInterval'
+    UserId:
+      type: string
+      description: 'Filter by user identifier
+
+        '
+    AgentAvailabilityRequest:
+      type: object
+      properties:
+        teamIds:
+          type: array
+          items:
+            type: string
+          description: 'Filter by teams
+
+            '
+        userPresenceStatus:
+          type: string
+          enum:
+          - AWAY
+          - AVAILABLE
     MetricRequest:
       type: object
       required:
@@ -489,82 +438,16 @@ components:
           enum:
           - NEW
           - PENDING
-    UserId:
-      type: string
-      description: 'Filter by user identifier
-
-        '
-    MediumId:
-      type: string
-      enum:
-      - fb
-      - twit
-      - instagram
-      - rtm
-      - whatsapp
-      - linkedin
-      description: 'Filter by medium identifier
-
-        '
-    ResponseTimeRequest:
-      type: object
-      required:
-      - from
-      properties:
-        from:
-          $ref: '#/components/schemas/From'
-        to:
-          $ref: '#/components/schemas/To'
-        timezone:
-          $ref: '#/components/schemas/Timezone'
-        mediumIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/MediumId'
-        channelIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/ChannelId'
-        teamIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/TeamId'
-        groupByInterval:
-          $ref: '#/components/schemas/GroupByInterval'
-        groupBy:
-          type: string
-          enum:
-          - TEAM
-    TeamId:
-      type: string
-      description: 'Filter by team identifier
-
-        '
-    To:
-      type: string
-      description: 'An `ISO-8601` date time marking the exclusive end of the result. Must be URL encoded
-
-        '
-    TimeSeriesMetricResponse:
+    NumberMetricResponse:
       type: object
       properties:
         value:
-          type: array
-          items:
-            type: object
-            additionalProperties:
-              $ref: '#/components/schemas/TimeSeriesDataPoint'
-    TimeSeriesDataPoint:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        value:
-          type: object
-          oneOf:
-          - $ref: '#/components/schemas/GroupedMetricResponse'
-          - $ref: '#/components/schemas/NumberMetricResponse'
+          type: integer
+    From:
+      type: string
+      description: 'An `ISO-8601` date time marking the inclusive start of the result. Must be URL encoded. The `from` filter can be a maximum of 14 days in the past.
+
+        '
     HandleTimeRequest:
       type: object
       required:
@@ -594,6 +477,108 @@ components:
             - HANDLE_TIME
             - NO_REPLY_TIME
             - CHERRY_PICKING
+    TimeSeriesMetricResponse:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/TimeSeriesDataPoint'
+    Timezone:
+      type: string
+      description: 'The `timezone` to be used in conjunction with`groupByInterval`, e.g. America/Los_Angeles. Must be URL encoded. If no `timezone` is provided, the default ''UTC'' timezone is used
+
+        '
+    MediumId:
+      type: string
+      enum:
+      - fb
+      - twit
+      - instagram
+      - rtm
+      - whatsapp
+      - linkedin
+      description: 'Filter by medium identifier
+
+        '
+    To:
+      type: string
+      description: 'An `ISO-8601` date time marking the exclusive end of the result. Must be URL encoded
+
+        '
+    TotalResolvedConversationsRequest:
+      type: object
+      required:
+      - from
+      properties:
+        from:
+          $ref: '#/components/schemas/From'
+        to:
+          $ref: '#/components/schemas/To'
+        mediumIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediumId'
+        channelIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelId'
+        teamIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamId'
+        groupBy:
+          type: string
+          enum:
+          - TEAM
+    ResponseTimeRequest:
+      type: object
+      required:
+      - from
+      properties:
+        from:
+          $ref: '#/components/schemas/From'
+        to:
+          $ref: '#/components/schemas/To'
+        timezone:
+          $ref: '#/components/schemas/Timezone'
+        mediumIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediumId'
+        channelIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelId'
+        teamIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamId'
+        groupByInterval:
+          $ref: '#/components/schemas/GroupByInterval'
+        groupBy:
+          type: string
+          enum:
+          - TEAM
+    ChannelId:
+      type: string
+      description: 'Filter by channel identifier (to obtain a list of your channel IDs, contact a Inbox 2.0 representative)
+
+        '
+    GroupByInterval:
+      type: string
+      enum:
+      - MINUTE
+      - HOUR
+      - DAY
+      - MONTH
+      - YEAR
+      - HOUR_BY_DAY
+      description: 'An interval to group results by. No more than 60 intervals can be requested per request. For example, when selecting `minute`, the requested time range cannot be longer than 1 hour
+
+        '
     GroupedMetricResponse:
       type: object
       properties:
@@ -601,11 +586,6 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/NumberMetricResponse'
-    NumberMetricResponse:
-      type: object
-      properties:
-        value:
-          type: integer
   securitySchemes:
     bearer-token:
       type: http
@@ -624,12 +604,6 @@ components:
       type: apiKey
       in: header
       name: X-Hootsuite-Signature
-x-provenance:
-  generated: '2026-08-13'
-  method: searched
-  source: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
-  note: Verbatim first-party OpenAPI 3.1 for the Hootsuite Inbox 2.0 API (formerly Sparkcentral), linked as service-desc for anchor https://platform.hootsuite.com/inbox/v1/ in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog.
-  ownership: servers[] https://platform.hootsuite.com, contact dev.support@hootsuite.com, license "Hootsuite Developer Terms and API License Agreement" - Hootsuite's own contract.
 x-tagGroups:
 - name: General
   tags:

@@ -18,7 +18,7 @@ security:
 tags:
 - name: proactive_messaging_rest_api
   x-displayName: REST API
-  description: "When calling the Proactive Messaging API, the client needs to be authenticated.  \n\nThe [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client.\n\n### Examples\n\n1. Send a proactive text message\n\nThe following example shows a proactive outbound message that can be sent as a text message. Inbox 2.0 supports text messaging on WhatsApp\nEnterprises are responsible for ensuring that the customers have opted-in for proactive communications.\n\nRequest\n\n```shell\ncurl -X POST https://platform.hootsuite.com/inbox/v1/proactive-messaging/ \\\n  -H 'Authorization: Bearer <token>' \\\n  -H 'Content-Type: application/json' \\\n  -d '{ \"medium\": \"WHATSAPP\", \"channel\": \"myChannel\", \"contact\": \"+32495123456\", \"text\": \"Hello world!\" }'\n```\n\nResponse `200`\n\n```json\n{\n  \"correlationId\": \"3a7c6c1d-9f9b-11e8-b23b-6f13d5844b66\"\n}\n```\n\n2. Send a proactive message template (WhatsApp)\n\nWhatsApp allows for proactive outbound communication when these are sent as message templates that have been authorized by WhatsApp. These templates have a name, corresponding text, and substitution parameters within the text to make them personalized.\nInbox 2.0 has simplified how enterprises can send out these message templates through the use of shorthand codes for inline syntax:\n\n```text\n&((namespace=[[NAMESPACE]] template=[[TEMPLATE NAME]] fallback=[[FALLBACK TEXT]] language=[[LANGUAGE]] body_text=[[VARIABLE1]] body_text=[[VARIABLE2]]))&\n```\n\n| Parameter name | Parameter description                                                                                                      | Required  |\n|----------------|----------------------------------------------------------------------------------------------------------------------------|-----------|\n| namespace      | Unique code provided by WhatsApp while defining message templates.                                                         | true      |\n| template       | Name of the template provided on WhatsApp Manager.                                                                         | true      |\n| fallback       | We recommend setting the same value as the Template name here.                                                             | true      |\n| language       | The language in which the messages should be sent. The language needs to be defined in the WhatsApp Manager.               | true      |\n| body_text      | The variable text. 0, 1, or multiple variables in a message. Per variable, there needs to be a body_text parameter.        | true      |\n\nThe language codes can be found on: <https://developers.facebook.com/docs/whatsapp/message-templates/creation>\n\nEnterprises construct the messages in shorthand and send it in the text field as shown in the following code.\n\nRequest\n\n```shell\ncurl -X POST https://platform.hootsuite.com/inbox/v1/proactive-messaging/ \\\n  -H 'Authorization: Bearer <token>' \\\n  -H 'Content-Type: application/json' \\\n  -d '{ \"medium\": \"WHATSAPP\", \"channel\": \"myChannel\", \"contact\": \"+32495123456\", \"text\": \"&((namespace=[[3c860f8b_1ae3_1105_b9ea_647e69aa2d49]] template=[[welcome_customer]] fallback=[[welcome_customer]] language=[[en]] body_text=[[Gregory]] body_text=[[How can I help you?]]))&\" }'\n```\n\nResponse `200`\n\n```json\n{\n  \"correlationId\": \"3a7c6c1d-9f9b-11e8-b23b-6f13d5844b66\"\n}\n```\n\n3. Get status overview\n\nRequest\n\n```shell\ncurl -X GET https://platform.hootsuite.com/inbox/v1/proactive-messaging/3a7c6c1d-9f9b-11e8-b23b-6f13d5844b66 \\\n  -H 'Authorization: Bearer '\n```\n\nResponse `200`\n\n```json\n{\n  \"correlationId\": \"3a7c6c1d-9f9b-11e8-b23b-6f13d5844b66\",\n  \"total\": 1,\n  \"statuses\": {\n    \"SENT\": 1\n  }\n}\n```\n\n4. Get status details\n\nRequest\n\n```shell\ncurl -X GET https://platform.hootsuite.com/inbox/v1/proactive-messaging/f988bd0f-9f9d-11e8-b23b-7d351b0c7ce9/FAILED \\\n  -H 'Authorization: Bearer '\n```\n\nResponse 200\n\n```json\n[\n  {\n    \"status\": \"FAILED\",\n    \"contact\": \"+32495123456\",\n    \"reason\": \"No channel found for medium TWIT\"\n  }\n]\n```\n"
+  description: When calling the Proactive Messaging API, the client needs to be authenticated.
 paths:
   /inbox/v1/proactive-messaging:
     post:
@@ -26,9 +26,7 @@ paths:
       - proactive_messaging_rest_api
       summary: Send proactive message
       operationId: proactiveSendMessage
-      description: 'The message is queued for processing. Use the returned correlation id to get the status of the sent message.
-
-        '
+      description: The message is queued for processing. Use the returned correlation id to get the status of the sent message.
       requestBody:
         content:
           application/json:
@@ -68,9 +66,7 @@ paths:
       - proactive_messaging_rest_api
       summary: Get status
       operationId: proactiveGetStatusForCorrelationId
-      description: 'Get the status overview for a sent proactive message
-
-        '
+      description: Get the status overview for a sent proactive message
       parameters:
       - in: path
         name: correlationId
@@ -103,9 +99,7 @@ paths:
       - proactive_messaging_rest_api
       summary: Get status detail
       operationId: proactiveGetStatusDetailForCorrelationId
-      description: 'Get the details of a message with a specific status.
-
-        '
+      description: Get the details of a message with a specific status.
       parameters:
       - in: path
         name: correlationId
@@ -184,13 +178,6 @@ components:
         total: 1
         statuses:
           DELIVERED: 1
-    ErrorResponse:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: string
     SendProactiveMessageRequest:
       type: object
       properties:
@@ -231,6 +218,13 @@ components:
       - channel
       - contact
       - text
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
     StatusDetailResponse:
       type: array
       items:
@@ -267,12 +261,6 @@ components:
       type: apiKey
       in: header
       name: X-Hootsuite-Signature
-x-provenance:
-  generated: '2026-08-13'
-  method: searched
-  source: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
-  note: Verbatim first-party OpenAPI 3.1 for the Hootsuite Inbox 2.0 API (formerly Sparkcentral), linked as service-desc for anchor https://platform.hootsuite.com/inbox/v1/ in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog.
-  ownership: servers[] https://platform.hootsuite.com, contact dev.support@hootsuite.com, license "Hootsuite Developer Terms and API License Agreement" - Hootsuite's own contract.
 x-tagGroups:
 - name: General
   tags:

@@ -21,9 +21,7 @@ tags:
   description: 'When calling the User Presence API, the client needs to be authenticated.
 
 
-    The [REST API authentication](#tag/rest-api-authentication) section contains more details on how to authenticate your client.
-
-    '
+    The REST API authentication section contains more details on how to authenticate your client.'
 paths:
   /inbox/v1/user-presence/online-agents:
     get:
@@ -31,9 +29,7 @@ paths:
       - user_presence_rest_api
       summary: Online Agents
       operationId: onlineAgents
-      description: 'List of all currently online agents.
-
-        '
+      description: List of all currently online agents.
       responses:
         '200':
           description: Success
@@ -98,12 +94,6 @@ components:
       type: apiKey
       in: header
       name: X-Hootsuite-Signature
-x-provenance:
-  generated: '2026-08-13'
-  method: searched
-  source: https://apidocs.hootsuite.com/docs/api/inbox/openapi/openapi.yaml
-  note: Verbatim first-party OpenAPI 3.1 for the Hootsuite Inbox 2.0 API (formerly Sparkcentral), linked as service-desc for anchor https://platform.hootsuite.com/inbox/v1/ in Hootsuite's RFC 9727 API catalog at https://www.hootsuite.com/.well-known/api-catalog.
-  ownership: servers[] https://platform.hootsuite.com, contact dev.support@hootsuite.com, license "Hootsuite Developer Terms and API License Agreement" - Hootsuite's own contract.
 x-tagGroups:
 - name: General
   tags:
