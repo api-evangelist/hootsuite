@@ -304,137 +304,34 @@ paths:
                 $ref: '#/components/schemas/ErrorsResponseEnvelope'
 components:
   schemas:
-    MediaUrl:
+    Error:
       type: object
       properties:
-        thumbnailUrl:
+        code:
+          type: number
+          description: An error code indicating the type of error that occurred.
+          example: 1234
+        message:
           type: string
-          description: The thumbnail media URL.
-          example: http://static.ow.ly/photos/thumb/cS5.jpg
-        url:
+          description: A description of error.
+          example: An error message
+        id:
           type: string
-          description: The media URL.
-          example: http://static.ow.ly/photos/normal/cS5.jpg
-      description: An ow.ly media URL.
-    MessageReviewResponseEnvelope:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Actions'
-    LinkedInV2CompanyTargeting:
-      description: Targeting options for LinkedIn Company V2.
-      type: object
-      properties:
-        locations:
-          type: array
-          description: "Locations to target the message at, expected format of urn:li:geo:{CODE}. [Geo Locations reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/standardized-data/locations/geo), \n[Geo Typeahead Locations reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/standardized-data/locations/geo-typeahead?tabs=http)\n"
-          items:
-            type: string
-          example:
-          - urn:li:geo:103644278
-          - urn:li:geo:102095887
-        staffCountRanges:
-          type: array
-          description: 'Staff count to target the message at, expected format of SIZE_{VALUES}.
-
-            Valid values: SIZE_1, SIZE_2_TO_10, SIZE_11_TO_50, SIZE_51_TO_200, SIZE_201_TO_500, SIZE_501_TO_1000,
-
-            SIZE_1001_TO_5000, SIZE_5001_TO_10000, SIZE_10001_OR_MORE
-
-            [Staff count codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/company-size-codes)
-
-            '
-          items:
-            type: string
-          example:
-          - SIZE_1
-          - SIZE_51_TO_200
-          - SIZE_10001_OR_MORE
-        seniorities:
-          type: array
-          description: 'Seniorities to target the message at, expected format of urn:li:seniority:{CODE}. [Seniorities codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/seniority-codes)
-
-            '
-          items:
-            type: string
-          example:
-          - urn:li:seniority:1
-          - urn:li:seniority:2
-        industries:
-          type: array
-          description: 'Industries to target the message at, expected format of urn:li:industry:{CODE}. [Industries codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/industry-codes-v2)
-
-            '
-          items:
-            type: string
-          example:
-          - urn:li:industry:1
-          - urn:li:industry:2
-        interfaceLocales:
-          type: array
-          description: 'Languages to target the message at, expected format of {"country":"COUNTRY","language":"language"}. [Language codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/language-codes)
-
-            Languages can be interpreted as this format: language_COUNTRY, replace in request as necessary.
-
-            '
-          items:
-            type: object
-          example:
-          - country: US
-            language: en
-          - country: ES
-            language: es
-    LinkedInPrivacy:
-      type: object
-      properties:
-        visibility:
-          type: array
-          description: LinkedIn visibility rules. At most 1 can be used.
-          items:
-            type: string
-            example: anyone
-            enum:
-            - anyone
-            - connectionsOnly
-    RejectMessageRequest:
-      type: object
-      required:
-      - reason
-      - sequenceNumber
-      properties:
-        reason:
-          type: string
-          description: The rejection reason to be displayed to the creator of the message.
-          example: Message contains profanity
-        sequenceNumber:
-          type: integer
-          description: The sequence number of the message being rejected.
-          example: 11
-        reviewerType:
-          type: string
-          description: 'The actor that will be rejecting the message. Leaving this field empty will use "EXTERNAL" by default.
-
-
-            Using "MEMBER" requires that you use a member token to reject a message that is pending approval by that member.
-
-            '
-          enum:
-          - EXTERNAL
-          - MEMBER
-    ErrorsResponseEnvelope:
-      type: object
-      properties:
-        errors:
-          type: array
-          description: The errors response envelope.
-          items:
-            $ref: '#/components/schemas/Error'
-    EmptyDataEnvelope:
-      type: object
-      properties:
-        data:
-          description: The data response envelope.
+          description: A unique error id for tracing purposes
+          example: f7d32670-4e6a-48c0-a2a7-87803536a712
+        resource:
           type: object
+          description: A reference to the resource in error
+          title: ResourceReference
+          properties:
+            type:
+              type: string
+              description: The resource type.
+              example: socialProfile
+            id:
+              type: string
+              description: The resource ID.
+              example: '7534653235'
     PrivacyOptions:
       type: object
       description: Social network privacy options to be applied when publishing the message.
@@ -443,19 +340,6 @@ components:
           $ref: '#/components/schemas/FacebookPrivacy'
         linkedIn:
           $ref: '#/components/schemas/LinkedInPrivacy'
-    FacebookPrivacy:
-      type: object
-      properties:
-        visibility:
-          type: array
-          description: Facebook visibility rules. At most 1 can be used.
-          items:
-            type: string
-            example: everyone
-            enum:
-            - everyone
-            - friends
-            - friendsOfFriends
     FacebookPageTargeting:
       description: Targeting options for Facebook Page. Note that recently Facebook has deprecated feed targeting fields `ageMax`, `genders`, and `locales`.
       type: object
@@ -550,69 +434,6 @@ components:
                 type: string
                 description: The zip/postal code key, as provided by Facebook.
                 example: CA:K1S
-    ReviewAction:
-      type: object
-      properties:
-        actorType:
-          type: string
-          description: The type of actor who performed this review action.
-          example: MEMBER
-          enum:
-          - MEMBER
-          - SYSTEM
-          - EXTERNAL_REVIEW_V1
-        actorId:
-          type: string
-          description: The ID of the actor that performed this review action.
-          example: '12345678'
-        actionType:
-          type: string
-          description: The action performed.
-          example: CREATE
-          enum:
-          - CREATE
-          - APPROVE
-          - REJECT
-          - DELETE
-          - RESET
-          - EDIT
-          - EXPIRE
-          - SEND
-          - SCHEDULE
-          - SENDFAIL
-          - SCHEDULEFAIL
-        timestamp:
-          type: string
-          description: The time the review action was performed. Timezone is UTC.
-          example: 2017-02-15 18:51:13+00:00
-    SocialProfileMessagesResponseEnvelope:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          type: array
-          description: The data response envelope.
-          items:
-            $ref: '#/components/schemas/SocialProfileMessage'
-        metadata:
-          title: metadata
-          type: object
-          description: The metadata response envelope.
-          properties:
-            cursor:
-              title: cursor
-              type: object
-              description: The cursor to paginate the results. A cursor will be created if the number of results exceeds the limit set in the query parameters.
-              properties:
-                next:
-                  type: string
-                  description: A cursor to the next page of results. This is set to null if no more pages exist.
-                  example: 1577887200000:4138476039:0
-                previous:
-                  type: string
-                  description: A cursor to the previous page of results. This is set to null if no previous pages exist.
-                  example: 1577887200000:4138476039:1
     LinkedInCompanyTargeting:
       description: Targeting options for LinkedIn Company. Legacy field, please do not use.
       type: object
@@ -2643,60 +2464,41 @@ components:
           items:
             type: string
             example: en
-    ApproveMessageRequest:
-      type: object
-      required:
-      - sequenceNumber
-      properties:
-        sequenceNumber:
-          type: integer
-          description: The sequence number of the message being approved.
-          example: 11
-        reviewerType:
-          type: string
-          description: 'The actor that will be approving the message. Leaving this field empty will use "EXTERNAL" by default.
-
-
-            Using "MEMBER" requires that you use a member token to approve a message that is pending approval by that member.
-
-            '
-          enum:
-          - EXTERNAL
-          - MEMBER
-    Reviewer:
+    ReviewAction:
       type: object
       properties:
-        id:
+        actorType:
           type: string
-          description: The reviewer member ID.
-          example: 22421144
-        type:
-          type: string
-          description: The reviewer type
-          example: MESSAGE_LEVEL
+          description: The type of actor who performed this review action.
+          example: MEMBER
           enum:
-          - MESSAGE_LEVEL
-          - TEAM
           - MEMBER
-          - EXTERNAL
           - SYSTEM
-          - ADMIN_AND_EDITOR
-          - ORGANIZATION
-      description: Member that was requested to approve the message
-    Location:
-      description: The message’s geolocation in decimal degrees for latitude and longitude. Twitter allows users to set the location for a post manually. The location object takes in Decimal Degrees for latitude and longitude. Decimal degrees are an alternative to using degrees, minutes, and seconds (DMS). The values for latitude and longitude are bounded by ±90° and ±180° respectively. Positive latitudes are north of the equator, negative latitudes are south of the equator. Positive longitudes are east of Prime Meridian, negative longitudes are west of the Prime Meridian.<br/>Not supported by Pinterest.
-      type: object
-      properties:
-        latitude:
-          type: number
-          format: double
-          description: The latitude in decimal degrees. Must be between -90 to 90.
-          example: 57.64911
-        longitude:
-          type: number
-          format: double
-          description: The longitude in decimal degrees. Must be between -180 to 180.
-          example: 10.40744
+          - EXTERNAL_REVIEW_V1
+        actorId:
+          type: string
+          description: The ID of the actor that performed this review action.
+          example: '12345678'
+        actionType:
+          type: string
+          description: The action performed.
+          example: CREATE
+          enum:
+          - CREATE
+          - APPROVE
+          - REJECT
+          - DELETE
+          - RESET
+          - EDIT
+          - EXPIRE
+          - SEND
+          - SCHEDULE
+          - SENDFAIL
+          - SCHEDULEFAIL
+        timestamp:
+          type: string
+          description: The time the review action was performed. Timezone is UTC.
+          example: 2017-02-15 18:51:13+00:00
     Actions:
       type: object
       description: An array of the review actions performed on the message.
@@ -2705,6 +2507,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReviewAction'
+    EmptyDataEnvelope:
+      type: object
+      properties:
+        data:
+          description: The data response envelope.
+          type: object
+    MediaUrl:
+      type: object
+      properties:
+        thumbnailUrl:
+          type: string
+          description: The thumbnail media URL.
+          example: http://static.ow.ly/photos/thumb/cS5.jpg
+        url:
+          type: string
+          description: The media URL.
+          example: http://static.ow.ly/photos/normal/cS5.jpg
+      description: An ow.ly media URL.
     TargetingOptions:
       type: object
       description: Social network targeting options to be applied when publishing the message.
@@ -2715,81 +2535,6 @@ components:
           $ref: '#/components/schemas/LinkedInCompanyTargeting'
         linkedInV2Company:
           $ref: '#/components/schemas/LinkedInV2CompanyTargeting'
-    Media:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The media ID.
-          example: aHR0cDovL2V4YW1wbGUub3Jn
-        thumbnailId:
-          type: string
-          description: The thumbnail media ID.
-          example: aHR0cDovL2V4YW1wbGUtMDAwMS5vcmc=
-        videoOptions:
-          type: object
-          description: The metadata to set for a video.
-          properties:
-            facebook:
-              type: object
-              description: Facebook video metadata. Optional.
-              properties:
-                title:
-                  type: string
-                  description: The video title
-                  example: My Video
-                category:
-                  type: string
-                  description: The video category
-                  example: ENTERTAINMENT
-                  enum:
-                  - BEAUTY_FASHION
-                  - BUSINESS
-                  - CARS_TRUCKS
-                  - COMEDY
-                  - CUTE_ANIMALS
-                  - ENTERTAINMENT
-                  - FAMILY
-                  - FOOD_HEALTH
-                  - HOME
-                  - LIFESTYLE
-                  - MUSIC
-                  - NEWS
-                  - POLITICS
-                  - SCIENCE
-                  - SPORTS
-                  - TECHNOLOGY
-                  - VIDEO_GAMING
-                  - OTHER
-      description: The media attached to the message.
-    Error:
-      type: object
-      properties:
-        code:
-          type: number
-          description: An error code indicating the type of error that occurred.
-          example: 1234
-        message:
-          type: string
-          description: A description of error.
-          example: An error message
-        id:
-          type: string
-          description: A unique error id for tracing purposes
-          example: f7d32670-4e6a-48c0-a2a7-87803536a712
-        resource:
-          type: object
-          description: A reference to the resource in error
-          title: ResourceReference
-          properties:
-            type:
-              type: string
-              description: The resource type.
-              example: socialProfile
-            id:
-              type: string
-              description: The resource ID.
-              example: '7534653235'
     Message:
       type: object
       properties:
@@ -2912,12 +2657,247 @@ components:
                     type: string
                     description: Website for Pin
                     example: https://www.hootsuite.com
+    MessageReviewResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Actions'
+    RejectMessageRequest:
+      type: object
+      required:
+      - reason
+      - sequenceNumber
+      properties:
+        reason:
+          type: string
+          description: The rejection reason to be displayed to the creator of the message.
+          example: Message contains profanity
+        sequenceNumber:
+          type: integer
+          description: The sequence number of the message being rejected.
+          example: 11
+        reviewerType:
+          type: string
+          description: 'The actor that will be rejecting the message. Leaving this field empty will use "EXTERNAL" by default.
+
+
+            Using "MEMBER" requires that you use a member token to reject a message that is pending approval by that member.
+
+            '
+          enum:
+          - EXTERNAL
+          - MEMBER
     SocialProfileMessageResponseEnvelope:
       type: object
       properties:
         data:
           $ref: '#/components/schemas/SocialProfileMessage'
       description: The response data wrapper for a social profile message
+    SocialProfileMessagesResponseEnvelope:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          description: The data response envelope.
+          items:
+            $ref: '#/components/schemas/SocialProfileMessage'
+        metadata:
+          title: metadata
+          type: object
+          description: The metadata response envelope.
+          properties:
+            cursor:
+              title: cursor
+              type: object
+              description: The cursor to paginate the results. A cursor will be created if the number of results exceeds the limit set in the query parameters.
+              properties:
+                next:
+                  type: string
+                  description: A cursor to the next page of results. This is set to null if no more pages exist.
+                  example: 1577887200000:4138476039:0
+                previous:
+                  type: string
+                  description: A cursor to the previous page of results. This is set to null if no previous pages exist.
+                  example: 1577887200000:4138476039:1
+    LinkedInV2CompanyTargeting:
+      description: Targeting options for LinkedIn Company V2.
+      type: object
+      properties:
+        locations:
+          type: array
+          description: "Locations to target the message at, expected format of urn:li:geo:{CODE}. [Geo Locations reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/standardized-data/locations/geo), \n[Geo Typeahead Locations reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/standardized-data/locations/geo-typeahead?tabs=http)\n"
+          items:
+            type: string
+          example:
+          - urn:li:geo:103644278
+          - urn:li:geo:102095887
+        staffCountRanges:
+          type: array
+          description: 'Staff count to target the message at, expected format of SIZE_{VALUES}.
+
+            Valid values: SIZE_1, SIZE_2_TO_10, SIZE_11_TO_50, SIZE_51_TO_200, SIZE_201_TO_500, SIZE_501_TO_1000,
+
+            SIZE_1001_TO_5000, SIZE_5001_TO_10000, SIZE_10001_OR_MORE
+
+            [Staff count codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/company-size-codes)
+
+            '
+          items:
+            type: string
+          example:
+          - SIZE_1
+          - SIZE_51_TO_200
+          - SIZE_10001_OR_MORE
+        seniorities:
+          type: array
+          description: 'Seniorities to target the message at, expected format of urn:li:seniority:{CODE}. [Seniorities codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/seniority-codes)
+
+            '
+          items:
+            type: string
+          example:
+          - urn:li:seniority:1
+          - urn:li:seniority:2
+        industries:
+          type: array
+          description: 'Industries to target the message at, expected format of urn:li:industry:{CODE}. [Industries codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/industry-codes-v2)
+
+            '
+          items:
+            type: string
+          example:
+          - urn:li:industry:1
+          - urn:li:industry:2
+        interfaceLocales:
+          type: array
+          description: 'Languages to target the message at, expected format of {"country":"COUNTRY","language":"language"}. [Language codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/language-codes)
+
+            Languages can be interpreted as this format: language_COUNTRY, replace in request as necessary.
+
+            '
+          items:
+            type: object
+          example:
+          - country: US
+            language: en
+          - country: ES
+            language: es
+    LinkedInPrivacy:
+      type: object
+      properties:
+        visibility:
+          type: array
+          description: LinkedIn visibility rules. At most 1 can be used.
+          items:
+            type: string
+            example: anyone
+            enum:
+            - anyone
+            - connectionsOnly
+    Location:
+      description: The message’s geolocation in decimal degrees for latitude and longitude. Twitter allows users to set the location for a post manually. The location object takes in Decimal Degrees for latitude and longitude. Decimal degrees are an alternative to using degrees, minutes, and seconds (DMS). The values for latitude and longitude are bounded by ±90° and ±180° respectively. Positive latitudes are north of the equator, negative latitudes are south of the equator. Positive longitudes are east of Prime Meridian, negative longitudes are west of the Prime Meridian.<br/>Not supported by Pinterest.
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          description: The latitude in decimal degrees. Must be between -90 to 90.
+          example: 57.64911
+        longitude:
+          type: number
+          format: double
+          description: The longitude in decimal degrees. Must be between -180 to 180.
+          example: 10.40744
+    ErrorsResponseEnvelope:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: The errors response envelope.
+          items:
+            $ref: '#/components/schemas/Error'
+    Reviewer:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The reviewer member ID.
+          example: 22421144
+        type:
+          type: string
+          description: The reviewer type
+          example: MESSAGE_LEVEL
+          enum:
+          - MESSAGE_LEVEL
+          - TEAM
+          - MEMBER
+          - EXTERNAL
+          - SYSTEM
+          - ADMIN_AND_EDITOR
+          - ORGANIZATION
+      description: Member that was requested to approve the message
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The media ID.
+          example: aHR0cDovL2V4YW1wbGUub3Jn
+        thumbnailId:
+          type: string
+          description: The thumbnail media ID.
+          example: aHR0cDovL2V4YW1wbGUtMDAwMS5vcmc=
+        videoOptions:
+          type: object
+          description: The metadata to set for a video.
+          properties:
+            facebook:
+              type: object
+              description: Facebook video metadata. Optional.
+              properties:
+                title:
+                  type: string
+                  description: The video title
+                  example: My Video
+                category:
+                  type: string
+                  description: The video category
+                  example: ENTERTAINMENT
+                  enum:
+                  - BEAUTY_FASHION
+                  - BUSINESS
+                  - CARS_TRUCKS
+                  - COMEDY
+                  - CUTE_ANIMALS
+                  - ENTERTAINMENT
+                  - FAMILY
+                  - FOOD_HEALTH
+                  - HOME
+                  - LIFESTYLE
+                  - MUSIC
+                  - NEWS
+                  - POLITICS
+                  - SCIENCE
+                  - SPORTS
+                  - TECHNOLOGY
+                  - VIDEO_GAMING
+                  - OTHER
+      description: The media attached to the message.
+    FacebookPrivacy:
+      type: object
+      properties:
+        visibility:
+          type: array
+          description: Facebook visibility rules. At most 1 can be used.
+          items:
+            type: string
+            example: everyone
+            enum:
+            - everyone
+            - friends
+            - friendsOfFriends
     SocialProfileMessage:
       type: object
       required:
@@ -3069,6 +3049,26 @@ components:
           description: A list of message reviewers
           items:
             $ref: '#/components/schemas/Reviewer'
+    ApproveMessageRequest:
+      type: object
+      required:
+      - sequenceNumber
+      properties:
+        sequenceNumber:
+          type: integer
+          description: The sequence number of the message being approved.
+          example: 11
+        reviewerType:
+          type: string
+          description: 'The actor that will be approving the message. Leaving this field empty will use "EXTERNAL" by default.
+
+
+            Using "MEMBER" requires that you use a member token to approve a message that is pending approval by that member.
+
+            '
+          enum:
+          - EXTERNAL
+          - MEMBER
   parameters:
     bearerToken:
       in: header

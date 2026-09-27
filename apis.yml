@@ -43,7 +43,7 @@ accessModel:
     shortener API and organization apps for prescreen components are Enterprise-only.
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/hootsuite.png
 tags:
-- Social-Media
+- Social Media
 - Social Media Management
 - Marketing
 - Content Scheduling
@@ -55,6 +55,8 @@ tags:
 - SCIM
 - Authentication
 - Webhook
+- Scheduling
+- Canada
 tags_raw:
 - Social Media
 - Social Media Management
@@ -68,6 +70,9 @@ tags_raw:
 - SCIM
 - OAuth 2.0
 - Webhooks
+- Social-Media
+- Scheduling
+- Canada
 url: https://raw.githubusercontent.com/api-evangelist/hootsuite/refs/heads/main/apis.yml
 created: '2026-05-11'
 modified: '2026-08-13'

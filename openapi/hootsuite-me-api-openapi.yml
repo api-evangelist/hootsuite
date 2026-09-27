@@ -276,28 +276,15 @@ paths:
     - url: https://platform.hootsuite.com
 components:
   schemas:
-    DeobfuscatePostBody:
-      properties:
-        ids:
-          description: Obfuscated memberIDs (max 500 per request)
-          example: '[ "ABCDEF", "DEFGHI", "GHIJKL"]'
-          items:
-            type: string
-          type: array
-      type: object
-    ConversionModel:
-      properties:
-        data:
-          items:
-            $ref: '#/components/schemas/ObfuscationsToMemberIDs'
-          type: array
-      type: object
-    ShareableNetworks:
+    enabledNetworks:
       properties:
         facebook:
           example: true
           type: boolean
         facebookpage:
+          example: true
+          type: boolean
+        hootsuite:
           example: true
           type: boolean
         instagram:
@@ -313,23 +300,26 @@ components:
           example: true
           type: boolean
       type: object
-    TikTokPrivacySettings:
+    OrgListModel:
       properties:
-        allowComments:
-          default: true
-          description: Whether comments are allowed for TikTok posts
-          example: true
-          type: boolean
-        allowDuet:
-          default: true
-          description: Whether duets are allowed for TikTok posts
-          example: true
-          type: boolean
-        allowStitch:
-          default: true
-          description: Whether stitching is allowed for TikTok posts
-          example: true
-          type: boolean
+        data:
+          items:
+            $ref: '#/components/schemas/Organization'
+          type: array
+      type: object
+    TopicPostBody:
+      properties:
+        name:
+          description: Name of the topic
+          example: sports
+          type: string
+        privacy:
+          description: Privacy of the topic
+          enum:
+          - opened
+          - closed
+          example: opened
+          type: string
       type: object
     Organization:
       properties:
@@ -347,6 +337,11 @@ components:
           description: Name of the organization
           example: Hootsuite Inc.
           type: string
+      type: object
+    TopicModel:
+      properties:
+        data:
+          $ref: '#/components/schemas/Topic'
       type: object
     Member:
       properties:
@@ -366,28 +361,95 @@ components:
             type: string
           type: array
       type: object
-    MemberResponse:
-      properties:
-        data:
-          $ref: '#/components/schemas/Member'
-      type: object
     MessageResponse:
       properties:
         data:
           $ref: '#/components/schemas/Message'
       type: object
-    Attachment:
+    Message:
+      allOf:
+      - $ref: '#/components/schemas/MessageCore'
+      - properties:
+          content:
+            description: Detailed message content structure including organic and amplify properties
+            type: object
+          createdDate:
+            description: Date of creation
+            example: 2017-10-16 16:42:23.141000+00:00
+            format: date-time
+            type: string
+          id:
+            description: Unique identifier for the message
+            example: 59d6df3c6bc0160ba6e15f73
+            type: string
+          isDeleted:
+            description: It tells if this message is considered deleted or not
+            example: false
+            type: boolean
+          isReshareable:
+            description: Whether the message is retweetable on Twitter or reshareable on Facebook
+            example: false
+            type: boolean
+          isReshareableWithThoughts:
+            description: Whether the message is allowed to be reshared with added comment
+            example: false
+            type: boolean
+          raw_message:
+            type: object
+          url:
+            description: Link shared in the message
+            example: http://ow.ly/fjzz30fU6EK
+            type: string
+        type: object
+    PrivacySettings:
       properties:
-        mimeType:
-          example: image/jpeg
-          type: string
-        thumbnailUrl:
-          example: https://somethumbnail.jpeg
-          type: string
-        url:
-          example: https://somethumbnail.jpeg
-          type: string
+        tiktokbusiness:
+          allOf:
+          - $ref: '#/components/schemas/TikTokPrivacySettings'
+          description: TikTok-specific privacy settings
       type: object
+    MessagePostData:
+      allOf:
+      - $ref: '#/components/schemas/MessageCore'
+      - properties:
+          isEditable:
+            default: false
+            description: Should this message be editable?
+            example: false
+            type: boolean
+          isNativeShareEnabled:
+            default: false
+            description: Should native share be allowed for the posts in this org?
+            example: false
+            type: boolean
+          isPublished:
+            default: false
+            description: Has this message been published?
+            example: false
+            type: boolean
+          isSuggested:
+            default: false
+            description: Whether a message is a suggestion. Message will default to a draft post
+            example: false
+            type: boolean
+          photoUriBase64:
+            description: Base 64 image URL
+            example: data:image/gif;base64,R0lGODlhEAAQAM...
+            type: string
+          srcNetwork:
+            default: ''
+            description: Network where we are posting this message from
+            type: string
+          srcUser:
+            default: ''
+            description: When the message has been shared by Twitter or Facebook, this field will contain the original user that shared the post
+            example: twitter_techie
+            type: string
+          suggestionReason:
+            default: ''
+            description: Reason why this message was suggested
+            type: string
+        type: object
     Topic:
       properties:
         count:
@@ -412,10 +474,44 @@ components:
           example: opened
           type: string
       type: object
-    TopicModel:
+    DeobfuscatePostBody:
       properties:
-        data:
-          $ref: '#/components/schemas/Topic'
+        ids:
+          description: Obfuscated memberIDs (max 500 per request)
+          example: '[ "ABCDEF", "DEFGHI", "GHIJKL"]'
+          items:
+            type: string
+          type: array
+      type: object
+    TikTokPrivacySettings:
+      properties:
+        allowComments:
+          default: true
+          description: Whether comments are allowed for TikTok posts
+          example: true
+          type: boolean
+        allowDuet:
+          default: true
+          description: Whether duets are allowed for TikTok posts
+          example: true
+          type: boolean
+        allowStitch:
+          default: true
+          description: Whether stitching is allowed for TikTok posts
+          example: true
+          type: boolean
+      type: object
+    Attachment:
+      properties:
+        mimeType:
+          example: image/jpeg
+          type: string
+        thumbnailUrl:
+          example: https://somethumbnail.jpeg
+          type: string
+        url:
+          example: https://somethumbnail.jpeg
+          type: string
       type: object
     MessageCore:
       properties:
@@ -472,57 +568,35 @@ components:
         videoAttachment:
           type: object
       type: object
-    MessagePostData:
-      allOf:
-      - $ref: '#/components/schemas/MessageCore'
-      - properties:
-          isEditable:
-            default: false
-            description: Should this message be editable?
-            example: false
-            type: boolean
-          isNativeShareEnabled:
-            default: false
-            description: Should native share be allowed for the posts in this org?
-            example: false
-            type: boolean
-          isPublished:
-            default: false
-            description: Has this message been published?
-            example: false
-            type: boolean
-          isSuggested:
-            default: false
-            description: Whether a message is a suggestion. Message will default to a draft post
-            example: false
-            type: boolean
-          photoUriBase64:
-            description: Base 64 image URL
-            example: data:image/gif;base64,R0lGODlhEAAQAM...
-            type: string
-          srcNetwork:
-            default: ''
-            description: Network where we are posting this message from
-            type: string
-          srcUser:
-            default: ''
-            description: When the message has been shared by Twitter or Facebook, this field will contain the original user that shared the post
-            example: twitter_techie
-            type: string
-          suggestionReason:
-            default: ''
-            description: Reason why this message was suggested
-            type: string
-        type: object
-    enabledNetworks:
+    ConversionModel:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ObfuscationsToMemberIDs'
+          type: array
+      type: object
+    MemberResponse:
+      properties:
+        data:
+          $ref: '#/components/schemas/Member'
+      type: object
+    ObfuscationsToMemberIDs:
+      properties:
+        memberID:
+          description: Employee memberID
+          example: '123456'
+          type: string
+        obfuscatedID:
+          description: Obfuscated memberID
+          example: ABCDEF
+          type: string
+      type: object
+    ShareableNetworks:
       properties:
         facebook:
           example: true
           type: boolean
         facebookpage:
-          example: true
-          type: boolean
-        hootsuite:
           example: true
           type: boolean
         instagram:
@@ -538,80 +612,6 @@ components:
           example: true
           type: boolean
       type: object
-    ObfuscationsToMemberIDs:
-      properties:
-        memberID:
-          description: Employee memberID
-          example: '123456'
-          type: string
-        obfuscatedID:
-          description: Obfuscated memberID
-          example: ABCDEF
-          type: string
-      type: object
-    TopicPostBody:
-      properties:
-        name:
-          description: Name of the topic
-          example: sports
-          type: string
-        privacy:
-          description: Privacy of the topic
-          enum:
-          - opened
-          - closed
-          example: opened
-          type: string
-      type: object
-    Message:
-      allOf:
-      - $ref: '#/components/schemas/MessageCore'
-      - properties:
-          content:
-            description: Detailed message content structure including organic and amplify properties
-            type: object
-          createdDate:
-            description: Date of creation
-            example: 2017-10-16 16:42:23.141000+00:00
-            format: date-time
-            type: string
-          id:
-            description: Unique identifier for the message
-            example: 59d6df3c6bc0160ba6e15f73
-            type: string
-          isDeleted:
-            description: It tells if this message is considered deleted or not
-            example: false
-            type: boolean
-          isReshareable:
-            description: Whether the message is retweetable on Twitter or reshareable on Facebook
-            example: false
-            type: boolean
-          isReshareableWithThoughts:
-            description: Whether the message is allowed to be reshared with added comment
-            example: false
-            type: boolean
-          raw_message:
-            type: object
-          url:
-            description: Link shared in the message
-            example: http://ow.ly/fjzz30fU6EK
-            type: string
-        type: object
-    PrivacySettings:
-      properties:
-        tiktokbusiness:
-          allOf:
-          - $ref: '#/components/schemas/TikTokPrivacySettings'
-          description: TikTok-specific privacy settings
-      type: object
-    OrgListModel:
-      properties:
-        data:
-          items:
-            $ref: '#/components/schemas/Organization'
-          type: array
-      type: object
     TopicListModel:
       properties:
         data:
@@ -619,6 +619,57 @@ components:
             $ref: '#/components/schemas/Topic'
           type: array
       type: object
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+          description: An error code indicating the type of error that occurred.
+          example: 1234
+        message:
+          type: string
+          description: A description of error.
+          example: An error message
+        id:
+          type: string
+          description: A unique error id for tracing purposes
+          example: f7d32670-4e6a-48c0-a2a7-87803536a712
+        resource:
+          type: object
+          description: A reference to the resource in error
+          title: ResourceReference
+          properties:
+            type:
+              type: string
+              description: The resource type.
+              example: socialProfile
+            id:
+              type: string
+              description: The resource ID.
+              example: '7534653235'
+    MeOrganizationsResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          description: The data response envelope.
+          items:
+            $ref: '#/components/schemas/MeOrganization'
+    MeOrganization:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The organization ID
+          example: '626731'
+        name:
+          type: string
+          description: The organization display name
+          example: Test Organization
+        logoUrl:
+          type: string
+          description: URL of the organization logo
+          example: https://assets.hootsuite.com/avatars_production/organization/12345_owl.gif
     Member_2:
       type: object
       required:
@@ -684,71 +735,6 @@ components:
           - ru
           - th
           - tr
-    Error:
-      type: object
-      properties:
-        code:
-          type: number
-          description: An error code indicating the type of error that occurred.
-          example: 1234
-        message:
-          type: string
-          description: A description of error.
-          example: An error message
-        id:
-          type: string
-          description: A unique error id for tracing purposes
-          example: f7d32670-4e6a-48c0-a2a7-87803536a712
-        resource:
-          type: object
-          description: A reference to the resource in error
-          title: ResourceReference
-          properties:
-            type:
-              type: string
-              description: The resource type.
-              example: socialProfile
-            id:
-              type: string
-              description: The resource ID.
-              example: '7534653235'
-    AdAccounts:
-      type: object
-      properties:
-        ad_accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdAccount'
-    MemberSocialProfiles:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The social profile ID.
-          example: '115185509'
-    OrganizationMemberSocialProfilesResponseEnvelope:
-      type: object
-      properties:
-        data:
-          type: array
-          description: The data response envelope.
-          items:
-            $ref: '#/components/schemas/MemberSocialProfiles'
-    MeOrganization:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The organization ID
-          example: '626731'
-        name:
-          type: string
-          description: The organization display name
-          example: Test Organization
-        logoUrl:
-          type: string
-          description: URL of the organization logo
-          example: https://assets.hootsuite.com/avatars_production/organization/12345_owl.gif
     adAccountsNativeStatus:
       type: string
       enum:
@@ -767,6 +753,18 @@ components:
       - TW_STATUS_REJECTED
       - TW_STATUS_UNDER_REVIEW
       default: STATUS_UNKNOWN
+    adAccountsSocialNetwork:
+      type: string
+      enum:
+      - UNKNOWN
+      - FACEBOOK
+      - TWITTER
+      default: UNKNOWN
+    MemberResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Member_2'
     ErrorsResponseEnvelope:
       type: object
       properties:
@@ -775,26 +773,21 @@ components:
           description: The errors response envelope.
           items:
             $ref: '#/components/schemas/Error'
-    MeOrganizationsResponseEnvelope:
+    OrganizationMemberSocialProfilesResponseEnvelope:
       type: object
       properties:
         data:
           type: array
           description: The data response envelope.
           items:
-            $ref: '#/components/schemas/MeOrganization'
-    MemberResponseEnvelope:
+            $ref: '#/components/schemas/MemberSocialProfiles'
+    AdAccounts:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/Member_2'
-    adAccountsSocialNetwork:
-      type: string
-      enum:
-      - UNKNOWN
-      - FACEBOOK
-      - TWITTER
-      default: UNKNOWN
+        ad_accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdAccount'
     AdAccount:
       type: object
       properties:
@@ -840,6 +833,13 @@ components:
           title: Optional. SocialNetwork dependent additional account information
         native_status:
           $ref: '#/components/schemas/adAccountsNativeStatus'
+    MemberSocialProfiles:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The social profile ID.
+          example: '115185509'
   parameters:
     bearerToken:
       in: header

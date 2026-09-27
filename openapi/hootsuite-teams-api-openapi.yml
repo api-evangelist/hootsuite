@@ -245,6 +245,63 @@ paths:
                 $ref: '#/components/schemas/ErrorsResponseEnvelope'
 components:
   schemas:
+    CreateTeamRequest:
+      type: object
+      required:
+      - teamName
+      properties:
+        teamName:
+          type: string
+          description: The team name.
+          example: North America Support Team
+    EmptyDataEnvelope:
+      type: object
+      properties:
+        data:
+          description: The data response envelope.
+          type: object
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+          description: An error code indicating the type of error that occurred.
+          example: 1234
+        message:
+          type: string
+          description: A description of error.
+          example: An error message
+        id:
+          type: string
+          description: A unique error id for tracing purposes
+          example: f7d32670-4e6a-48c0-a2a7-87803536a712
+        resource:
+          type: object
+          description: A reference to the resource in error
+          title: ResourceReference
+          properties:
+            type:
+              type: string
+              description: The resource type.
+              example: socialProfile
+            id:
+              type: string
+              description: The resource ID.
+              example: '7534653235'
+    TeamPermissions:
+      type: object
+      properties:
+        permissions:
+          type: array
+          description: The organization member's team permissions.
+          items:
+            type: string
+            description: The permission.
+            example: ORG_MANAGE_TEAM
+        permissionPreset:
+          type: string
+          description: The permission preset.
+          example: CUSTOM
     OrganizationMemberTeamPermissionsResponseEnvelope:
       type: object
       properties:
@@ -291,61 +348,11 @@ components:
               type: string
               description: The member ID.
               example: '13892119232'
-    TeamSocialProfiles:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The social profile ID.
-          example: '115185509'
-    Error:
-      type: object
-      properties:
-        code:
-          type: number
-          description: An error code indicating the type of error that occurred.
-          example: 1234
-        message:
-          type: string
-          description: A description of error.
-          example: An error message
-        id:
-          type: string
-          description: A unique error id for tracing purposes
-          example: f7d32670-4e6a-48c0-a2a7-87803536a712
-        resource:
-          type: object
-          description: A reference to the resource in error
-          title: ResourceReference
-          properties:
-            type:
-              type: string
-              description: The resource type.
-              example: socialProfile
-            id:
-              type: string
-              description: The resource ID.
-              example: '7534653235'
     TeamResponseEnvelope:
       type: object
       properties:
         data:
           $ref: '#/components/schemas/Team'
-    TeamMember:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The member ID.
-          example: '15240789'
-    OrganizationTeamSocialProfilesResponseEnvelope:
-      type: object
-      properties:
-        data:
-          type: array
-          description: The data response envelope.
-          items:
-            $ref: '#/components/schemas/TeamSocialProfiles'
     ErrorsResponseEnvelope:
       type: object
       properties:
@@ -354,6 +361,28 @@ components:
           description: The errors response envelope.
           items:
             $ref: '#/components/schemas/Error'
+    OrganizationTeamSocialProfilesResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          description: The data response envelope.
+          items:
+            $ref: '#/components/schemas/TeamSocialProfiles'
+    TeamSocialProfiles:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The social profile ID.
+          example: '115185509'
+    TeamMember:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The member ID.
+          example: '15240789'
     TeamMembersResponseEnvelope:
       type: object
       properties:
@@ -362,35 +391,6 @@ components:
           description: The data response envelope.
           items:
             $ref: '#/components/schemas/TeamMember'
-    EmptyDataEnvelope:
-      type: object
-      properties:
-        data:
-          description: The data response envelope.
-          type: object
-    TeamPermissions:
-      type: object
-      properties:
-        permissions:
-          type: array
-          description: The organization member's team permissions.
-          items:
-            type: string
-            description: The permission.
-            example: ORG_MANAGE_TEAM
-        permissionPreset:
-          type: string
-          description: The permission preset.
-          example: CUSTOM
-    CreateTeamRequest:
-      type: object
-      required:
-      - teamName
-      properties:
-        teamName:
-          type: string
-          description: The team name.
-          example: North America Support Team
   parameters:
     bearerToken:
       in: header

@@ -145,6 +145,14 @@ components:
               type: string
               description: The resource ID.
               example: '7534653235'
+    ErrorsResponseEnvelope:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: The errors response envelope.
+          items:
+            $ref: '#/components/schemas/Error'
     SocialProfile:
       type: object
       properties:
@@ -196,28 +204,6 @@ components:
           type: integer
           description: 1 indicates that this social profile is disconnected and needs to be reconnected, 0 shows the social profile is in a connected state.
           example: 0
-    SocialProfileTeamsResponseEnvelope:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TeamId'
-      description: The response data wrapper for a team.
-    SocialProfileResponseEnvelope:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/SocialProfile'
-      description: The response data wrapper for a social profile.
-    ErrorsResponseEnvelope:
-      type: object
-      properties:
-        errors:
-          type: array
-          description: The errors response envelope.
-          items:
-            $ref: '#/components/schemas/Error'
     SocialProfilesResponseEnvelope:
       type: object
       properties:
@@ -226,6 +212,20 @@ components:
           items:
             $ref: '#/components/schemas/SocialProfile'
       description: The response data wrapper for a social profile.
+    SocialProfileResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SocialProfile'
+      description: The response data wrapper for a social profile.
+    SocialProfileTeamsResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamId'
+      description: The response data wrapper for a team.
   parameters:
     bearerToken:
       in: header

@@ -103,6 +103,34 @@ paths:
                 $ref: '#/components/schemas/ErrorsResponseEnvelope'
 components:
   schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+          description: An error code indicating the type of error that occurred.
+          example: 1234
+        message:
+          type: string
+          description: A description of error.
+          example: An error message
+        id:
+          type: string
+          description: A unique error id for tracing purposes
+          example: f7d32670-4e6a-48c0-a2a7-87803536a712
+        resource:
+          type: object
+          description: A reference to the resource in error
+          title: ResourceReference
+          properties:
+            type:
+              type: string
+              description: The resource type.
+              example: socialProfile
+            id:
+              type: string
+              description: The resource ID.
+              example: '7534653235'
     Member:
       type: object
       required:
@@ -168,34 +196,34 @@ components:
           - ru
           - th
           - tr
-    Error:
+    MemberResponseEnvelope:
       type: object
       properties:
-        code:
-          type: number
-          description: An error code indicating the type of error that occurred.
-          example: 1234
-        message:
-          type: string
-          description: A description of error.
-          example: An error message
+        data:
+          $ref: '#/components/schemas/Member'
+    ErrorsResponseEnvelope:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: The errors response envelope.
+          items:
+            $ref: '#/components/schemas/Error'
+    MemberOrganizationsResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          description: The data response envelope.
+          items:
+            $ref: '#/components/schemas/MemberOrganizations'
+    MemberOrganizations:
+      type: object
+      properties:
         id:
           type: string
-          description: A unique error id for tracing purposes
-          example: f7d32670-4e6a-48c0-a2a7-87803536a712
-        resource:
-          type: object
-          description: A reference to the resource in error
-          title: ResourceReference
-          properties:
-            type:
-              type: string
-              description: The resource type.
-              example: socialProfile
-            id:
-              type: string
-              description: The resource ID.
-              example: '7534653235'
+          description: The organization ID
+          example: '626731'
     CreateMemberRequest:
       type: object
       required:
@@ -252,34 +280,6 @@ components:
           - ru
           - th
           - tr
-    MemberOrganizationsResponseEnvelope:
-      type: object
-      properties:
-        data:
-          type: array
-          description: The data response envelope.
-          items:
-            $ref: '#/components/schemas/MemberOrganizations'
-    ErrorsResponseEnvelope:
-      type: object
-      properties:
-        errors:
-          type: array
-          description: The errors response envelope.
-          items:
-            $ref: '#/components/schemas/Error'
-    MemberResponseEnvelope:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Member'
-    MemberOrganizations:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The organization ID
-          example: '626731'
   parameters:
     bearerToken:
       in: header

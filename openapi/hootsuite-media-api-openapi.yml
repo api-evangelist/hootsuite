@@ -98,14 +98,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorsResponseEnvelope'
 components:
-  parameters:
-    bearerToken:
-      in: header
-      name: Authorization
-      description: A bearer token string used for authentication
-      required: true
-      schema:
-        type: string
   schemas:
     Error:
       type: object
@@ -135,6 +127,18 @@ components:
               type: string
               description: The resource ID.
               example: '7534653235'
+    MediaUploadUrlResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/MediaUploadUrl'
+      description: The response data wrapper for a Media Upload Url.
+    MediaDownloadUrlResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/MediaDownloadUrl'
+      description: The response data wrapper for a Media Download Url.
     MediaUploadUrl:
       type: object
       properties:
@@ -150,17 +154,6 @@ components:
           type: integer
           description: The number of seconds until the upload url is no longer valid.
           example: 1799
-    MediaUploadUrlRequest:
-      type: object
-      properties:
-        sizeBytes:
-          type: integer
-          description: Size in bytes of the media file to be uploaded.
-          example: 383631
-        mimeType:
-          type: string
-          description: MIME type of the media to be uploaded. Supported media types are video/mp4, image/gif, image/jpeg, image/jpg, image/png.
-          example: video/mp4
     MediaDownloadUrl:
       type: object
       properties:
@@ -183,12 +176,6 @@ components:
           type: integer
           description: The number of seconds until the download url is no longer valid. This is only available after the media has been processed
           example: 1799
-    MediaUploadUrlResponseEnvelope:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/MediaUploadUrl'
-      description: The response data wrapper for a Media Upload Url.
     ErrorsResponseEnvelope:
       type: object
       properties:
@@ -197,12 +184,25 @@ components:
           description: The errors response envelope.
           items:
             $ref: '#/components/schemas/Error'
-    MediaDownloadUrlResponseEnvelope:
+    MediaUploadUrlRequest:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/MediaDownloadUrl'
-      description: The response data wrapper for a Media Download Url.
+        sizeBytes:
+          type: integer
+          description: Size in bytes of the media file to be uploaded.
+          example: 383631
+        mimeType:
+          type: string
+          description: MIME type of the media to be uploaded. Supported media types are video/mp4, image/gif, image/jpeg, image/jpg, image/png.
+          example: video/mp4
+  parameters:
+    bearerToken:
+      in: header
+      name: Authorization
+      description: A bearer token string used for authentication
+      required: true
+      schema:
+        type: string
   securitySchemes:
     OAuth2:
       type: oauth2

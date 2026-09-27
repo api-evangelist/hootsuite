@@ -116,6 +116,74 @@ paths:
                 $ref: '#/components/schemas/ErrorsResponseEnvelope'
 components:
   schemas:
+    EmptyDataEnvelope:
+      type: object
+      properties:
+        data:
+          description: The data response envelope.
+          type: object
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+          description: An error code indicating the type of error that occurred.
+          example: 1234
+        message:
+          type: string
+          description: A description of error.
+          example: An error message
+        id:
+          type: string
+          description: A unique error id for tracing purposes
+          example: f7d32670-4e6a-48c0-a2a7-87803536a712
+        resource:
+          type: object
+          description: A reference to the resource in error
+          title: ResourceReference
+          properties:
+            type:
+              type: string
+              description: The resource type.
+              example: socialProfile
+            id:
+              type: string
+              description: The resource ID.
+              example: '7534653235'
+    ApproveCommentRequest:
+      type: object
+      required:
+      - sequenceNumber
+      properties:
+        sequenceNumber:
+          type: integer
+          description: The sequence number of the comment being approved.
+          example: 11
+        reviewerType:
+          type: string
+          description: 'The actor that will be approving the comment. Leaving this field empty will use "EXTERNAL" by default.
+
+
+            Using "MEMBER" requires that you use a member token to approve a comment that is pending approval by that member.
+
+            '
+          enum:
+          - EXTERNAL
+          - MEMBER
+    ErrorsResponseEnvelope:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: The errors response envelope.
+          items:
+            $ref: '#/components/schemas/Error'
+    SocialProfileCommentResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SocialProfileComment'
+      description: The response data wrapper for a social profile comment
     SocialProfileComment:
       type: object
       required:
@@ -190,74 +258,6 @@ components:
 
 
             Using "MEMBER" requires that you use a member token to reject a comment that is pending approval by that member.
-
-            '
-          enum:
-          - EXTERNAL
-          - MEMBER
-    SocialProfileCommentResponseEnvelope:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/SocialProfileComment'
-      description: The response data wrapper for a social profile comment
-    Error:
-      type: object
-      properties:
-        code:
-          type: number
-          description: An error code indicating the type of error that occurred.
-          example: 1234
-        message:
-          type: string
-          description: A description of error.
-          example: An error message
-        id:
-          type: string
-          description: A unique error id for tracing purposes
-          example: f7d32670-4e6a-48c0-a2a7-87803536a712
-        resource:
-          type: object
-          description: A reference to the resource in error
-          title: ResourceReference
-          properties:
-            type:
-              type: string
-              description: The resource type.
-              example: socialProfile
-            id:
-              type: string
-              description: The resource ID.
-              example: '7534653235'
-    ErrorsResponseEnvelope:
-      type: object
-      properties:
-        errors:
-          type: array
-          description: The errors response envelope.
-          items:
-            $ref: '#/components/schemas/Error'
-    EmptyDataEnvelope:
-      type: object
-      properties:
-        data:
-          description: The data response envelope.
-          type: object
-    ApproveCommentRequest:
-      type: object
-      required:
-      - sequenceNumber
-      properties:
-        sequenceNumber:
-          type: integer
-          description: The sequence number of the comment being approved.
-          example: 11
-        reviewerType:
-          type: string
-          description: 'The actor that will be approving the comment. Leaving this field empty will use "EXTERNAL" by default.
-
-
-            Using "MEMBER" requires that you use a member token to approve a comment that is pending approval by that member.
 
             '
           enum:

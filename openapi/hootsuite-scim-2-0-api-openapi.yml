@@ -321,6 +321,19 @@ paths:
                 $ref: '#/components/schemas/ScimResourceTypes'
 components:
   schemas:
+    ScimPatchGroupOperation:
+      type: object
+      properties:
+        op:
+          type: string
+          description: 'The operation to perform: can be `add`, `replace` or `remove`'
+          example: replace
+        value:
+          type: object
+          example: new_value
+          description: New value to set for attribute
+          anyOf:
+          - $ref: '#/components/schemas/AnyValue'
     ScimResourceTypes:
       type: object
       properties:
@@ -333,49 +346,174 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ScimResourceInfo'
-    ScimResourceInfo:
+    ScimSchemas:
+      type: array
+      description: Required SCIM schemas
+      items:
+        type: string
+      example:
+      - urn:ietf:params:scim:schemas:core:2.0:User
+    ScimGroup:
       type: object
       properties:
-        name:
-          type: string
-          example: User
-        schemaExtensions:
-          type: array
-          items:
-            type: object
-            properties:
-              schema:
-                type: string
-                example: urn:ietf:params:scim:schemas:core:2.0:User
-              required:
-                type: boolean
-                example: true
-        description:
-          type: string
-          example: User Account
+        schemas:
+          $ref: '#/components/schemas/ScimSchemas'
         id:
           type: string
-          example: User
+          description: ''
+          example: '3918310'
         meta:
           type: object
+          description: ''
           properties:
             resourceType:
               type: string
-              example: ResourceType
+              description: ''
+              example: Group
+            created:
+              type: string
+              description: ''
+              example: 2012-05-07 15:36:18+00:00
+            lastModified:
+              type: string
+              description: ''
+              example: 2015-04-21 21:25:40+00:00
             location:
               type: string
-              example: /scim/v2/ResourceTypes/User
-        schema:
+              description: ''
+              example: https://platform.hootsuite.com/scim/v2/groups/627221
+        displayName:
           type: string
-          example: urn:ietf:params:scim:schemas:core:2.0:User
-        endpoint:
-          type: string
-          example: /scim/v2/Users
-        schemas:
+          description: ''
+          example: team 1
+        members:
           type: array
+          description: ''
           items:
-            type: string
-            example: urn:ietf:params:scim:schemas:core:2.0:ResourceType
+            $ref: '#/components/schemas/MemberRef'
+    ScimPatchUserOperation:
+      type: object
+      properties:
+        op:
+          type: string
+          description: 'The operation to perform: can be `add`, `replace` or `remove`'
+          example: replace
+        path:
+          type: string
+          description: Contains an attribute path describing the target of the operation. OPTIONAL for `add` and `replace`
+          example: emails[type eq "work"]
+        value:
+          type: object
+          example: new_value
+          description: New value if add/replace, or name of target for remove
+          anyOf:
+          - $ref: '#/components/schemas/AnyValue'
+    AnyValue: {}
+    CreateReplaceScimUser:
+      type: object
+      required:
+      - displayName
+      - userName
+      - active
+      properties:
+        schemas:
+          $ref: '#/components/schemas/ScimSchemas'
+        userName:
+          type: string
+          description: ''
+          example: joe.smith@hootsuite.com
+        name:
+          type: object
+          description: ''
+          properties:
+            givenName:
+              type: string
+              description: ''
+              example: joe.smith
+            familyName:
+              type: string
+              description: ''
+              example: joe.smith
+        emails:
+          type: array
+          description: ''
+          items:
+            required:
+            - primary
+            type: object
+            description: ''
+            properties:
+              primary:
+                type: boolean
+                description: ''
+                example: true
+              value:
+                type: string
+                description: ''
+                example: joe.smith@hootsuite.com
+              type:
+                type: string
+                description: ''
+                example: work
+        displayName:
+          type: string
+          description: ''
+          example: Joe Smith
+        timezone:
+          type: string
+          description: The user's time zone. If not provided it will default to "America/Vancouver". Valid values are defined at http://php.net/manual/en/timezones.php.
+          example: America/Vancouver
+        preferredLanguage:
+          type: string
+          description: The user's language.
+          example: en
+          enum:
+          - en
+          - ja
+          - fr
+          - it
+          - es
+          - de
+          - pt_BR
+          - pl
+          - id
+          - zh_CN
+          - zh_HK
+          - zh_TW
+          - nl
+          - ko
+          - ar
+          - ru
+          - th
+          - tr
+        title:
+          type: string
+          description: ''
+          example: Manager
+        groups:
+          type: array
+          description: ''
+          items:
+            $ref: '#/components/schemas/GroupRef'
+        active:
+          type: boolean
+          description: ''
+          example: true
+    GroupRef:
+      type: object
+      properties:
+        value:
+          type: string
+          description: ''
+          example: '5838356'
+        $ref:
+          type: string
+          description: ''
+          example: https://platform.hootsuite.com/scim/v2/groups/663806
+        display:
+          type: string
+          description: ''
+          example: Group 1
     ScimUser:
       type: object
       properties:
@@ -480,23 +618,6 @@ components:
           type: boolean
           description: ''
           example: true
-    ScimPatchUserOperation:
-      type: object
-      properties:
-        op:
-          type: string
-          description: 'The operation to perform: can be `add`, `replace` or `remove`'
-          example: replace
-        path:
-          type: string
-          description: Contains an attribute path describing the target of the operation. OPTIONAL for `add` and `replace`
-          example: emails[type eq "work"]
-        value:
-          type: object
-          example: new_value
-          description: New value if add/replace, or name of target for remove
-          anyOf:
-          - $ref: '#/components/schemas/AnyValue'
     ScimPatchUser:
       type: object
       properties:
@@ -510,247 +631,23 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ScimPatchUserOperation'
-    ScimPatchGroupOperation:
+    CreateReplaceScimGroup:
       type: object
-      properties:
-        op:
-          type: string
-          description: 'The operation to perform: can be `add`, `replace` or `remove`'
-          example: replace
-        value:
-          type: object
-          example: new_value
-          description: New value to set for attribute
-          anyOf:
-          - $ref: '#/components/schemas/AnyValue'
-    MemberRef:
-      type: object
-      properties:
-        value:
-          type: string
-          description: ''
-          example: '235836528356'
-        $ref:
-          type: string
-          description: ''
-          example: https://platform.hootsuite.com/scim/v2/users/21790633
-        display:
-          type: string
-          description: ''
-          example: John Doe
-    ScimGroup:
-      type: object
+      required:
+      - displayName
+      - schema
       properties:
         schemas:
           $ref: '#/components/schemas/ScimSchemas'
-        id:
-          type: string
-          description: ''
-          example: '3918310'
-        meta:
-          type: object
-          description: ''
-          properties:
-            resourceType:
-              type: string
-              description: ''
-              example: Group
-            created:
-              type: string
-              description: ''
-              example: 2012-05-07 15:36:18+00:00
-            lastModified:
-              type: string
-              description: ''
-              example: 2015-04-21 21:25:40+00:00
-            location:
-              type: string
-              description: ''
-              example: https://platform.hootsuite.com/scim/v2/groups/627221
         displayName:
           type: string
           description: ''
-          example: team 1
+          example: Group 1
         members:
           type: array
           description: ''
           items:
             $ref: '#/components/schemas/MemberRef'
-    ScimPatchGroup:
-      type: object
-      properties:
-        schemas:
-          type: array
-          description: Must contain the URI value of "urn:ietf:params:scim:api:messages:2.0:PatchOp"
-          items:
-            type: string
-            example: urn:ietf:params:scim:api:messages:2.0:PatchOp
-        Operations:
-          type: array
-          items:
-            $ref: '#/components/schemas/ScimPatchGroupOperation'
-    ScimErrorResponse:
-      type: object
-      properties:
-        schemas:
-          type: array
-          items:
-            type: string
-            example: urn:ietf:params:scim:api:messages:2.0:Error
-        status:
-          type: string
-          example: '400'
-        detail:
-          type: string
-          example: A required value was missing, or the value specified was not compatible with the operation or attribute type.
-        scimType:
-          type: string
-          description: (optional) The SCIM error type
-          example: invalidValue
-          enum:
-          - invalidSyntax
-          - mutability
-          - invalidValue
-          - uniqueness
-    CreateReplaceScimUser:
-      type: object
-      required:
-      - displayName
-      - userName
-      - active
-      properties:
-        schemas:
-          $ref: '#/components/schemas/ScimSchemas'
-        userName:
-          type: string
-          description: ''
-          example: joe.smith@hootsuite.com
-        name:
-          type: object
-          description: ''
-          properties:
-            givenName:
-              type: string
-              description: ''
-              example: joe.smith
-            familyName:
-              type: string
-              description: ''
-              example: joe.smith
-        emails:
-          type: array
-          description: ''
-          items:
-            required:
-            - primary
-            type: object
-            description: ''
-            properties:
-              primary:
-                type: boolean
-                description: ''
-                example: true
-              value:
-                type: string
-                description: ''
-                example: joe.smith@hootsuite.com
-              type:
-                type: string
-                description: ''
-                example: work
-        displayName:
-          type: string
-          description: ''
-          example: Joe Smith
-        timezone:
-          type: string
-          description: The user's time zone. If not provided it will default to "America/Vancouver". Valid values are defined at http://php.net/manual/en/timezones.php.
-          example: America/Vancouver
-        preferredLanguage:
-          type: string
-          description: The user's language.
-          example: en
-          enum:
-          - en
-          - ja
-          - fr
-          - it
-          - es
-          - de
-          - pt_BR
-          - pl
-          - id
-          - zh_CN
-          - zh_HK
-          - zh_TW
-          - nl
-          - ko
-          - ar
-          - ru
-          - th
-          - tr
-        title:
-          type: string
-          description: ''
-          example: Manager
-        groups:
-          type: array
-          description: ''
-          items:
-            $ref: '#/components/schemas/GroupRef'
-        active:
-          type: boolean
-          description: ''
-          example: true
-    ScimSchemas:
-      type: array
-      description: Required SCIM schemas
-      items:
-        type: string
-      example:
-      - urn:ietf:params:scim:schemas:core:2.0:User
-    ScimGroups:
-      type: object
-      description: ''
-      properties:
-        Resources:
-          type: array
-          description: ''
-          items:
-            $ref: '#/components/schemas/ScimGroup'
-        totalResults:
-          type: number
-          description: The total number of groups found
-          example: 8
-        startIndex:
-          type: number
-          description: The current offset used for result paging
-          example: 1
-        itemsPerPage:
-          type: number
-          description: The page size used for paging
-          example: 10
-        schemas:
-          type: array
-          description: ''
-          items:
-            type: string
-            example: urn:ietf:params:scim:api:messages:2.0:ListResponse
-    GroupRef:
-      type: object
-      properties:
-        value:
-          type: string
-          description: ''
-          example: '5838356'
-        $ref:
-          type: string
-          description: ''
-          example: https://platform.hootsuite.com/scim/v2/groups/663806
-        display:
-          type: string
-          description: ''
-          example: Group 1
     ScimUsers:
       type: object
       description: ''
@@ -778,32 +675,127 @@ components:
           items:
             type: string
             example: urn:ietf:params:scim:api:messages:2.0:ListResponse
-    CreateReplaceScimGroup:
+    ScimErrorResponse:
       type: object
-      required:
-      - displayName
-      - schema
       properties:
         schemas:
-          $ref: '#/components/schemas/ScimSchemas'
-        displayName:
+          type: array
+          items:
+            type: string
+            example: urn:ietf:params:scim:api:messages:2.0:Error
+        status:
+          type: string
+          example: '400'
+        detail:
+          type: string
+          example: A required value was missing, or the value specified was not compatible with the operation or attribute type.
+        scimType:
+          type: string
+          description: (optional) The SCIM error type
+          example: invalidValue
+          enum:
+          - invalidSyntax
+          - mutability
+          - invalidValue
+          - uniqueness
+    ScimResourceInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          example: User
+        schemaExtensions:
+          type: array
+          items:
+            type: object
+            properties:
+              schema:
+                type: string
+                example: urn:ietf:params:scim:schemas:core:2.0:User
+              required:
+                type: boolean
+                example: true
+        description:
+          type: string
+          example: User Account
+        id:
+          type: string
+          example: User
+        meta:
+          type: object
+          properties:
+            resourceType:
+              type: string
+              example: ResourceType
+            location:
+              type: string
+              example: /scim/v2/ResourceTypes/User
+        schema:
+          type: string
+          example: urn:ietf:params:scim:schemas:core:2.0:User
+        endpoint:
+          type: string
+          example: /scim/v2/Users
+        schemas:
+          type: array
+          items:
+            type: string
+            example: urn:ietf:params:scim:schemas:core:2.0:ResourceType
+    ScimPatchGroup:
+      type: object
+      properties:
+        schemas:
+          type: array
+          description: Must contain the URI value of "urn:ietf:params:scim:api:messages:2.0:PatchOp"
+          items:
+            type: string
+            example: urn:ietf:params:scim:api:messages:2.0:PatchOp
+        Operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScimPatchGroupOperation'
+    MemberRef:
+      type: object
+      properties:
+        value:
           type: string
           description: ''
-          example: Group 1
-        members:
+          example: '235836528356'
+        $ref:
+          type: string
+          description: ''
+          example: https://platform.hootsuite.com/scim/v2/users/21790633
+        display:
+          type: string
+          description: ''
+          example: John Doe
+    ScimGroups:
+      type: object
+      description: ''
+      properties:
+        Resources:
           type: array
           description: ''
           items:
-            $ref: '#/components/schemas/MemberRef'
-    AnyValue: {}
-  parameters:
-    bearerToken:
-      in: header
-      name: Authorization
-      description: A bearer token string used for authentication
-      required: true
-      schema:
-        type: string
+            $ref: '#/components/schemas/ScimGroup'
+        totalResults:
+          type: number
+          description: The total number of groups found
+          example: 8
+        startIndex:
+          type: number
+          description: The current offset used for result paging
+          example: 1
+        itemsPerPage:
+          type: number
+          description: The page size used for paging
+          example: 10
+        schemas:
+          type: array
+          description: ''
+          items:
+            type: string
+            example: urn:ietf:params:scim:api:messages:2.0:ListResponse
   requestBodies:
     CreateReplaceScimGroup:
       content:
@@ -817,6 +809,14 @@ components:
           schema:
             $ref: '#/components/schemas/CreateReplaceScimUser'
       required: true
+  parameters:
+    bearerToken:
+      in: header
+      name: Authorization
+      description: A bearer token string used for authentication
+      required: true
+      schema:
+        type: string
   securitySchemes:
     OAuth2:
       type: oauth2
