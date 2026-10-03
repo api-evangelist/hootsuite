@@ -139,6 +139,70 @@ paths:
             '
 components:
   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+    StatusDetailResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          status:
+            type: string
+            description: The status of the message
+          contact:
+            type: string
+            description: The contact used to send the message to
+          reason:
+            type: string
+            description: The reason of failure
+      example:
+      - status: FAILED
+        contact: '+32495123456'
+        reason: No channel found for medium WHATSAPP
+    StatusOverviewResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: The correlation id of the sent message.
+        total:
+          type: string
+          description: The total number of sent proactive messages.
+        statuses:
+          type: object
+          description: An overview with the number of messages per status
+          properties:
+            PROCESSING:
+              type: number
+              description: Number of proactive messages that are queued for sending.
+            FAILED:
+              type: number
+              description: Number of proactive messages that failed to send.
+            SENT:
+              type: number
+              description: Number of proactive messages that are sent.
+            DELIVERED:
+              type: number
+              description: Number of proactive messages that are sent and delivered.
+            DELIVERING_FAILED:
+              type: number
+              description: Number of proactive messages that are sent but could not be delivered.
+      example:
+        correlationId: 44717822-9f05-11e8-b71e-671342217f40
+        total: 1
+        statuses:
+          DELIVERED: 1
+    SendProactiveMessageResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          example: 4f1dba7b-9ef3-11e8-a0f4-175408e41992
     SendProactiveMessageRequest:
       type: object
       properties:
@@ -179,70 +243,6 @@ components:
       - channel
       - contact
       - text
-    SendProactiveMessageResponse:
-      type: object
-      properties:
-        correlationId:
-          type: string
-          example: 4f1dba7b-9ef3-11e8-a0f4-175408e41992
-    ErrorResponse:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: string
-    StatusOverviewResponse:
-      type: object
-      properties:
-        correlationId:
-          type: string
-          description: The correlation id of the sent message.
-        total:
-          type: string
-          description: The total number of sent proactive messages.
-        statuses:
-          type: object
-          description: An overview with the number of messages per status
-          properties:
-            PROCESSING:
-              type: number
-              description: Number of proactive messages that are queued for sending.
-            FAILED:
-              type: number
-              description: Number of proactive messages that failed to send.
-            SENT:
-              type: number
-              description: Number of proactive messages that are sent.
-            DELIVERED:
-              type: number
-              description: Number of proactive messages that are sent and delivered.
-            DELIVERING_FAILED:
-              type: number
-              description: Number of proactive messages that are sent but could not be delivered.
-      example:
-        correlationId: 44717822-9f05-11e8-b71e-671342217f40
-        total: 1
-        statuses:
-          DELIVERED: 1
-    StatusDetailResponse:
-      type: array
-      items:
-        type: object
-        properties:
-          status:
-            type: string
-            description: The status of the message
-          contact:
-            type: string
-            description: The contact used to send the message to
-          reason:
-            type: string
-            description: The reason of failure
-      example:
-      - status: FAILED
-        contact: '+32495123456'
-        reason: No channel found for medium WHATSAPP
   securitySchemes:
     bearer-token:
       type: http

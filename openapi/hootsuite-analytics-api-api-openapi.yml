@@ -161,14 +161,58 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
 components:
   schemas:
-    AdContentDailyMetrics:
+    DatatypeEnum:
+      type: string
+      description: API code for this datatype
+      enum:
+      - ORGANIC
+      - PAID
+    TimeFieldFilters:
       type: object
-      description: Daily metrics snapshot for a paid ad.
+      description: Filter by a time field, at least one filter must be specified.
+      properties:
+        timespan:
+          $ref: '#/components/schemas/TimespanFilter'
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        photo:
+          type: string
+        url:
+          type: string
+        displayName:
+          type: string
+        location:
+          type: string
+    RequestFilters:
+      type: object
+      required:
+      - profileId
+      properties:
+        profileId:
+          $ref: '#/components/schemas/DataFieldFilters'
+        lastModified:
+          $ref: '#/components/schemas/TimeFieldFilters'
+        reportingPeriod:
+          $ref: '#/components/schemas/TimeFieldFilters'
+    DataFieldFilters:
+      type: object
+      description: Filter by a data field, at least one filter must be specified.
+      properties:
+        eq:
+          $ref: '#/components/schemas/EqFilter'
+        in:
+          $ref: '#/components/schemas/InFilter'
+    CampaignContentDailyMetrics:
+      type: object
+      description: Daily metrics snapshot for a paid campaign.
       required:
       - adAccountId
       - organizationId
-      - externalAdId
-      - externalAdsetId
       - externalCampaignId
       - adAccountType
       - externalAdAccountId
@@ -182,16 +226,10 @@ components:
           $ref: '#/components/schemas/AdAccountTypeEnum'
         organizationId:
           type: string
-          description: Hootsuite Organization Id
-        externalAdId:
-          type: string
-          description: Ad identifier from the external ad platform.
-        externalAdsetId:
-          type: string
-          description: Parent ad set identifier from the external ad platform.
+          description: Hootsuite organization Id
         externalCampaignId:
           type: string
-          description: Parent campaign identifier from the external ad platform.
+          description: Campaign identifier from the external ad platform.
         externalAdAccountId:
           type: string
           description: Account identifier from the external ad platform.
@@ -201,105 +239,13 @@ components:
           description: Reporting date for this metrics record.
         metrics:
           $ref: '#/components/schemas/MetricsPublic'
-    ListProfilesMetricsResponse:
+    ListPaidMetricsRequest:
       type: object
       required:
-      - data
-      - metadata
+      - filters
       properties:
-        data:
-          type: array
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/ProfileMetricsEntry'
-        metadata:
-          $ref: '#/components/schemas/Metadata'
-    AdsetContentDailyMetrics:
-      type: object
-      description: Daily metrics snapshot for a paid ad set.
-      required:
-      - adAccountId
-      - organizationId
-      - externalAdsetId
-      - externalCampaignId
-      - adAccountType
-      - externalAdAccountId
-      - date
-      - metrics
-      properties:
-        adAccountId:
-          type: string
-          description: Internal identifier of the ad account.
-        adAccountType:
-          $ref: '#/components/schemas/AdAccountTypeEnum'
-        organizationId:
-          type: string
-          description: Internal identifier of the owning organization.
-        externalAdsetId:
-          type: string
-          description: Ad set identifier from the external ad platform.
-        externalCampaignId:
-          type: string
-          description: Parent campaign identifier from the external ad platform.
-        externalAdAccountId:
-          type: string
-          description: Account identifier from the external ad platform.
-        date:
-          type: string
-          format: date
-          description: Reporting date for this metrics record.
-        metrics:
-          $ref: '#/components/schemas/MetricsPublic'
-    InFilter:
-      type: array
-      description: Options to filter against, at least 1 must match.
-      items:
-        type: string
-        example: abc123
-      minItems: 1
-      maxItems: 10
-    CollectionInfo:
-      type: object
-      properties:
-        next:
-          $ref: '#/components/schemas/Cursor'
-        prev:
-          $ref: '#/components/schemas/Cursor'
-    AdMetadata:
-      type: object
-      description: 'Platform-specific metadata in a single object. Keys and values depend on ad_account_type.
-
-        '
-      additionalProperties: true
-    PageMetric:
-      type: object
-      required:
-      - total
-      properties:
-        total:
-          type: number
-          description: total value for the metric
-          format: double
-        breakdownDimensions:
-          type: array
-          items:
-            $ref: '#/components/schemas/BreakdownDimension'
-    BreakdownDimension:
-      type: object
-      required:
-      - breakdownId
-      - values
-      properties:
-        breakdownId:
-          type: string
-        values:
-          type: object
-          description: 'Per-breakdown dimensions (e.g. by type, by country). Each item has a breakdown id and a map of dimension value -> metric value.
-
-            '
-          additionalProperties:
-            type: number
-            format: double
+        filters:
+          $ref: '#/components/schemas/AdRequestFilters'
     ListPaidResponse:
       type: object
       description: Response payload for listing paid entities (campaigns, ad sets, or ads).
@@ -317,46 +263,116 @@ components:
             - $ref: '#/components/schemas/Ad'
         metadata:
           $ref: '#/components/schemas/Metadata'
-    Author:
+    Lifecycle:
       type: object
+      description: Schedule window (start and end time), when available.
       properties:
-        id:
+        startTime:
           type: string
-        name:
+          format: date-time
+        endTime:
           type: string
-        photo:
-          type: string
-        url:
-          type: string
-        displayName:
-          type: string
-        location:
-          type: string
-    MetricsPublic:
+          format: date-time
+    PageMetricsOverview:
       type: object
-      description: 'All social network and Owly metrics in a single map.
-
-        Keys are metric names (e.g. "likes", "comments", "post_views", "clicks").
+      description: 'All page level metrics in a single object. Keys are metric names (e.g. "page_reactions", "total_followers").
 
         Values are numeric (float64). For metric definitions, see the Help Center documentation.
 
         '
       additionalProperties:
-        type: number
-        format: double
-    ListPostsResponse:
+        $ref: '#/components/schemas/PageMetric'
+    Cursor:
       type: object
       required:
-      - data
-      - metadata
+      - cursor
       properties:
-        data:
-          type: array
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/Post'
-        metadata:
-          $ref: '#/components/schemas/Metadata'
+        cursor:
+          type: string
+          description: Cursor for the next/prev page of data, if available
+          example: aWQ9NTAK
+    AttachmentType:
+      type: string
+      enum:
+      - ATTACHMENT_UNKNOWN
+      - ATTACHMENT_PHOTO
+      - ATTACHMENT_VIDEO
+      - ATTACHMENT_LINK
+      - ATTACHMENT_EVENT
+      - ATTACHMENT_ALBUM
+      - ATTACHMENT_ANIMATED_GIF
+    AdEntityCollectionEnum:
+      type: string
+      description: Plural collection name used in the URL path. Determines whether the response contains campaigns, ad sets, or ads
+      enum:
+      - campaigns
+      - adsets
+      - ads
+    InFilter:
+      type: array
+      description: Options to filter against, at least 1 must match.
+      items:
+        type: string
+        example: abc123
+      minItems: 1
+      maxItems: 10
+    MediaPublic:
+      type: object
+      description: Media item. Do not include thumbnail_url when high_resolution_thumbnail_url is present.
+      properties:
+        mimeType:
+          type: string
+          enum:
+          - MEDIA_UNKNOWN
+          - MEDIA_PHOTO
+          - MEDIA_VIDEO
+          - MEDIA_ANIMATED_GIF
+          - MEDIA_TEXT
+          - MEDIA_LINK
+          - MEDIA_SWF
+          - MEDIA_MUSIC
+          - MEDIA_OFFER
+          - MEDIA_ALBUM
+          - MEDIA_EVENT
+          - MEDIA_NOTE
+          - MEDIA_AUDIO
+        thumbnailUrl:
+          type: string
+          description: Omit when high_resolution_thumbnail_url is present.
+        url:
+          type: string
+        liveVideo:
+          type: boolean
+        length:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+        highResolutionThumbnailUrl:
+          type: string
+    TimespanFilter:
+      type: object
+      description: Timespan to filter against, inclusive. At least one of `since` or `until` must be provided.
+      properties:
+        since:
+          type: string
+          format: date
+          example: '2025-01-01'
+          description: Start of query, if omitted defaults to 1 year ago
+        until:
+          type: string
+          format: date
+          example: '2025-02-28'
+          description: End of query, if omitted defaults to now
+    Metadata:
+      type: object
+      required:
+      - collectionInfo
+      properties:
+        collectionInfo:
+          $ref: '#/components/schemas/CollectionInfo'
     AdSet:
       type: object
       description: Paid ad set entity returned from ad platform integrations.
@@ -424,87 +440,6 @@ components:
           $ref: '#/components/schemas/Lifecycle'
         marketingMetadata:
           $ref: '#/components/schemas/AdMetadata'
-    LabeledType:
-      type: object
-      required:
-      - id
-      - label
-      properties:
-        label:
-          type: string
-        id:
-          type: string
-    MediaPublic:
-      type: object
-      description: Media item. Do not include thumbnail_url when high_resolution_thumbnail_url is present.
-      properties:
-        mimeType:
-          type: string
-          enum:
-          - MEDIA_UNKNOWN
-          - MEDIA_PHOTO
-          - MEDIA_VIDEO
-          - MEDIA_ANIMATED_GIF
-          - MEDIA_TEXT
-          - MEDIA_LINK
-          - MEDIA_SWF
-          - MEDIA_MUSIC
-          - MEDIA_OFFER
-          - MEDIA_ALBUM
-          - MEDIA_EVENT
-          - MEDIA_NOTE
-          - MEDIA_AUDIO
-        thumbnailUrl:
-          type: string
-          description: Omit when high_resolution_thumbnail_url is present.
-        url:
-          type: string
-        liveVideo:
-          type: boolean
-        length:
-          type: integer
-          format: int64
-        title:
-          type: string
-        content:
-          type: string
-        highResolutionThumbnailUrl:
-          type: string
-    AdEntityCollectionEnum:
-      type: string
-      description: Plural collection name used in the URL path. Determines whether the response contains campaigns, ad sets, or ads
-      enum:
-      - campaigns
-      - adsets
-      - ads
-    PageMetricsOverview:
-      type: object
-      description: 'All page level metrics in a single object. Keys are metric names (e.g. "page_reactions", "total_followers").
-
-        Values are numeric (float64). For metric definitions, see the Help Center documentation.
-
-        '
-      additionalProperties:
-        $ref: '#/components/schemas/PageMetric'
-    AdRequestFilters:
-      type: object
-      required:
-      - adAccounts
-      properties:
-        adAccounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdAccountFilter'
-        lastModified:
-          $ref: '#/components/schemas/TimeFieldFilters'
-        reportingPeriod:
-          $ref: '#/components/schemas/TimeFieldFilters'
-    TimeFieldFilters:
-      type: object
-      description: Filter by a time field, at least one filter must be specified.
-      properties:
-        timespan:
-          $ref: '#/components/schemas/TimespanFilter'
     Campaign:
       type: object
       description: Paid campaign entity returned from ad platform integrations.
@@ -564,6 +499,156 @@ components:
           $ref: '#/components/schemas/Lifecycle'
         marketingMetadata:
           $ref: '#/components/schemas/AdMetadata'
+    AdRequestFilters:
+      type: object
+      required:
+      - adAccounts
+      properties:
+        adAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdAccountFilter'
+        lastModified:
+          $ref: '#/components/schemas/TimeFieldFilters'
+        reportingPeriod:
+          $ref: '#/components/schemas/TimeFieldFilters'
+    PageMetric:
+      type: object
+      required:
+      - total
+      properties:
+        total:
+          type: number
+          description: total value for the metric
+          format: double
+        breakdownDimensions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreakdownDimension'
+    AdsetContentDailyMetrics:
+      type: object
+      description: Daily metrics snapshot for a paid ad set.
+      required:
+      - adAccountId
+      - organizationId
+      - externalAdsetId
+      - externalCampaignId
+      - adAccountType
+      - externalAdAccountId
+      - date
+      - metrics
+      properties:
+        adAccountId:
+          type: string
+          description: Internal identifier of the ad account.
+        adAccountType:
+          $ref: '#/components/schemas/AdAccountTypeEnum'
+        organizationId:
+          type: string
+          description: Internal identifier of the owning organization.
+        externalAdsetId:
+          type: string
+          description: Ad set identifier from the external ad platform.
+        externalCampaignId:
+          type: string
+          description: Parent campaign identifier from the external ad platform.
+        externalAdAccountId:
+          type: string
+          description: Account identifier from the external ad platform.
+        date:
+          type: string
+          format: date
+          description: Reporting date for this metrics record.
+        metrics:
+          $ref: '#/components/schemas/MetricsPublic'
+    LabeledType:
+      type: object
+      required:
+      - id
+      - label
+      properties:
+        label:
+          type: string
+        id:
+          type: string
+    AdMetadata:
+      type: object
+      description: 'Platform-specific metadata in a single object. Keys and values depend on ad_account_type.
+
+        '
+      additionalProperties: true
+    AdContentDailyMetrics:
+      type: object
+      description: Daily metrics snapshot for a paid ad.
+      required:
+      - adAccountId
+      - organizationId
+      - externalAdId
+      - externalAdsetId
+      - externalCampaignId
+      - adAccountType
+      - externalAdAccountId
+      - date
+      - metrics
+      properties:
+        adAccountId:
+          type: string
+          description: Internal identifier of the ad account.
+        adAccountType:
+          $ref: '#/components/schemas/AdAccountTypeEnum'
+        organizationId:
+          type: string
+          description: Hootsuite Organization Id
+        externalAdId:
+          type: string
+          description: Ad identifier from the external ad platform.
+        externalAdsetId:
+          type: string
+          description: Parent ad set identifier from the external ad platform.
+        externalCampaignId:
+          type: string
+          description: Parent campaign identifier from the external ad platform.
+        externalAdAccountId:
+          type: string
+          description: Account identifier from the external ad platform.
+        date:
+          type: string
+          format: date
+          description: Reporting date for this metrics record.
+        metrics:
+          $ref: '#/components/schemas/MetricsPublic'
+    ProfileMetricsEntry:
+      type: object
+      required:
+      - profileId
+      - externalProfileId
+      - date
+      - metrics
+      properties:
+        profileId:
+          type: string
+          description: Hootsuite identifier of this social profile.
+          example: '12345678'
+        externalProfileId:
+          type: string
+          description: Identifier of the social profile on the social network.
+        date:
+          type: string
+          format: date
+          description: date of the metrics
+        metrics:
+          $ref: '#/components/schemas/PageMetricsOverview'
+    AdMedia:
+      type: object
+      description: Thumbnail and media URLs for the ad, when available.
+      required:
+      - thumbnailUrl
+      - url
+      properties:
+        thumbnailUrl:
+          type: string
+        url:
+          type: string
     UTM:
       type: object
       description: UTM objects associated with the ad.
@@ -584,114 +669,6 @@ components:
           type: string
         term:
           type: string
-    ListPaidMetricsRequest:
-      type: object
-      required:
-      - filters
-      properties:
-        filters:
-          $ref: '#/components/schemas/AdRequestFilters'
-    AdMedia:
-      type: object
-      description: Thumbnail and media URLs for the ad, when available.
-      required:
-      - thumbnailUrl
-      - url
-      properties:
-        thumbnailUrl:
-          type: string
-        url:
-          type: string
-    AdLink:
-      type: object
-      description: Link objects associated with the ad.
-      required:
-      - extendedUrl
-      properties:
-        extendedUrl:
-          type: string
-        utm:
-          $ref: '#/components/schemas/UTM'
-    ProblemDetails:
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri
-          description: URI reference identifying the problem type.
-        title:
-          type: string
-          description: Short, human-readable summary of the problem.
-          example: invalid-argument
-        status:
-          type: integer
-          format: int32
-          description: HTTP status code for this occurrence of the problem.
-          example: 422
-        detail:
-          type: string
-          description: Detailed explanation of the error.
-          example: An invalid argument was provided.
-        instance:
-          type: string
-          format: uri
-          description: URI reference to the specific occurrence of the problem.
-      required:
-      - title
-      - status
-      additionalProperties: true
-    TimespanFilter:
-      type: object
-      description: Timespan to filter against, inclusive. At least one of `since` or `until` must be provided.
-      properties:
-        since:
-          type: string
-          format: date
-          example: '2025-01-01'
-          description: Start of query, if omitted defaults to 1 year ago
-        until:
-          type: string
-          format: date
-          example: '2025-02-28'
-          description: End of query, if omitted defaults to now
-    LinkPublic:
-      type: object
-      description: Link from the post. UTM is excluded (not populated since beginning of 2024).
-      properties:
-        extendedUrl:
-          type: string
-        thumbnailUrl:
-          type: string
-    RequestFilters:
-      type: object
-      required:
-      - profileId
-      properties:
-        profileId:
-          $ref: '#/components/schemas/DataFieldFilters'
-        lastModified:
-          $ref: '#/components/schemas/TimeFieldFilters'
-        reportingPeriod:
-          $ref: '#/components/schemas/TimeFieldFilters'
-    ListProfilesMetricsRequest:
-      type: object
-      required:
-      - filters
-      properties:
-        filters:
-          $ref: '#/components/schemas/RequestFilters'
-    EqFilter:
-      type: string
-      description: Filter by exact match.
-      example: abc123
-    DataFieldFilters:
-      type: object
-      description: Filter by a data field, at least one filter must be specified.
-      properties:
-        eq:
-          $ref: '#/components/schemas/EqFilter'
-        in:
-          $ref: '#/components/schemas/InFilter'
     Post:
       type: object
       required:
@@ -767,6 +744,163 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LabeledType'
+    LinkPublic:
+      type: object
+      description: Link from the post. UTM is excluded (not populated since beginning of 2024).
+      properties:
+        extendedUrl:
+          type: string
+        thumbnailUrl:
+          type: string
+    ListProfilesMetricsRequest:
+      type: object
+      required:
+      - filters
+      properties:
+        filters:
+          $ref: '#/components/schemas/RequestFilters'
+    PostMetadata:
+      type: object
+      description: 'Platform-specific metadata in a single object. Keys and values depend on social_profile_type.
+
+        Examples: is_popular, object_type, is_boosted_post, is_eligible_for_promotion (Facebook);
+
+        in_reply_to_status_id, in_reply_to_user_id (Twitter); embed_url, video_duration (TikTok).
+
+        Excluded from source data: in_reply_to_link, quote_to_post_id, user_mentions (Twitter); board_id (Pinterest).
+
+        '
+      additionalProperties: true
+    Budget:
+      type: object
+      description: Budget configuration, when available.
+      required:
+      - daily
+      - lifetime
+      properties:
+        daily:
+          type: number
+          format: double
+        lifetime:
+          type: number
+          format: double
+    NetworkTypeEnum:
+      type: string
+      description: API code for this Social Network
+      enum:
+      - FACEBOOKPAGE
+      - TWITTER
+      - INSTAGRAMBUSINESS
+      - TIKTOKBUSINESS
+      - YOUTUBECHANNEL
+      - PINTEREST
+      - THREADS
+    EqFilter:
+      type: string
+      description: Filter by exact match.
+      example: abc123
+    ListProfilesMetricsResponse:
+      type: object
+      required:
+      - data
+      - metadata
+      properties:
+        data:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/ProfileMetricsEntry'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    BreakdownDimension:
+      type: object
+      required:
+      - breakdownId
+      - values
+      properties:
+        breakdownId:
+          type: string
+        values:
+          type: object
+          description: 'Per-breakdown dimensions (e.g. by type, by country). Each item has a breakdown id and a map of dimension value -> metric value.
+
+            '
+          additionalProperties:
+            type: number
+            format: double
+    ListPostsResponse:
+      type: object
+      required:
+      - data
+      - metadata
+      properties:
+        data:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Post'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    ListPaidMetricsResponse:
+      type: object
+      required:
+      - data
+      - metadata
+      properties:
+        data:
+          type: array
+          maxItems: 100
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/CampaignContentDailyMetrics'
+            - $ref: '#/components/schemas/AdsetContentDailyMetrics'
+            - $ref: '#/components/schemas/AdContentDailyMetrics'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    CollectionInfo:
+      type: object
+      properties:
+        next:
+          $ref: '#/components/schemas/Cursor'
+        prev:
+          $ref: '#/components/schemas/Cursor'
+    ListPostsRequest:
+      type: object
+      required:
+      - filters
+      properties:
+        filters:
+          $ref: '#/components/schemas/RequestFilters'
+    AdAccountFilter:
+      type: object
+      required:
+      - adAccountId
+      - organizationId
+      description: filter by adAccountId and organizationId
+      properties:
+        adAccountId:
+          type: string
+        organizationId:
+          type: string
+    MetricsPublic:
+      type: object
+      description: 'All social network and Owly metrics in a single map.
+
+        Keys are metric names (e.g. "likes", "comments", "post_views", "clicks").
+
+        Values are numeric (float64). For metric definitions, see the Help Center documentation.
+
+        '
+      additionalProperties:
+        type: number
+        format: double
+    ListPaidRequest:
+      type: object
+      required:
+      - filters
+      properties:
+        filters:
+          $ref: '#/components/schemas/AdRequestFilters'
     Ad:
       type: object
       required:
@@ -880,185 +1014,79 @@ components:
           description: Timestamp when Hootsuite last collected this ad record.
         marketingMetadata:
           $ref: '#/components/schemas/AdMetadata'
-    CampaignContentDailyMetrics:
+    ProblemDetails:
       type: object
-      description: Daily metrics snapshot for a paid campaign.
-      required:
-      - adAccountId
-      - organizationId
-      - externalCampaignId
-      - adAccountType
-      - externalAdAccountId
-      - date
-      - metrics
       properties:
-        adAccountId:
+        type:
           type: string
-          description: Internal identifier of the ad account.
-        adAccountType:
-          $ref: '#/components/schemas/AdAccountTypeEnum'
-        organizationId:
+          format: uri
+          description: URI reference identifying the problem type.
+        title:
           type: string
-          description: Hootsuite organization Id
-        externalCampaignId:
+          description: Short, human-readable summary of the problem.
+          example: invalid-argument
+        status:
+          type: integer
+          format: int32
+          description: HTTP status code for this occurrence of the problem.
+          example: 422
+        detail:
           type: string
-          description: Campaign identifier from the external ad platform.
-        externalAdAccountId:
+          description: Detailed explanation of the error.
+          example: An invalid argument was provided.
+        instance:
           type: string
-          description: Account identifier from the external ad platform.
-        date:
-          type: string
-          format: date
-          description: Reporting date for this metrics record.
-        metrics:
-          $ref: '#/components/schemas/MetricsPublic'
+          format: uri
+          description: URI reference to the specific occurrence of the problem.
+      required:
+      - title
+      - status
+      additionalProperties: true
     AdAccountTypeEnum:
       type: string
       description: Ad account network type
       enum:
       - FACEBOOK
       - TWITTER
-    ListPaidRequest:
+    AdLink:
       type: object
+      description: Link objects associated with the ad.
       required:
-      - filters
+      - extendedUrl
       properties:
-        filters:
-          $ref: '#/components/schemas/AdRequestFilters'
-    Lifecycle:
-      type: object
-      description: Schedule window (start and end time), when available.
-      properties:
-        startTime:
+        extendedUrl:
           type: string
-          format: date-time
-        endTime:
-          type: string
-          format: date-time
-    ProfileMetricsEntry:
-      type: object
-      required:
-      - profileId
-      - externalProfileId
-      - date
-      - metrics
-      properties:
-        profileId:
-          type: string
-          description: Hootsuite identifier of this social profile.
-          example: '12345678'
-        externalProfileId:
-          type: string
-          description: Identifier of the social profile on the social network.
-        date:
-          type: string
-          format: date
-          description: date of the metrics
-        metrics:
-          $ref: '#/components/schemas/PageMetricsOverview'
-    Metadata:
-      type: object
-      required:
-      - collectionInfo
-      properties:
-        collectionInfo:
-          $ref: '#/components/schemas/CollectionInfo'
-    AttachmentType:
-      type: string
-      enum:
-      - ATTACHMENT_UNKNOWN
-      - ATTACHMENT_PHOTO
-      - ATTACHMENT_VIDEO
-      - ATTACHMENT_LINK
-      - ATTACHMENT_EVENT
-      - ATTACHMENT_ALBUM
-      - ATTACHMENT_ANIMATED_GIF
-    ListPaidMetricsResponse:
-      type: object
-      required:
-      - data
-      - metadata
-      properties:
-        data:
-          type: array
-          maxItems: 100
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/CampaignContentDailyMetrics'
-            - $ref: '#/components/schemas/AdsetContentDailyMetrics'
-            - $ref: '#/components/schemas/AdContentDailyMetrics'
-        metadata:
-          $ref: '#/components/schemas/Metadata'
-    NetworkTypeEnum:
-      type: string
-      description: API code for this Social Network
-      enum:
-      - FACEBOOKPAGE
-      - TWITTER
-      - INSTAGRAMBUSINESS
-      - TIKTOKBUSINESS
-      - YOUTUBECHANNEL
-      - PINTEREST
-      - THREADS
-    Budget:
-      type: object
-      description: Budget configuration, when available.
-      required:
-      - daily
-      - lifetime
-      properties:
-        daily:
-          type: number
-          format: double
-        lifetime:
-          type: number
-          format: double
-    DatatypeEnum:
-      type: string
-      description: API code for this datatype
-      enum:
-      - ORGANIC
-      - PAID
-    ListPostsRequest:
-      type: object
-      required:
-      - filters
-      properties:
-        filters:
-          $ref: '#/components/schemas/RequestFilters'
-    PostMetadata:
-      type: object
-      description: 'Platform-specific metadata in a single object. Keys and values depend on social_profile_type.
-
-        Examples: is_popular, object_type, is_boosted_post, is_eligible_for_promotion (Facebook);
-
-        in_reply_to_status_id, in_reply_to_user_id (Twitter); embed_url, video_duration (TikTok).
-
-        Excluded from source data: in_reply_to_link, quote_to_post_id, user_mentions (Twitter); board_id (Pinterest).
+        utm:
+          $ref: '#/components/schemas/UTM'
+  parameters:
+    LimitParameter:
+      in: query
+      name: limit
+      description: Number of results to return in this page of data.
+      schema:
+        type: integer
+        format: int
+        default: 10
+        minimum: 1
+        maximum: 100
+      example: 10
+    AdEntityCollectionParameter:
+      in: path
+      name: adEntityCollection
+      description: 'Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.
 
         '
-      additionalProperties: true
-    Cursor:
-      type: object
-      required:
-      - cursor
-      properties:
-        cursor:
-          type: string
-          description: Cursor for the next/prev page of data, if available
-          example: aWQ9NTAK
-    AdAccountFilter:
-      type: object
-      required:
-      - adAccountId
-      - organizationId
-      description: filter by adAccountId and organizationId
-      properties:
-        adAccountId:
-          type: string
-        organizationId:
-          type: string
-  parameters:
+      required: true
+      schema:
+        $ref: '#/components/schemas/AdEntityCollectionEnum'
+      example: ads
+    NetworkIdParameter:
+      in: query
+      name: networkId
+      description: The network type to retrieve analytics for.
+      schema:
+        $ref: '#/components/schemas/NetworkTypeEnum'
+      example: FACEBOOKPAGE
     CursorParameter:
       in: query
       name: cursor
@@ -1072,34 +1100,6 @@ components:
       schema:
         $ref: '#/components/schemas/DatatypeEnum'
       example: ORGANIC
-    NetworkIdParameter:
-      in: query
-      name: networkId
-      description: The network type to retrieve analytics for.
-      schema:
-        $ref: '#/components/schemas/NetworkTypeEnum'
-      example: FACEBOOKPAGE
-    AdEntityCollectionParameter:
-      in: path
-      name: adEntityCollection
-      description: 'Paid entity collection to list (`campaigns`, `adsets`, or `ads`).  Must match the `{adEntityType}` path segment.
-
-        '
-      required: true
-      schema:
-        $ref: '#/components/schemas/AdEntityCollectionEnum'
-      example: ads
-    LimitParameter:
-      in: query
-      name: limit
-      description: Number of results to return in this page of data.
-      schema:
-        type: integer
-        format: int
-        default: 10
-        minimum: 1
-        maximum: 100
-      example: 10
     AdAccountTypeParameter:
       in: query
       name: adAccountType

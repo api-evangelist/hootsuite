@@ -109,14 +109,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorsResponseEnvelope'
 components:
+  parameters:
+    bearerToken:
+      in: header
+      name: Authorization
+      description: A bearer token string used for authentication
+      required: true
+      schema:
+        type: string
   schemas:
-    TeamId:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The team ID.
-          example: '1998554224'
     Error:
       type: object
       properties:
@@ -145,6 +146,13 @@ components:
               type: string
               description: The resource ID.
               example: '7534653235'
+    TeamId:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The team ID.
+          example: '1998554224'
     ErrorsResponseEnvelope:
       type: object
       properties:
@@ -204,6 +212,14 @@ components:
           type: integer
           description: 1 indicates that this social profile is disconnected and needs to be reconnected, 0 shows the social profile is in a connected state.
           example: 0
+    SocialProfileTeamsResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamId'
+      description: The response data wrapper for a team.
     SocialProfilesResponseEnvelope:
       type: object
       properties:
@@ -218,22 +234,6 @@ components:
         data:
           $ref: '#/components/schemas/SocialProfile'
       description: The response data wrapper for a social profile.
-    SocialProfileTeamsResponseEnvelope:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TeamId'
-      description: The response data wrapper for a team.
-  parameters:
-    bearerToken:
-      in: header
-      name: Authorization
-      description: A bearer token string used for authentication
-      required: true
-      schema:
-        type: string
   securitySchemes:
     OAuth2:
       type: oauth2

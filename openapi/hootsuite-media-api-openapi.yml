@@ -99,6 +99,21 @@ paths:
                 $ref: '#/components/schemas/ErrorsResponseEnvelope'
 components:
   schemas:
+    MediaUploadUrl:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The media identifier.
+          example: aHR0cHM6Ly9ob290c3VpdGUtdmlkZW8uczMuYW1hem9uYXdzLmNvbS9wcm9kdWN0aW9uLzEyMjU1MjQ0XzgyOTVmZjllLWFkOWYtNGNlNy1iOGE3LTgwNzI0NDAwYTBhZS5tcDQ=
+        uploadUrl:
+          type: string
+          description: An S3 URL to upload media to Hootsuite.
+          example: https://hootsuite-video.s3.amazonaws.com/production/12255244_01942650-3d42-42b8-a191-aa84eb45d105.mp4?AWSAccessKeyId=REDACTED_AWS_ACCESS_KEY_ID&Expires=1471978770&Signature=b%2B196oEHxySdmE%2FC34ZRL6pXSAI%3D
+        uploadUrlDurationSeconds:
+          type: integer
+          description: The number of seconds until the upload url is no longer valid.
+          example: 1799
     Error:
       type: object
       properties:
@@ -127,33 +142,31 @@ components:
               type: string
               description: The resource ID.
               example: '7534653235'
+    ErrorsResponseEnvelope:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: The errors response envelope.
+          items:
+            $ref: '#/components/schemas/Error'
     MediaUploadUrlResponseEnvelope:
       type: object
       properties:
         data:
           $ref: '#/components/schemas/MediaUploadUrl'
       description: The response data wrapper for a Media Upload Url.
-    MediaDownloadUrlResponseEnvelope:
+    MediaUploadUrlRequest:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/MediaDownloadUrl'
-      description: The response data wrapper for a Media Download Url.
-    MediaUploadUrl:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The media identifier.
-          example: aHR0cHM6Ly9ob290c3VpdGUtdmlkZW8uczMuYW1hem9uYXdzLmNvbS9wcm9kdWN0aW9uLzEyMjU1MjQ0XzgyOTVmZjllLWFkOWYtNGNlNy1iOGE3LTgwNzI0NDAwYTBhZS5tcDQ=
-        uploadUrl:
-          type: string
-          description: An S3 URL to upload media to Hootsuite.
-          example: https://hootsuite-video.s3.amazonaws.com/production/12255244_01942650-3d42-42b8-a191-aa84eb45d105.mp4?AWSAccessKeyId=REDACTED_AWS_ACCESS_KEY_ID&Expires=1471978770&Signature=b%2B196oEHxySdmE%2FC34ZRL6pXSAI%3D
-        uploadUrlDurationSeconds:
+        sizeBytes:
           type: integer
-          description: The number of seconds until the upload url is no longer valid.
-          example: 1799
+          description: Size in bytes of the media file to be uploaded.
+          example: 383631
+        mimeType:
+          type: string
+          description: MIME type of the media to be uploaded. Supported media types are video/mp4, image/gif, image/jpeg, image/jpg, image/png.
+          example: video/mp4
     MediaDownloadUrl:
       type: object
       properties:
@@ -176,25 +189,12 @@ components:
           type: integer
           description: The number of seconds until the download url is no longer valid. This is only available after the media has been processed
           example: 1799
-    ErrorsResponseEnvelope:
+    MediaDownloadUrlResponseEnvelope:
       type: object
       properties:
-        errors:
-          type: array
-          description: The errors response envelope.
-          items:
-            $ref: '#/components/schemas/Error'
-    MediaUploadUrlRequest:
-      type: object
-      properties:
-        sizeBytes:
-          type: integer
-          description: Size in bytes of the media file to be uploaded.
-          example: 383631
-        mimeType:
-          type: string
-          description: MIME type of the media to be uploaded. Supported media types are video/mp4, image/gif, image/jpeg, image/jpg, image/png.
-          example: video/mp4
+        data:
+          $ref: '#/components/schemas/MediaDownloadUrl'
+      description: The response data wrapper for a Media Download Url.
   parameters:
     bearerToken:
       in: header

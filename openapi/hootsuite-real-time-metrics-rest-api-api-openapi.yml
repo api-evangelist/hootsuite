@@ -354,33 +354,7 @@ paths:
             '
 components:
   schemas:
-    TeamId:
-      type: string
-      description: 'Filter by team identifier
-
-        '
-    TimeSeriesDataPoint:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        value:
-          type: object
-          oneOf:
-          - $ref: '#/components/schemas/GroupedMetricResponse'
-          - $ref: '#/components/schemas/NumberMetricResponse'
-    From:
-      type: string
-      description: 'An `ISO-8601` date time marking the inclusive start of the result. Must be URL encoded. The `from` filter can be a maximum of 14 days in the past.
-
-        '
-    Timezone:
-      type: string
-      description: 'The `timezone` to be used in conjunction with`groupByInterval`, e.g. America/Los_Angeles. Must be URL encoded. If no `timezone` is provided, the default ''UTC'' timezone is used
-
-        '
-    HandleTimeRequest:
+    TotalResolvedConversationsRequest:
       type: object
       required:
       - from
@@ -397,76 +371,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ChannelId'
-        userIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserId'
-        handleTimeTypes:
-          type: array
-          items:
-            type: string
-            enum:
-            - HANDLE_TIME
-            - NO_REPLY_TIME
-            - CHERRY_PICKING
-    AgentAvailabilityRequest:
-      type: object
-      properties:
         teamIds:
           type: array
           items:
-            type: string
-          description: 'Filter by teams
-
-            '
-        userPresenceStatus:
+            $ref: '#/components/schemas/TeamId'
+        groupBy:
           type: string
           enum:
-          - AWAY
-          - AVAILABLE
-    NumberMetricResponse:
-      type: object
-      properties:
-        value:
-          type: integer
-    TotalMessagesRequest:
-      type: object
-      required:
-      - from
-      properties:
-        from:
-          $ref: '#/components/schemas/From'
-        to:
-          $ref: '#/components/schemas/To'
-        timezone:
-          $ref: '#/components/schemas/Timezone'
-        mediumIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/MediumId'
-        channelIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/ChannelId'
-        groupByInterval:
-          $ref: '#/components/schemas/GroupByInterval'
-    To:
-      type: string
-      description: 'An `ISO-8601` date time marking the exclusive end of the result. Must be URL encoded
-
-        '
-    MediumId:
-      type: string
-      enum:
-      - fb
-      - twit
-      - instagram
-      - rtm
-      - whatsapp
-      - linkedin
-      description: 'Filter by medium identifier
-
-        '
+          - TEAM
     TimeSeriesMetricResponse:
       type: object
       properties:
@@ -476,6 +388,11 @@ components:
             type: object
             additionalProperties:
               $ref: '#/components/schemas/TimeSeriesDataPoint'
+    To:
+      type: string
+      description: 'An `ISO-8601` date time marking the exclusive end of the result. Must be URL encoded
+
+        '
     ResponseTimeRequest:
       type: object
       required:
@@ -505,12 +422,43 @@ components:
           type: string
           enum:
           - TEAM
-    ChannelId:
+    TotalMessagesRequest:
+      type: object
+      required:
+      - from
+      properties:
+        from:
+          $ref: '#/components/schemas/From'
+        to:
+          $ref: '#/components/schemas/To'
+        timezone:
+          $ref: '#/components/schemas/Timezone'
+        mediumIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediumId'
+        channelIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelId'
+        groupByInterval:
+          $ref: '#/components/schemas/GroupByInterval'
+    TeamId:
       type: string
-      description: 'Filter by channel identifier (to obtain a list of your channel IDs, contact a Inbox 2.0 representative)
+      description: 'Filter by team identifier
 
         '
-    TotalResolvedConversationsRequest:
+    UserId:
+      type: string
+      description: 'Filter by user identifier
+
+        '
+    NumberMetricResponse:
+      type: object
+      properties:
+        value:
+          type: integer
+    HandleTimeRequest:
       type: object
       required:
       - from
@@ -527,14 +475,28 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ChannelId'
-        teamIds:
+        userIds:
           type: array
           items:
-            $ref: '#/components/schemas/TeamId'
-        groupBy:
-          type: string
-          enum:
-          - TEAM
+            $ref: '#/components/schemas/UserId'
+        handleTimeTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - HANDLE_TIME
+            - NO_REPLY_TIME
+            - CHERRY_PICKING
+    From:
+      type: string
+      description: 'An `ISO-8601` date time marking the inclusive start of the result. Must be URL encoded. The `from` filter can be a maximum of 14 days in the past.
+
+        '
+    Timezone:
+      type: string
+      description: 'The `timezone` to be used in conjunction with`groupByInterval`, e.g. America/Los_Angeles. Must be URL encoded. If no `timezone` is provided, the default ''UTC'' timezone is used
+
+        '
     MetricRequest:
       type: object
       required:
@@ -574,11 +536,17 @@ components:
       description: 'An interval to group results by. No more than 60 intervals can be requested per request. For example, when selecting `minute`, the requested time range cannot be longer than 1 hour
 
         '
-    UserId:
-      type: string
-      description: 'Filter by user identifier
-
-        '
+    TimeSeriesDataPoint:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        value:
+          type: object
+          oneOf:
+          - $ref: '#/components/schemas/GroupedMetricResponse'
+          - $ref: '#/components/schemas/NumberMetricResponse'
     GroupedMetricResponse:
       type: object
       properties:
@@ -586,6 +554,38 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/NumberMetricResponse'
+    AgentAvailabilityRequest:
+      type: object
+      properties:
+        teamIds:
+          type: array
+          items:
+            type: string
+          description: 'Filter by teams
+
+            '
+        userPresenceStatus:
+          type: string
+          enum:
+          - AWAY
+          - AVAILABLE
+    MediumId:
+      type: string
+      enum:
+      - fb
+      - twit
+      - instagram
+      - rtm
+      - whatsapp
+      - linkedin
+      description: 'Filter by medium identifier
+
+        '
+    ChannelId:
+      type: string
+      description: 'Filter by channel identifier (to obtain a list of your channel IDs, contact a Inbox 2.0 representative)
+
+        '
   securitySchemes:
     bearer-token:
       type: http

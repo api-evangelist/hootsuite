@@ -304,42 +304,372 @@ paths:
                 $ref: '#/components/schemas/ErrorsResponseEnvelope'
 components:
   schemas:
-    Error:
+    SocialProfileMessage:
       type: object
+      required:
+      - id
+      - state
       properties:
-        code:
-          type: number
-          description: An error code indicating the type of error that occurred.
-          example: 1234
-        message:
-          type: string
-          description: A description of error.
-          example: An error message
         id:
           type: string
-          description: A unique error id for tracing purposes
-          example: f7d32670-4e6a-48c0-a2a7-87803536a712
-        resource:
+          description: The message ID.
+          example: '4138476039'
+        state:
+          type: string
+          description: The message state.
+          example: SCHEDULED
+          enum:
+          - SCHEDULED
+          - SUBMITTED
+          - PENDING_APPROVAL
+          - SENT
+          - SEND_FAILED_PERMANENTLY
+          - REJECTED
+        text:
+          type: string
+          description: The message text to publish.
+          example: 5 trends that will change how we use social media this year http://owl.li/YuNr2
+        socialProfile:
+          title: socialProfileReference
           type: object
-          description: A reference to the resource in error
-          title: ResourceReference
+          description: The social profile that the message will be published to.
           properties:
-            type:
-              type: string
-              description: The resource type.
-              example: socialProfile
             id:
               type: string
-              description: The resource ID.
-              example: '7534653235'
-    PrivacyOptions:
+              description: The social profile ID.
+              example: '115185509'
+            externalURL:
+              type: string
+              description: The external public URL of the social profile.
+              example: https://www.linkedin.com/in/l-lhs-8654321
+        scheduledSendTime:
+          type: string
+          description: The time the message is scheduled to be sent in UTC time, [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format. Missing or different timezones will not be accepted, to ensure there is no ambiguity about scheduled time. Dates must end with 'Z' to be accepted.
+          example: 2018-10-25 10:35:00+00:00
+        webhookUrls:
+          type: array
+          description: The webhook URL(s) to call to when the message’s state changes.
+          items:
+            type: string
+            example: https://myserver.com/inbound
+        tags:
+          type: array
+          description: The Hootsuite message tags to apply to the message. To set tags the social profile must belong to an organization. Tags are case sensitive. Limited permission members can only use the existing tags for organization and cannot create new ones. See more about message tags at the Hootsuite Help Center.
+          items:
+            type: string
+            example: test_tag
+        targeting:
+          title: targetingOptions
+          type: object
+          description: Social network targeting options to be applied when publishing the message.
+          properties:
+            facebookPage:
+              $ref: '#/components/schemas/FacebookPageTargeting'
+            linkedInCompany:
+              $ref: '#/components/schemas/LinkedInCompanyTargeting'
+        privacy:
+          title: privacyOptions
+          type: object
+          description: Social network privacy options to be applied when publishing the message.
+          properties:
+            facebook:
+              $ref: '#/components/schemas/FacebookPrivacy'
+            linkedIn:
+              $ref: '#/components/schemas/LinkedInPrivacy'
+        location:
+          $ref: '#/components/schemas/Location'
+        emailNotification:
+          type: boolean
+          description: A flag to determine whether email notifications are sent when the message is published.
+          example: true
+        mediaUrls:
+          type: array
+          description: The ow.ly media attached to the message
+          items:
+            $ref: '#/components/schemas/MediaUrl'
+        media:
+          type: array
+          description: The media attached to the message
+          items:
+            $ref: '#/components/schemas/Media'
+        extendedInfo:
+          type: array
+          description: Social profile metadata attached to the message. Only available for Pinterest messages at this time.
+          items:
+            type: object
+            properties:
+              socialProfileType:
+                type: string
+                description: The social profile type that this extendedInfo object is for.
+                example: PINTEREST
+                enum:
+                - PINTEREST
+              socialProfileId:
+                type: string
+                description: The social profile ID that this extendedInfo object is for.
+                example: '123456789'
+              data:
+                type: object
+                description: Social profile specific meta data.
+                properties:
+                  boardId:
+                    type: string
+                    description: Pinterest board ID for Pin
+                    example: '123456789012345678'
+                  destinationUrl:
+                    type: string
+                    description: Website for Pin
+                    example: https://www.hootsuite.com
+        postId:
+          type: string
+          description: The external message ID used by social network for this message. Only set once the message has been published.
+          example: '705207140236001282'
+        postUrl:
+          type: string
+          description: The URL of the message live on the social network. Only set once the message has been published. Only available for Facebook and LinkedIn messages at this time.
+          example: https://www.facebook.com/177463958820/posts/10155617296368821
+        createdByMember:
+          title: memberReference
+          type: object
+          description: The identifier of the member who originally created the message.
+          properties:
+            id:
+              type: string
+              description: ID of member.
+              example: '1389211223'
+        lastUpdatedByMember:
+          title: memberReference
+          type: object
+          description: The identifier of the member who last updated the message.
+          properties:
+            id:
+              type: string
+              description: ID of member.
+              example: '1389211222'
+        sequenceNumber:
+          type: number
+          description: The number representing which step in the approval process the message is on, or null if the message is not subject to approval.
+          example: 3
+        reviewers:
+          type: array
+          description: A list of message reviewers
+          items:
+            $ref: '#/components/schemas/Reviewer'
+    Media:
       type: object
-      description: Social network privacy options to be applied when publishing the message.
       properties:
-        facebook:
-          $ref: '#/components/schemas/FacebookPrivacy'
-        linkedIn:
-          $ref: '#/components/schemas/LinkedInPrivacy'
+        id:
+          type: string
+          description: The media ID.
+          example: aHR0cDovL2V4YW1wbGUub3Jn
+        thumbnailId:
+          type: string
+          description: The thumbnail media ID.
+          example: aHR0cDovL2V4YW1wbGUtMDAwMS5vcmc=
+        videoOptions:
+          type: object
+          description: The metadata to set for a video.
+          properties:
+            facebook:
+              type: object
+              description: Facebook video metadata. Optional.
+              properties:
+                title:
+                  type: string
+                  description: The video title
+                  example: My Video
+                category:
+                  type: string
+                  description: The video category
+                  example: ENTERTAINMENT
+                  enum:
+                  - BEAUTY_FASHION
+                  - BUSINESS
+                  - CARS_TRUCKS
+                  - COMEDY
+                  - CUTE_ANIMALS
+                  - ENTERTAINMENT
+                  - FAMILY
+                  - FOOD_HEALTH
+                  - HOME
+                  - LIFESTYLE
+                  - MUSIC
+                  - NEWS
+                  - POLITICS
+                  - SCIENCE
+                  - SPORTS
+                  - TECHNOLOGY
+                  - VIDEO_GAMING
+                  - OTHER
+      description: The media attached to the message.
+    ApproveMessageRequest:
+      type: object
+      required:
+      - sequenceNumber
+      properties:
+        sequenceNumber:
+          type: integer
+          description: The sequence number of the message being approved.
+          example: 11
+        reviewerType:
+          type: string
+          description: 'The actor that will be approving the message. Leaving this field empty will use "EXTERNAL" by default.
+
+
+            Using "MEMBER" requires that you use a member token to approve a message that is pending approval by that member.
+
+            '
+          enum:
+          - EXTERNAL
+          - MEMBER
+    ErrorsResponseEnvelope:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: The errors response envelope.
+          items:
+            $ref: '#/components/schemas/Error'
+    Message:
+      type: object
+      properties:
+        text:
+          type: string
+          description: The message text to publish.
+          example: 5 trends that will change how we use social media this year http://owl.li/YuNr2
+        socialProfileIds:
+          type: array
+          description: The social profiles that the message will be posted to.
+          items:
+            type: string
+            example: '115185509'
+        scheduledSendTime:
+          type: string
+          description: The time the message is scheduled to be sent in UTC time, [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format. Missing or different timezones will not be accepted, to ensure there is no ambiguity about scheduled time. Dates must end with 'Z' to be accepted.
+          example: 2020-01-01 14:00:00+00:00
+        webhookUrls:
+          type: array
+          description: The webhook URL(s) to call to when the message’s state changes.
+          items:
+            type: string
+            example: https://myserver.com/inbound
+        tags:
+          type: array
+          description: The Hootsuite message tags to apply to the message. To set tags the social profile must belong to an organization. Tags are case sensitive. Limited permission members can only use the existing tags for organization and cannot create new ones. See more about message tags at the Hootsuite Help Center.<br/>Not supported by Pinterest.
+          items:
+            type: string
+            example: test_tag
+        targeting:
+          $ref: '#/components/schemas/TargetingOptions'
+        privacy:
+          $ref: '#/components/schemas/PrivacyOptions'
+        location:
+          $ref: '#/components/schemas/Location'
+        emailNotification:
+          type: boolean
+          description: A flag to determine whether email notifications are sent when the message is published.
+          example: true
+        mediaUrls:
+          type: array
+          description: The ow.ly media to attach to the message
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                description: The media URL.
+                example: http://static.ow.ly/photos/normal/cS5.jpg
+        media:
+          type: array
+          description: The media to attach to the message
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The media ID.
+                example: aHR0cDovL2V4YW1wbGUub3Jn
+              videoOptions:
+                type: object
+                description: The metadata to set for a video.
+                properties:
+                  facebook:
+                    type: object
+                    description: Facebook video metadata. Optional.
+                    properties:
+                      title:
+                        type: string
+                        description: The video title
+                        example: My Video
+                      category:
+                        type: string
+                        description: The video category
+                        example: ENTERTAINMENT
+                        enum:
+                        - BEAUTY_FASHION
+                        - BUSINESS
+                        - CARS_TRUCKS
+                        - COMEDY
+                        - CUTE_ANIMALS
+                        - ENTERTAINMENT
+                        - FAMILY
+                        - FOOD_HEALTH
+                        - HOME
+                        - LIFESTYLE
+                        - MUSIC
+                        - NEWS
+                        - POLITICS
+                        - SCIENCE
+                        - SPORTS
+                        - TECHNOLOGY
+                        - VIDEO_GAMING
+                        - OTHER
+        extendedInfo:
+          type: array
+          description: Object used to send social profile metadata. Only available for Pinterest messages at this time.
+          items:
+            type: object
+            properties:
+              socialProfileType:
+                type: string
+                description: The social profile type that this extendedInfo object is for.
+                example: PINTEREST
+                enum:
+                - PINTEREST
+              socialProfileId:
+                type: string
+                description: The social profile ID that this extendedInfo object is for.
+                example: '123456789'
+              data:
+                type: object
+                description: Social profile specific metadata.
+                properties:
+                  boardId:
+                    type: string
+                    description: Pinterest board ID for Pin
+                    example: '123456789012345678'
+                  destinationUrl:
+                    type: string
+                    description: Website for Pin
+                    example: https://www.hootsuite.com
+    FacebookPrivacy:
+      type: object
+      properties:
+        visibility:
+          type: array
+          description: Facebook visibility rules. At most 1 can be used.
+          items:
+            type: string
+            example: everyone
+            enum:
+            - everyone
+            - friends
+            - friendsOfFriends
+    MessageReviewResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Actions'
     FacebookPageTargeting:
       description: Targeting options for Facebook Page. Note that recently Facebook has deprecated feed targeting fields `ageMax`, `genders`, and `locales`.
       type: object
@@ -434,6 +764,281 @@ components:
                 type: string
                 description: The zip/postal code key, as provided by Facebook.
                 example: CA:K1S
+    Reviewer:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The reviewer member ID.
+          example: 22421144
+        type:
+          type: string
+          description: The reviewer type
+          example: MESSAGE_LEVEL
+          enum:
+          - MESSAGE_LEVEL
+          - TEAM
+          - MEMBER
+          - EXTERNAL
+          - SYSTEM
+          - ADMIN_AND_EDITOR
+          - ORGANIZATION
+      description: Member that was requested to approve the message
+    SocialProfileMessagesResponseEnvelope:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          description: The data response envelope.
+          items:
+            $ref: '#/components/schemas/SocialProfileMessage'
+        metadata:
+          title: metadata
+          type: object
+          description: The metadata response envelope.
+          properties:
+            cursor:
+              title: cursor
+              type: object
+              description: The cursor to paginate the results. A cursor will be created if the number of results exceeds the limit set in the query parameters.
+              properties:
+                next:
+                  type: string
+                  description: A cursor to the next page of results. This is set to null if no more pages exist.
+                  example: 1577887200000:4138476039:0
+                previous:
+                  type: string
+                  description: A cursor to the previous page of results. This is set to null if no previous pages exist.
+                  example: 1577887200000:4138476039:1
+    TargetingOptions:
+      type: object
+      description: Social network targeting options to be applied when publishing the message.
+      properties:
+        facebookPage:
+          $ref: '#/components/schemas/FacebookPageTargeting'
+        linkedInCompany:
+          $ref: '#/components/schemas/LinkedInCompanyTargeting'
+        linkedInV2Company:
+          $ref: '#/components/schemas/LinkedInV2CompanyTargeting'
+    Location:
+      description: The message’s geolocation in decimal degrees for latitude and longitude. Twitter allows users to set the location for a post manually. The location object takes in Decimal Degrees for latitude and longitude. Decimal degrees are an alternative to using degrees, minutes, and seconds (DMS). The values for latitude and longitude are bounded by ±90° and ±180° respectively. Positive latitudes are north of the equator, negative latitudes are south of the equator. Positive longitudes are east of Prime Meridian, negative longitudes are west of the Prime Meridian.<br/>Not supported by Pinterest.
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          description: The latitude in decimal degrees. Must be between -90 to 90.
+          example: 57.64911
+        longitude:
+          type: number
+          format: double
+          description: The longitude in decimal degrees. Must be between -180 to 180.
+          example: 10.40744
+    LinkedInV2CompanyTargeting:
+      description: Targeting options for LinkedIn Company V2.
+      type: object
+      properties:
+        locations:
+          type: array
+          description: "Locations to target the message at, expected format of urn:li:geo:{CODE}. [Geo Locations reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/standardized-data/locations/geo), \n[Geo Typeahead Locations reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/standardized-data/locations/geo-typeahead?tabs=http)\n"
+          items:
+            type: string
+          example:
+          - urn:li:geo:103644278
+          - urn:li:geo:102095887
+        staffCountRanges:
+          type: array
+          description: 'Staff count to target the message at, expected format of SIZE_{VALUES}.
+
+            Valid values: SIZE_1, SIZE_2_TO_10, SIZE_11_TO_50, SIZE_51_TO_200, SIZE_201_TO_500, SIZE_501_TO_1000,
+
+            SIZE_1001_TO_5000, SIZE_5001_TO_10000, SIZE_10001_OR_MORE
+
+            [Staff count codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/company-size-codes)
+
+            '
+          items:
+            type: string
+          example:
+          - SIZE_1
+          - SIZE_51_TO_200
+          - SIZE_10001_OR_MORE
+        seniorities:
+          type: array
+          description: 'Seniorities to target the message at, expected format of urn:li:seniority:{CODE}. [Seniorities codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/seniority-codes)
+
+            '
+          items:
+            type: string
+          example:
+          - urn:li:seniority:1
+          - urn:li:seniority:2
+        industries:
+          type: array
+          description: 'Industries to target the message at, expected format of urn:li:industry:{CODE}. [Industries codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/industry-codes-v2)
+
+            '
+          items:
+            type: string
+          example:
+          - urn:li:industry:1
+          - urn:li:industry:2
+        interfaceLocales:
+          type: array
+          description: 'Languages to target the message at, expected format of {"country":"COUNTRY","language":"language"}. [Language codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/language-codes)
+
+            Languages can be interpreted as this format: language_COUNTRY, replace in request as necessary.
+
+            '
+          items:
+            type: object
+          example:
+          - country: US
+            language: en
+          - country: ES
+            language: es
+    Actions:
+      type: object
+      description: An array of the review actions performed on the message.
+      properties:
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewAction'
+    SocialProfileMessageResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SocialProfileMessage'
+      description: The response data wrapper for a social profile message
+    PrivacyOptions:
+      type: object
+      description: Social network privacy options to be applied when publishing the message.
+      properties:
+        facebook:
+          $ref: '#/components/schemas/FacebookPrivacy'
+        linkedIn:
+          $ref: '#/components/schemas/LinkedInPrivacy'
+    MediaUrl:
+      type: object
+      properties:
+        thumbnailUrl:
+          type: string
+          description: The thumbnail media URL.
+          example: http://static.ow.ly/photos/thumb/cS5.jpg
+        url:
+          type: string
+          description: The media URL.
+          example: http://static.ow.ly/photos/normal/cS5.jpg
+      description: An ow.ly media URL.
+    EmptyDataEnvelope:
+      type: object
+      properties:
+        data:
+          description: The data response envelope.
+          type: object
+    RejectMessageRequest:
+      type: object
+      required:
+      - reason
+      - sequenceNumber
+      properties:
+        reason:
+          type: string
+          description: The rejection reason to be displayed to the creator of the message.
+          example: Message contains profanity
+        sequenceNumber:
+          type: integer
+          description: The sequence number of the message being rejected.
+          example: 11
+        reviewerType:
+          type: string
+          description: 'The actor that will be rejecting the message. Leaving this field empty will use "EXTERNAL" by default.
+
+
+            Using "MEMBER" requires that you use a member token to reject a message that is pending approval by that member.
+
+            '
+          enum:
+          - EXTERNAL
+          - MEMBER
+    ReviewAction:
+      type: object
+      properties:
+        actorType:
+          type: string
+          description: The type of actor who performed this review action.
+          example: MEMBER
+          enum:
+          - MEMBER
+          - SYSTEM
+          - EXTERNAL_REVIEW_V1
+        actorId:
+          type: string
+          description: The ID of the actor that performed this review action.
+          example: '12345678'
+        actionType:
+          type: string
+          description: The action performed.
+          example: CREATE
+          enum:
+          - CREATE
+          - APPROVE
+          - REJECT
+          - DELETE
+          - RESET
+          - EDIT
+          - EXPIRE
+          - SEND
+          - SCHEDULE
+          - SENDFAIL
+          - SCHEDULEFAIL
+        timestamp:
+          type: string
+          description: The time the review action was performed. Timezone is UTC.
+          example: 2017-02-15 18:51:13+00:00
+    LinkedInPrivacy:
+      type: object
+      properties:
+        visibility:
+          type: array
+          description: LinkedIn visibility rules. At most 1 can be used.
+          items:
+            type: string
+            example: anyone
+            enum:
+            - anyone
+            - connectionsOnly
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+          description: An error code indicating the type of error that occurred.
+          example: 1234
+        message:
+          type: string
+          description: A description of error.
+          example: An error message
+        id:
+          type: string
+          description: A unique error id for tracing purposes
+          example: f7d32670-4e6a-48c0-a2a7-87803536a712
+        resource:
+          type: object
+          description: A reference to the resource in error
+          title: ResourceReference
+          properties:
+            type:
+              type: string
+              description: The resource type.
+              example: socialProfile
+            id:
+              type: string
+              description: The resource ID.
+              example: '7534653235'
     LinkedInCompanyTargeting:
       description: Targeting options for LinkedIn Company. Legacy field, please do not use.
       type: object
@@ -2464,611 +3069,6 @@ components:
           items:
             type: string
             example: en
-    ReviewAction:
-      type: object
-      properties:
-        actorType:
-          type: string
-          description: The type of actor who performed this review action.
-          example: MEMBER
-          enum:
-          - MEMBER
-          - SYSTEM
-          - EXTERNAL_REVIEW_V1
-        actorId:
-          type: string
-          description: The ID of the actor that performed this review action.
-          example: '12345678'
-        actionType:
-          type: string
-          description: The action performed.
-          example: CREATE
-          enum:
-          - CREATE
-          - APPROVE
-          - REJECT
-          - DELETE
-          - RESET
-          - EDIT
-          - EXPIRE
-          - SEND
-          - SCHEDULE
-          - SENDFAIL
-          - SCHEDULEFAIL
-        timestamp:
-          type: string
-          description: The time the review action was performed. Timezone is UTC.
-          example: 2017-02-15 18:51:13+00:00
-    Actions:
-      type: object
-      description: An array of the review actions performed on the message.
-      properties:
-        actions:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReviewAction'
-    EmptyDataEnvelope:
-      type: object
-      properties:
-        data:
-          description: The data response envelope.
-          type: object
-    MediaUrl:
-      type: object
-      properties:
-        thumbnailUrl:
-          type: string
-          description: The thumbnail media URL.
-          example: http://static.ow.ly/photos/thumb/cS5.jpg
-        url:
-          type: string
-          description: The media URL.
-          example: http://static.ow.ly/photos/normal/cS5.jpg
-      description: An ow.ly media URL.
-    TargetingOptions:
-      type: object
-      description: Social network targeting options to be applied when publishing the message.
-      properties:
-        facebookPage:
-          $ref: '#/components/schemas/FacebookPageTargeting'
-        linkedInCompany:
-          $ref: '#/components/schemas/LinkedInCompanyTargeting'
-        linkedInV2Company:
-          $ref: '#/components/schemas/LinkedInV2CompanyTargeting'
-    Message:
-      type: object
-      properties:
-        text:
-          type: string
-          description: The message text to publish.
-          example: 5 trends that will change how we use social media this year http://owl.li/YuNr2
-        socialProfileIds:
-          type: array
-          description: The social profiles that the message will be posted to.
-          items:
-            type: string
-            example: '115185509'
-        scheduledSendTime:
-          type: string
-          description: The time the message is scheduled to be sent in UTC time, [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format. Missing or different timezones will not be accepted, to ensure there is no ambiguity about scheduled time. Dates must end with 'Z' to be accepted.
-          example: 2020-01-01 14:00:00+00:00
-        webhookUrls:
-          type: array
-          description: The webhook URL(s) to call to when the message’s state changes.
-          items:
-            type: string
-            example: https://myserver.com/inbound
-        tags:
-          type: array
-          description: The Hootsuite message tags to apply to the message. To set tags the social profile must belong to an organization. Tags are case sensitive. Limited permission members can only use the existing tags for organization and cannot create new ones. See more about message tags at the Hootsuite Help Center.<br/>Not supported by Pinterest.
-          items:
-            type: string
-            example: test_tag
-        targeting:
-          $ref: '#/components/schemas/TargetingOptions'
-        privacy:
-          $ref: '#/components/schemas/PrivacyOptions'
-        location:
-          $ref: '#/components/schemas/Location'
-        emailNotification:
-          type: boolean
-          description: A flag to determine whether email notifications are sent when the message is published.
-          example: true
-        mediaUrls:
-          type: array
-          description: The ow.ly media to attach to the message
-          items:
-            type: object
-            properties:
-              url:
-                type: string
-                description: The media URL.
-                example: http://static.ow.ly/photos/normal/cS5.jpg
-        media:
-          type: array
-          description: The media to attach to the message
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: The media ID.
-                example: aHR0cDovL2V4YW1wbGUub3Jn
-              videoOptions:
-                type: object
-                description: The metadata to set for a video.
-                properties:
-                  facebook:
-                    type: object
-                    description: Facebook video metadata. Optional.
-                    properties:
-                      title:
-                        type: string
-                        description: The video title
-                        example: My Video
-                      category:
-                        type: string
-                        description: The video category
-                        example: ENTERTAINMENT
-                        enum:
-                        - BEAUTY_FASHION
-                        - BUSINESS
-                        - CARS_TRUCKS
-                        - COMEDY
-                        - CUTE_ANIMALS
-                        - ENTERTAINMENT
-                        - FAMILY
-                        - FOOD_HEALTH
-                        - HOME
-                        - LIFESTYLE
-                        - MUSIC
-                        - NEWS
-                        - POLITICS
-                        - SCIENCE
-                        - SPORTS
-                        - TECHNOLOGY
-                        - VIDEO_GAMING
-                        - OTHER
-        extendedInfo:
-          type: array
-          description: Object used to send social profile metadata. Only available for Pinterest messages at this time.
-          items:
-            type: object
-            properties:
-              socialProfileType:
-                type: string
-                description: The social profile type that this extendedInfo object is for.
-                example: PINTEREST
-                enum:
-                - PINTEREST
-              socialProfileId:
-                type: string
-                description: The social profile ID that this extendedInfo object is for.
-                example: '123456789'
-              data:
-                type: object
-                description: Social profile specific metadata.
-                properties:
-                  boardId:
-                    type: string
-                    description: Pinterest board ID for Pin
-                    example: '123456789012345678'
-                  destinationUrl:
-                    type: string
-                    description: Website for Pin
-                    example: https://www.hootsuite.com
-    MessageReviewResponseEnvelope:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Actions'
-    RejectMessageRequest:
-      type: object
-      required:
-      - reason
-      - sequenceNumber
-      properties:
-        reason:
-          type: string
-          description: The rejection reason to be displayed to the creator of the message.
-          example: Message contains profanity
-        sequenceNumber:
-          type: integer
-          description: The sequence number of the message being rejected.
-          example: 11
-        reviewerType:
-          type: string
-          description: 'The actor that will be rejecting the message. Leaving this field empty will use "EXTERNAL" by default.
-
-
-            Using "MEMBER" requires that you use a member token to reject a message that is pending approval by that member.
-
-            '
-          enum:
-          - EXTERNAL
-          - MEMBER
-    SocialProfileMessageResponseEnvelope:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/SocialProfileMessage'
-      description: The response data wrapper for a social profile message
-    SocialProfileMessagesResponseEnvelope:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          type: array
-          description: The data response envelope.
-          items:
-            $ref: '#/components/schemas/SocialProfileMessage'
-        metadata:
-          title: metadata
-          type: object
-          description: The metadata response envelope.
-          properties:
-            cursor:
-              title: cursor
-              type: object
-              description: The cursor to paginate the results. A cursor will be created if the number of results exceeds the limit set in the query parameters.
-              properties:
-                next:
-                  type: string
-                  description: A cursor to the next page of results. This is set to null if no more pages exist.
-                  example: 1577887200000:4138476039:0
-                previous:
-                  type: string
-                  description: A cursor to the previous page of results. This is set to null if no previous pages exist.
-                  example: 1577887200000:4138476039:1
-    LinkedInV2CompanyTargeting:
-      description: Targeting options for LinkedIn Company V2.
-      type: object
-      properties:
-        locations:
-          type: array
-          description: "Locations to target the message at, expected format of urn:li:geo:{CODE}. [Geo Locations reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/standardized-data/locations/geo), \n[Geo Typeahead Locations reference](https://learn.microsoft.com/en-us/linkedin/shared/references/v2/standardized-data/locations/geo-typeahead?tabs=http)\n"
-          items:
-            type: string
-          example:
-          - urn:li:geo:103644278
-          - urn:li:geo:102095887
-        staffCountRanges:
-          type: array
-          description: 'Staff count to target the message at, expected format of SIZE_{VALUES}.
-
-            Valid values: SIZE_1, SIZE_2_TO_10, SIZE_11_TO_50, SIZE_51_TO_200, SIZE_201_TO_500, SIZE_501_TO_1000,
-
-            SIZE_1001_TO_5000, SIZE_5001_TO_10000, SIZE_10001_OR_MORE
-
-            [Staff count codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/company-size-codes)
-
-            '
-          items:
-            type: string
-          example:
-          - SIZE_1
-          - SIZE_51_TO_200
-          - SIZE_10001_OR_MORE
-        seniorities:
-          type: array
-          description: 'Seniorities to target the message at, expected format of urn:li:seniority:{CODE}. [Seniorities codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/seniority-codes)
-
-            '
-          items:
-            type: string
-          example:
-          - urn:li:seniority:1
-          - urn:li:seniority:2
-        industries:
-          type: array
-          description: 'Industries to target the message at, expected format of urn:li:industry:{CODE}. [Industries codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/industry-codes-v2)
-
-            '
-          items:
-            type: string
-          example:
-          - urn:li:industry:1
-          - urn:li:industry:2
-        interfaceLocales:
-          type: array
-          description: 'Languages to target the message at, expected format of {"country":"COUNTRY","language":"language"}. [Language codes reference](https://learn.microsoft.com/en-us/linkedin/shared/references/reference-tables/language-codes)
-
-            Languages can be interpreted as this format: language_COUNTRY, replace in request as necessary.
-
-            '
-          items:
-            type: object
-          example:
-          - country: US
-            language: en
-          - country: ES
-            language: es
-    LinkedInPrivacy:
-      type: object
-      properties:
-        visibility:
-          type: array
-          description: LinkedIn visibility rules. At most 1 can be used.
-          items:
-            type: string
-            example: anyone
-            enum:
-            - anyone
-            - connectionsOnly
-    Location:
-      description: The message’s geolocation in decimal degrees for latitude and longitude. Twitter allows users to set the location for a post manually. The location object takes in Decimal Degrees for latitude and longitude. Decimal degrees are an alternative to using degrees, minutes, and seconds (DMS). The values for latitude and longitude are bounded by ±90° and ±180° respectively. Positive latitudes are north of the equator, negative latitudes are south of the equator. Positive longitudes are east of Prime Meridian, negative longitudes are west of the Prime Meridian.<br/>Not supported by Pinterest.
-      type: object
-      properties:
-        latitude:
-          type: number
-          format: double
-          description: The latitude in decimal degrees. Must be between -90 to 90.
-          example: 57.64911
-        longitude:
-          type: number
-          format: double
-          description: The longitude in decimal degrees. Must be between -180 to 180.
-          example: 10.40744
-    ErrorsResponseEnvelope:
-      type: object
-      properties:
-        errors:
-          type: array
-          description: The errors response envelope.
-          items:
-            $ref: '#/components/schemas/Error'
-    Reviewer:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The reviewer member ID.
-          example: 22421144
-        type:
-          type: string
-          description: The reviewer type
-          example: MESSAGE_LEVEL
-          enum:
-          - MESSAGE_LEVEL
-          - TEAM
-          - MEMBER
-          - EXTERNAL
-          - SYSTEM
-          - ADMIN_AND_EDITOR
-          - ORGANIZATION
-      description: Member that was requested to approve the message
-    Media:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The media ID.
-          example: aHR0cDovL2V4YW1wbGUub3Jn
-        thumbnailId:
-          type: string
-          description: The thumbnail media ID.
-          example: aHR0cDovL2V4YW1wbGUtMDAwMS5vcmc=
-        videoOptions:
-          type: object
-          description: The metadata to set for a video.
-          properties:
-            facebook:
-              type: object
-              description: Facebook video metadata. Optional.
-              properties:
-                title:
-                  type: string
-                  description: The video title
-                  example: My Video
-                category:
-                  type: string
-                  description: The video category
-                  example: ENTERTAINMENT
-                  enum:
-                  - BEAUTY_FASHION
-                  - BUSINESS
-                  - CARS_TRUCKS
-                  - COMEDY
-                  - CUTE_ANIMALS
-                  - ENTERTAINMENT
-                  - FAMILY
-                  - FOOD_HEALTH
-                  - HOME
-                  - LIFESTYLE
-                  - MUSIC
-                  - NEWS
-                  - POLITICS
-                  - SCIENCE
-                  - SPORTS
-                  - TECHNOLOGY
-                  - VIDEO_GAMING
-                  - OTHER
-      description: The media attached to the message.
-    FacebookPrivacy:
-      type: object
-      properties:
-        visibility:
-          type: array
-          description: Facebook visibility rules. At most 1 can be used.
-          items:
-            type: string
-            example: everyone
-            enum:
-            - everyone
-            - friends
-            - friendsOfFriends
-    SocialProfileMessage:
-      type: object
-      required:
-      - id
-      - state
-      properties:
-        id:
-          type: string
-          description: The message ID.
-          example: '4138476039'
-        state:
-          type: string
-          description: The message state.
-          example: SCHEDULED
-          enum:
-          - SCHEDULED
-          - SUBMITTED
-          - PENDING_APPROVAL
-          - SENT
-          - SEND_FAILED_PERMANENTLY
-          - REJECTED
-        text:
-          type: string
-          description: The message text to publish.
-          example: 5 trends that will change how we use social media this year http://owl.li/YuNr2
-        socialProfile:
-          title: socialProfileReference
-          type: object
-          description: The social profile that the message will be published to.
-          properties:
-            id:
-              type: string
-              description: The social profile ID.
-              example: '115185509'
-            externalURL:
-              type: string
-              description: The external public URL of the social profile.
-              example: https://www.linkedin.com/in/l-lhs-8654321
-        scheduledSendTime:
-          type: string
-          description: The time the message is scheduled to be sent in UTC time, [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format. Missing or different timezones will not be accepted, to ensure there is no ambiguity about scheduled time. Dates must end with 'Z' to be accepted.
-          example: 2018-10-25 10:35:00+00:00
-        webhookUrls:
-          type: array
-          description: The webhook URL(s) to call to when the message’s state changes.
-          items:
-            type: string
-            example: https://myserver.com/inbound
-        tags:
-          type: array
-          description: The Hootsuite message tags to apply to the message. To set tags the social profile must belong to an organization. Tags are case sensitive. Limited permission members can only use the existing tags for organization and cannot create new ones. See more about message tags at the Hootsuite Help Center.
-          items:
-            type: string
-            example: test_tag
-        targeting:
-          title: targetingOptions
-          type: object
-          description: Social network targeting options to be applied when publishing the message.
-          properties:
-            facebookPage:
-              $ref: '#/components/schemas/FacebookPageTargeting'
-            linkedInCompany:
-              $ref: '#/components/schemas/LinkedInCompanyTargeting'
-        privacy:
-          title: privacyOptions
-          type: object
-          description: Social network privacy options to be applied when publishing the message.
-          properties:
-            facebook:
-              $ref: '#/components/schemas/FacebookPrivacy'
-            linkedIn:
-              $ref: '#/components/schemas/LinkedInPrivacy'
-        location:
-          $ref: '#/components/schemas/Location'
-        emailNotification:
-          type: boolean
-          description: A flag to determine whether email notifications are sent when the message is published.
-          example: true
-        mediaUrls:
-          type: array
-          description: The ow.ly media attached to the message
-          items:
-            $ref: '#/components/schemas/MediaUrl'
-        media:
-          type: array
-          description: The media attached to the message
-          items:
-            $ref: '#/components/schemas/Media'
-        extendedInfo:
-          type: array
-          description: Social profile metadata attached to the message. Only available for Pinterest messages at this time.
-          items:
-            type: object
-            properties:
-              socialProfileType:
-                type: string
-                description: The social profile type that this extendedInfo object is for.
-                example: PINTEREST
-                enum:
-                - PINTEREST
-              socialProfileId:
-                type: string
-                description: The social profile ID that this extendedInfo object is for.
-                example: '123456789'
-              data:
-                type: object
-                description: Social profile specific meta data.
-                properties:
-                  boardId:
-                    type: string
-                    description: Pinterest board ID for Pin
-                    example: '123456789012345678'
-                  destinationUrl:
-                    type: string
-                    description: Website for Pin
-                    example: https://www.hootsuite.com
-        postId:
-          type: string
-          description: The external message ID used by social network for this message. Only set once the message has been published.
-          example: '705207140236001282'
-        postUrl:
-          type: string
-          description: The URL of the message live on the social network. Only set once the message has been published. Only available for Facebook and LinkedIn messages at this time.
-          example: https://www.facebook.com/177463958820/posts/10155617296368821
-        createdByMember:
-          title: memberReference
-          type: object
-          description: The identifier of the member who originally created the message.
-          properties:
-            id:
-              type: string
-              description: ID of member.
-              example: '1389211223'
-        lastUpdatedByMember:
-          title: memberReference
-          type: object
-          description: The identifier of the member who last updated the message.
-          properties:
-            id:
-              type: string
-              description: ID of member.
-              example: '1389211222'
-        sequenceNumber:
-          type: number
-          description: The number representing which step in the approval process the message is on, or null if the message is not subject to approval.
-          example: 3
-        reviewers:
-          type: array
-          description: A list of message reviewers
-          items:
-            $ref: '#/components/schemas/Reviewer'
-    ApproveMessageRequest:
-      type: object
-      required:
-      - sequenceNumber
-      properties:
-        sequenceNumber:
-          type: integer
-          description: The sequence number of the message being approved.
-          example: 11
-        reviewerType:
-          type: string
-          description: 'The actor that will be approving the message. Leaving this field empty will use "EXTERNAL" by default.
-
-
-            Using "MEMBER" requires that you use a member token to approve a message that is pending approval by that member.
-
-            '
-          enum:
-          - EXTERNAL
-          - MEMBER
   parameters:
     bearerToken:
       in: header

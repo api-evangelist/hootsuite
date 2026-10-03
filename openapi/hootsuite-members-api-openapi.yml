@@ -102,6 +102,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorsResponseEnvelope'
 components:
+  parameters:
+    bearerToken:
+      in: header
+      name: Authorization
+      description: A bearer token string used for authentication
+      required: true
+      schema:
+        type: string
   schemas:
     Error:
       type: object
@@ -131,6 +139,34 @@ components:
               type: string
               description: The resource ID.
               example: '7534653235'
+    MemberOrganizations:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The organization ID
+          example: '626731'
+    MemberResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Member'
+    ErrorsResponseEnvelope:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: The errors response envelope.
+          items:
+            $ref: '#/components/schemas/Error'
+    MemberOrganizationsResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          description: The data response envelope.
+          items:
+            $ref: '#/components/schemas/MemberOrganizations'
     Member:
       type: object
       required:
@@ -196,34 +232,6 @@ components:
           - ru
           - th
           - tr
-    MemberResponseEnvelope:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Member'
-    ErrorsResponseEnvelope:
-      type: object
-      properties:
-        errors:
-          type: array
-          description: The errors response envelope.
-          items:
-            $ref: '#/components/schemas/Error'
-    MemberOrganizationsResponseEnvelope:
-      type: object
-      properties:
-        data:
-          type: array
-          description: The data response envelope.
-          items:
-            $ref: '#/components/schemas/MemberOrganizations'
-    MemberOrganizations:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The organization ID
-          example: '626731'
     CreateMemberRequest:
       type: object
       required:
@@ -280,14 +288,6 @@ components:
           - ru
           - th
           - tr
-  parameters:
-    bearerToken:
-      in: header
-      name: Authorization
-      description: A bearer token string used for authentication
-      required: true
-      schema:
-        type: string
   securitySchemes:
     OAuth2:
       type: oauth2
