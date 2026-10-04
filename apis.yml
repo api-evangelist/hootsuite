@@ -42,6 +42,9 @@ accessModel:
     developer access; the platform subscription is seat-priced separately. The Ow.ly URL
     shortener API and organization apps for prescreen components are Enterprise-only.
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/hootsuite.png
+x-docs-platform: readme
+x-docs-platform-confidence: high
+x-docs-platform-checked: 2026-10-03
 tags:
 - Social Media
 - Social Media Management
