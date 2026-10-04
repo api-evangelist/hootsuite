@@ -76,6 +76,23 @@ paths:
       - basic-auth: []
 components:
   schemas:
+    OAuth2BearerToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: 'The token used to authorize requests. This should be added to requests as an authorization header: `Authorization: Bearer oZy8FDUHEiZ0mh0j4rUwOT9t5yHouTzBDsn-x_GROB0.rz-pMQzh-1F6VIGwnJZMBwH3SRwDfEHE4CRi-AClpcg`
+
+            '
+          example: oZy8FDUHEiZ0mh0j4rUwOT9t5yHouTzBDsn-x_GROB0.rz-pMQzh-1F6VIGwnJZMBwH3SRwDfEHE4CRi-AClpcg
+        token_Type:
+          type: string
+          description: The token type to be used in the authorization header. This will always be *bearer* for client credentials grant.
+          example: bearer
+        expires_in:
+          type: number
+          description: The number of seconds until the token expires (1 hour)
+          example: 3599
     OAuthError:
       type: object
       properties:
@@ -118,23 +135,6 @@ components:
           type: number
           description: The status code
           example: 401
-    OAuth2BearerToken:
-      type: object
-      properties:
-        access_token:
-          type: string
-          description: 'The token used to authorize requests. This should be added to requests as an authorization header: `Authorization: Bearer oZy8FDUHEiZ0mh0j4rUwOT9t5yHouTzBDsn-x_GROB0.rz-pMQzh-1F6VIGwnJZMBwH3SRwDfEHE4CRi-AClpcg`
-
-            '
-          example: oZy8FDUHEiZ0mh0j4rUwOT9t5yHouTzBDsn-x_GROB0.rz-pMQzh-1F6VIGwnJZMBwH3SRwDfEHE4CRi-AClpcg
-        token_Type:
-          type: string
-          description: The token type to be used in the authorization header. This will always be *bearer* for client credentials grant.
-          example: bearer
-        expires_in:
-          type: number
-          description: The number of seconds until the token expires (1 hour)
-          example: 3599
   securitySchemes:
     bearer-token:
       type: http

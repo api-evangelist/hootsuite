@@ -139,31 +139,6 @@ paths:
             '
 components:
   schemas:
-    ErrorResponse:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: string
-    StatusDetailResponse:
-      type: array
-      items:
-        type: object
-        properties:
-          status:
-            type: string
-            description: The status of the message
-          contact:
-            type: string
-            description: The contact used to send the message to
-          reason:
-            type: string
-            description: The reason of failure
-      example:
-      - status: FAILED
-        contact: '+32495123456'
-        reason: No channel found for medium WHATSAPP
     StatusOverviewResponse:
       type: object
       properties:
@@ -243,6 +218,31 @@ components:
       - channel
       - contact
       - text
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+    StatusDetailResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          status:
+            type: string
+            description: The status of the message
+          contact:
+            type: string
+            description: The contact used to send the message to
+          reason:
+            type: string
+            description: The reason of failure
+      example:
+      - status: FAILED
+        contact: '+32495123456'
+        reason: No channel found for medium WHATSAPP
   securitySchemes:
     bearer-token:
       type: http

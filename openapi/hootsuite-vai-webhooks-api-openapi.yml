@@ -172,6 +172,107 @@ webhooks:
             '
 components:
   schemas:
+    ConversationManipulation:
+      type: object
+      properties:
+        indicateTyping:
+          type: string
+          enum:
+          - START
+          - STOP
+          description: 'Indicate whether you are typing
+
+            '
+        sendMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+          description: 'The messages you want to send
+
+            '
+        sendMessage:
+          $ref: '#/components/schemas/Message'
+          description: 'The message you want to send
+
+            '
+        applyTopics:
+          type: array
+          items:
+            type: string
+          example:
+          - Hotel Reservation
+          description: 'The topics you want to apply to the conversation
+
+            '
+        applyTags:
+          type: array
+          items:
+            type: string
+          example:
+          - Happy
+          description: 'The tag you want to apply to the latest message
+
+            '
+        applyConversationNotes:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+                example: Some note to add
+          description: 'The notes you want to apply to the conversation
+
+            '
+        setContactAttributes:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            account_number: '19758293529351'
+          description: 'The attributes you want to apply to the contact. The key should match "^[a-zA-Z0-9_]+$"
+
+            '
+        complete:
+          type: string
+          enum:
+          - HANDOVER
+          - RESOLVED
+          description: 'Finish a conversation by handing it off to a human agent or by marking the conversation resolved
+
+            '
+    Message:
+      type: object
+      properties:
+        text:
+          type: string
+          example: Hi! How can I help you?
+        attachment:
+          type: string
+          example: funny_cat.gif
+      description: 'The messages you want to send
+
+        '
+    ConversationDelegatedEvent:
+      allOf:
+      - $ref: '#/components/schemas/VaiWebhookEvent'
+      - properties:
+          type:
+            type: string
+            enum:
+            - CONVERSATION_DELEGATED
+          data:
+            $ref: '#/components/schemas/ConversationData'
+    ConversationStartedEvent:
+      allOf:
+      - $ref: '#/components/schemas/VaiWebhookEvent'
+      - properties:
+          type:
+            type: string
+            enum:
+            - CONVERSATION_STARTED
+          data:
+            $ref: '#/components/schemas/ConversationData'
     InboundMessageReceivedEvent:
       allOf:
       - $ref: '#/components/schemas/VaiWebhookEvent'
@@ -275,107 +376,6 @@ components:
                   id:
                     type: string
                     example: facebook
-    ConversationManipulation:
-      type: object
-      properties:
-        indicateTyping:
-          type: string
-          enum:
-          - START
-          - STOP
-          description: 'Indicate whether you are typing
-
-            '
-        sendMessages:
-          type: array
-          items:
-            $ref: '#/components/schemas/Message'
-          description: 'The messages you want to send
-
-            '
-        sendMessage:
-          $ref: '#/components/schemas/Message'
-          description: 'The message you want to send
-
-            '
-        applyTopics:
-          type: array
-          items:
-            type: string
-          example:
-          - Hotel Reservation
-          description: 'The topics you want to apply to the conversation
-
-            '
-        applyTags:
-          type: array
-          items:
-            type: string
-          example:
-          - Happy
-          description: 'The tag you want to apply to the latest message
-
-            '
-        applyConversationNotes:
-          type: array
-          items:
-            type: object
-            properties:
-              text:
-                type: string
-                example: Some note to add
-          description: 'The notes you want to apply to the conversation
-
-            '
-        setContactAttributes:
-          type: object
-          additionalProperties:
-            type: string
-          example:
-            account_number: '19758293529351'
-          description: 'The attributes you want to apply to the contact. The key should match "^[a-zA-Z0-9_]+$"
-
-            '
-        complete:
-          type: string
-          enum:
-          - HANDOVER
-          - RESOLVED
-          description: 'Finish a conversation by handing it off to a human agent or by marking the conversation resolved
-
-            '
-    ConversationStartedEvent:
-      allOf:
-      - $ref: '#/components/schemas/VaiWebhookEvent'
-      - properties:
-          type:
-            type: string
-            enum:
-            - CONVERSATION_STARTED
-          data:
-            $ref: '#/components/schemas/ConversationData'
-    ConversationDelegatedEvent:
-      allOf:
-      - $ref: '#/components/schemas/VaiWebhookEvent'
-      - properties:
-          type:
-            type: string
-            enum:
-            - CONVERSATION_DELEGATED
-          data:
-            $ref: '#/components/schemas/ConversationData'
-    Message:
-      type: object
-      properties:
-        text:
-          type: string
-          example: Hi! How can I help you?
-        attachment:
-          type: string
-          example: funny_cat.gif
-      description: 'The messages you want to send
-
-        '
     VaiWebhookEvent:
       type: object
       properties:

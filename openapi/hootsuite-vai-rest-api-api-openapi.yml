@@ -199,18 +199,6 @@ paths:
             '
 components:
   schemas:
-    Message:
-      type: object
-      properties:
-        text:
-          type: string
-          example: Hi! How can I help you?
-        attachment:
-          type: string
-          example: funny_cat.gif
-      description: 'The messages you want to send
-
-        '
     ConversationManipulation:
       type: object
       properties:
@@ -280,6 +268,18 @@ components:
           description: 'Finish a conversation by handing it off to a human agent or by marking the conversation resolved
 
             '
+    Message:
+      type: object
+      properties:
+        text:
+          type: string
+          example: Hi! How can I help you?
+        attachment:
+          type: string
+          example: funny_cat.gif
+      description: 'The messages you want to send
+
+        '
   securitySchemes:
     bearer-token:
       type: http

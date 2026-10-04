@@ -333,6 +333,59 @@ webhooks:
             '
 components:
   schemas:
+    CrmErrorNotificationsRequest:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          example: 2
+        eventType:
+          type: string
+          enum:
+          - DATA_IMPORT_ERROR
+        messages:
+          type: array
+          description: an array of explicit error messages
+          items:
+            type: string
+          example:
+          - testMessage1 key:testKey1 value:testValue1
+          - testMessage2 key:testKey2 value:testValue2
+    CrmLookupAttributesResponse:
+      type: object
+      properties:
+        autoConfirm:
+          type: boolean
+          description: 'The `autoConfirm` field tells Inbox 2.0 to automatically save the attributes without having to use the `Confirm` button.
+
+            '
+        contactAttributes:
+          type: array
+          description: Array of JSON objects containing the lookup attributes
+          items:
+            additionalProperties:
+              type: object
+              properties:
+                attribute:
+                  type: string
+                value:
+                  type: string
+      example:
+        autoConfirm: true
+        contactAttributes:
+        - attribute: email
+          value: fj@example.com
+        - attribute: id
+          value: '98765432'
+        - attribute: first_name
+          value: Fred
+        - attribute: last_name
+          value: Jones
+        - attribute: last_order_number
+          value: null
     CrmWriteBackRequest:
       type: object
       description: The request contains write back payload.
@@ -530,59 +583,6 @@ components:
                 name: Redeem Rewards
               - id: ee089cc2-8a6a-11e8-b0d0-942d249592dc
                 name: Account Rewards
-    CrmErrorNotificationsRequest:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        version:
-          type: integer
-          example: 2
-        eventType:
-          type: string
-          enum:
-          - DATA_IMPORT_ERROR
-        messages:
-          type: array
-          description: an array of explicit error messages
-          items:
-            type: string
-          example:
-          - testMessage1 key:testKey1 value:testValue1
-          - testMessage2 key:testKey2 value:testValue2
-    CrmLookupAttributesResponse:
-      type: object
-      properties:
-        autoConfirm:
-          type: boolean
-          description: 'The `autoConfirm` field tells Inbox 2.0 to automatically save the attributes without having to use the `Confirm` button.
-
-            '
-        contactAttributes:
-          type: array
-          description: Array of JSON objects containing the lookup attributes
-          items:
-            additionalProperties:
-              type: object
-              properties:
-                attribute:
-                  type: string
-                value:
-                  type: string
-      example:
-        autoConfirm: true
-        contactAttributes:
-        - attribute: email
-          value: fj@example.com
-        - attribute: id
-          value: '98765432'
-        - attribute: first_name
-          value: Fred
-        - attribute: last_name
-          value: Jones
-        - attribute: last_order_number
-          value: null
   securitySchemes:
     bearer-token:
       type: http

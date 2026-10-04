@@ -161,6 +161,29 @@ paths:
                 $ref: '#/components/schemas/OAuthError'
 components:
   schemas:
+    OAuth2BearerToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: The access token.
+          example: e9a90a81-xf2d-dgh3-cfsd-23jhvn76
+        token_Type:
+          type: string
+          description: The access token type.
+          example: Bearer
+        expires_in:
+          type: number
+          description: The number of seconds until expiry
+          example: 2592000
+        refresh_token:
+          type: string
+          description: The refresh token.
+          example: 82d82cf4-76gf-gfds-nt3k-lzpo12jg
+        scope:
+          type: string
+          description: The scopes granted to this token.
+          example: offline
     OAuthError:
       type: object
       properties:
@@ -203,29 +226,6 @@ components:
           type: number
           description: The status code
           example: 400
-    OAuth2BearerToken:
-      type: object
-      properties:
-        access_token:
-          type: string
-          description: The access token.
-          example: e9a90a81-xf2d-dgh3-cfsd-23jhvn76
-        token_Type:
-          type: string
-          description: The access token type.
-          example: Bearer
-        expires_in:
-          type: number
-          description: The number of seconds until expiry
-          example: 2592000
-        refresh_token:
-          type: string
-          description: The refresh token.
-          example: 82d82cf4-76gf-gfds-nt3k-lzpo12jg
-        scope:
-          type: string
-          description: The scopes granted to this token.
-          example: offline
   securitySchemes:
     OAuth2:
       type: oauth2

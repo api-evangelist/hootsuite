@@ -116,6 +116,51 @@ paths:
                 $ref: '#/components/schemas/ErrorsResponseEnvelope'
 components:
   schemas:
+    RejectCommentRequest:
+      type: object
+      required:
+      - reason
+      - sequenceNumber
+      properties:
+        reason:
+          type: string
+          description: The rejection reason to be displayed to the creator of the comment.
+          example: Message contains profanity
+        sequenceNumber:
+          type: integer
+          description: The sequence number of the comment being rejected.
+          example: 11
+        reviewerType:
+          type: string
+          description: 'The actor that will be rejecting the comment. Leaving this field empty will use "EXTERNAL" by default.
+
+
+            Using "MEMBER" requires that you use a member token to reject a comment that is pending approval by that member.
+
+            '
+          enum:
+          - EXTERNAL
+          - MEMBER
+    EmptyDataEnvelope:
+      type: object
+      properties:
+        data:
+          description: The data response envelope.
+          type: object
+    ErrorsResponseEnvelope:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: The errors response envelope.
+          items:
+            $ref: '#/components/schemas/Error'
+    SocialProfileCommentResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SocialProfileComment'
+      description: The response data wrapper for a social profile comment
     ApproveCommentRequest:
       type: object
       required:
@@ -190,31 +235,6 @@ components:
           type: string
           description: The social profile that the comment will be published to.
           example: '12345'
-    RejectCommentRequest:
-      type: object
-      required:
-      - reason
-      - sequenceNumber
-      properties:
-        reason:
-          type: string
-          description: The rejection reason to be displayed to the creator of the comment.
-          example: Message contains profanity
-        sequenceNumber:
-          type: integer
-          description: The sequence number of the comment being rejected.
-          example: 11
-        reviewerType:
-          type: string
-          description: 'The actor that will be rejecting the comment. Leaving this field empty will use "EXTERNAL" by default.
-
-
-            Using "MEMBER" requires that you use a member token to reject a comment that is pending approval by that member.
-
-            '
-          enum:
-          - EXTERNAL
-          - MEMBER
     Error:
       type: object
       properties:
@@ -243,26 +263,6 @@ components:
               type: string
               description: The resource ID.
               example: '7534653235'
-    ErrorsResponseEnvelope:
-      type: object
-      properties:
-        errors:
-          type: array
-          description: The errors response envelope.
-          items:
-            $ref: '#/components/schemas/Error'
-    SocialProfileCommentResponseEnvelope:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/SocialProfileComment'
-      description: The response data wrapper for a social profile comment
-    EmptyDataEnvelope:
-      type: object
-      properties:
-        data:
-          description: The data response envelope.
-          type: object
   parameters:
     bearerToken:
       in: header
