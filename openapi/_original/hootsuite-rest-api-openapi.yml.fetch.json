@@ -1,0 +1,12 @@
+{
+ "url": "https://apidocs.hootsuite.com/docs/api/swagger.yaml",
+ "requested_url": "https://apidocs.hootsuite.com/docs/api/swagger.yaml",
+ "status": 200,
+ "content_type": "application/yaml",
+ "bytes": 154845,
+ "sha256": "2a21cb8baa29649cfc58296f60c809cfec5e97bfb77e61166817aa3a2d687cc8",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 1.0), but the bytes differ, so the archive is an earlier or reformatted copy."
+}

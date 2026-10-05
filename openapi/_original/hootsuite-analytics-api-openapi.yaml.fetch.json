@@ -1,0 +1,12 @@
+{
+ "url": "https://apidocs.hootsuite.com/docs/api/analytics/openapi/openapi.yaml",
+ "requested_url": "https://apidocs.hootsuite.com/docs/api/analytics/openapi/openapi.yaml",
+ "status": 200,
+ "content_type": "application/yaml",
+ "bytes": 35114,
+ "sha256": "3ad776057a40fdee3ef2f09e23a286a34bd83e3ba097ed338d78dd6dbc875be7",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the archived file is byte-identical to what the provider serves."
+}
