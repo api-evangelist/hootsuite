@@ -88,3 +88,42 @@ machine_readable_pricing: false
 note: >-
   No pricing or product-catalog API endpoint is published. Values above were read from the rendered
   plans page on 2026-08-13 and should be re-checked; Hootsuite runs frequent promotional pricing.
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - negotiated
+  - seat
+  units:
+  - seat
+  plans:
+  - name: Standard
+    access: other
+    model: seat
+    model_how: derived
+    units:
+    - seat
+    periods:
+    - month
+  - name: Professional
+    access: other
+    model: seat
+    model_how: derived
+    units:
+    - seat
+    periods:
+    - month
+  - name: Advanced
+    access: other
+    model: seat
+    model_how: derived
+    units:
+    - seat
+    periods:
+    - month
+  - name: Enterprise
+    access: other
+    model: negotiated
+    model_how: derived
+    units: []
+    periods: []
