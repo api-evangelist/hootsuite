@@ -106,3 +106,42 @@
       latest_authorization: '2022-03-02'
   status: not-a-workflow
   arazzo: null
+- slug: hootsuite-microsoft-teams-own
+  label: Microsoft Teams (own)
+  partner: microsoft-teams
+  partner_name: Microsoft Teams (own)
+  category: Microsoft Teams app
+  type: marketplace
+  marketplace: own
+  channel: partner-built
+  evidence: https://appsource.microsoft.com/en-us/product/office/WA200003153
+  source: edge
+  relationship: platform-app
+  status: not-a-workflow
+  arazzo: null
+- slug: hootsuite-monday-com-own
+  label: Monday.com (own)
+  partner: monday-com
+  partner_name: Monday.com (own)
+  category: monday.com app
+  type: marketplace
+  marketplace: own
+  channel: partner-built
+  evidence: https://monday.com/marketplace/listing/10000008
+  source: edge
+  relationship: platform-app
+  status: not-a-workflow
+  arazzo: null
+- slug: hootsuite-slack-own
+  label: Slack (own)
+  partner: slack
+  partner_name: Slack (own)
+  category: Slack app
+  type: marketplace
+  marketplace: own
+  channel: partner-built
+  evidence: https://slack.com/marketplace/A037WR8FJ91-amplify-by-hootsuite
+  source: edge
+  relationship: platform-app
+  status: not-a-workflow
+  arazzo: null
