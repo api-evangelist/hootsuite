@@ -16,55 +16,43 @@
   relationship: platform-app
   status: not-a-workflow
   arazzo: null
-- slug: hootsuite-zapier
-  label: Zapier
-  partner: zapier
-  partner_name: Zapier
+- slug: hootsuite-microsoft-teams-own
+  label: Microsoft Teams (own)
+  partner: microsoft-teams
+  partner_name: Microsoft Teams (own)
+  category: Microsoft Teams app
   type: marketplace
-  marketplace: zapier-directory
-  channel: ipaas-listing
-  evidence: https://zapier.com/apps/hootsuite/integrations
+  marketplace: own
+  channel: partner-built
+  evidence: https://appsource.microsoft.com/en-us/product/office/WA200003153
   source: edge
-  relationship: ipaas-bridge
-  contract_reference:
-    register: Zapier app directory (zapier.com/api/v4/apps)
-    spec_file: null
-    role: ipaas-connector:zapier
-    registered_name: Hootsuite
-    matched_domain: hootsuite.com
-    matched_by: domain
-    detected_by: sweep-workflow-automation.py
-    detected: '2026-10-15'
-    signal_note: one edge per (provider, platform); actions, triggers and usage counts are context, never read
-    app_slug: hootsuite
-    beta: false
-    builder: unknown (not in the directory record)
+  relationship: platform-app
   status: not-a-workflow
   arazzo: null
-- slug: hootsuite-pipedream
-  label: Pipedream
-  partner: pipedream
-  partner_name: Pipedream
+- slug: hootsuite-monday-com-own
+  label: Monday.com (own)
+  partner: monday-com
+  partner_name: Monday.com (own)
+  category: monday.com app
   type: marketplace
-  marketplace: pipedream-components
-  channel: open-source-node
-  evidence: https://github.com/PipedreamHQ/pipedream/tree/94800dd6de6640b942c65ea7ee655f71ac56d438/components/hootsuite
+  marketplace: own
+  channel: partner-built
+  evidence: https://monday.com/marketplace/listing/10000008
   source: edge
-  relationship: ipaas-bridge
-  contract_reference:
-    register: Pipedream components (PipedreamHQ/pipedream components/)
-    spec_file: null
-    role: ipaas-connector:pipedream
-    registered_name: hootsuite
-    matched_domain: hootsuite.com
-    matched_by: domain
-    detected_by: sweep-workflow-automation.py
-    detected: '2026-10-15'
-    signal_note: one edge per (provider, platform); actions, triggers and usage counts are context, never read
-    app_slug: hootsuite
-    actions: true
-    sources: true
-    builder: Pipedream repo (component)
+  relationship: platform-app
+  status: not-a-workflow
+  arazzo: null
+- slug: hootsuite-slack-own
+  label: Slack (own)
+  partner: slack
+  partner_name: Slack (own)
+  category: Slack app
+  type: marketplace
+  marketplace: own
+  channel: partner-built
+  evidence: https://slack.com/marketplace/A037WR8FJ91-amplify-by-hootsuite
+  source: edge
+  relationship: platform-app
   status: not-a-workflow
   arazzo: null
 - slug: hootsuite-fedramp
@@ -106,42 +94,54 @@
       latest_authorization: '2022-03-02'
   status: not-a-workflow
   arazzo: null
-- slug: hootsuite-microsoft-teams-own
-  label: Microsoft Teams (own)
-  partner: microsoft-teams
-  partner_name: Microsoft Teams (own)
-  category: Microsoft Teams app
+- slug: hootsuite-zapier
+  label: Zapier
+  partner: zapier
+  partner_name: Zapier
   type: marketplace
-  marketplace: own
-  channel: partner-built
-  evidence: https://appsource.microsoft.com/en-us/product/office/WA200003153
+  marketplace: zapier-directory
+  channel: ipaas-listing
+  evidence: https://zapier.com/apps/hootsuite/integrations
   source: edge
-  relationship: platform-app
+  relationship: ipaas-bridge
+  contract_reference:
+    register: Zapier app directory (zapier.com/api/v4/apps)
+    spec_file: null
+    role: ipaas-connector:zapier
+    registered_name: Hootsuite
+    matched_domain: hootsuite.com
+    matched_by: domain
+    detected_by: sweep-workflow-automation.py
+    detected: '2026-10-15'
+    signal_note: one edge per (provider, platform); actions, triggers and usage counts are context, never read
+    app_slug: hootsuite
+    beta: false
+    builder: unknown (not in the directory record)
   status: not-a-workflow
   arazzo: null
-- slug: hootsuite-monday-com-own
-  label: Monday.com (own)
-  partner: monday-com
-  partner_name: Monday.com (own)
-  category: monday.com app
+- slug: hootsuite-pipedream
+  label: Pipedream
+  partner: pipedream
+  partner_name: Pipedream
   type: marketplace
-  marketplace: own
-  channel: partner-built
-  evidence: https://monday.com/marketplace/listing/10000008
+  marketplace: pipedream-components
+  channel: open-source-node
+  evidence: https://github.com/PipedreamHQ/pipedream/tree/d5872355ef27b4efa769f05352f2820c299a456e/components/hootsuite
   source: edge
-  relationship: platform-app
-  status: not-a-workflow
-  arazzo: null
-- slug: hootsuite-slack-own
-  label: Slack (own)
-  partner: slack
-  partner_name: Slack (own)
-  category: Slack app
-  type: marketplace
-  marketplace: own
-  channel: partner-built
-  evidence: https://slack.com/marketplace/A037WR8FJ91-amplify-by-hootsuite
-  source: edge
-  relationship: platform-app
+  relationship: ipaas-bridge
+  contract_reference:
+    register: Pipedream components (PipedreamHQ/pipedream components/)
+    spec_file: null
+    role: ipaas-connector:pipedream
+    registered_name: hootsuite
+    matched_domain: hootsuite.com
+    matched_by: domain
+    detected_by: sweep-workflow-automation.py
+    detected: '2026-10-15'
+    signal_note: one edge per (provider, platform); actions, triggers and usage counts are context, never read
+    app_slug: hootsuite
+    actions: true
+    sources: true
+    builder: Pipedream repo (component)
   status: not-a-workflow
   arazzo: null
