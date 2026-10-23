@@ -187,3 +187,9 @@ x-tagGroups:
   tags:
   - messenger_introduction
   - messenger_web_sdk
+x-provenance:
+  method: harvested
+  publisher: Hootsuite
+  source: https://apidocs.hootsuite.com/docs/api/swagger.yaml
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)

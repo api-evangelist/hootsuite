@@ -1119,3 +1119,9 @@ components:
             analytics:read: Request analytics API access
 externalDocs:
   url: https://developer.hootsuite.com/docs/analytics-overview
+x-provenance:
+  method: harvested
+  publisher: Hootsuite
+  source: https://apidocs.hootsuite.com/docs/api/analytics/openapi/openapi.yaml
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
