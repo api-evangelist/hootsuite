@@ -26,6 +26,11 @@ checked:
 - https://www.crowncommercial.gov.uk/agreements
 - https://www.ncsc.gov.uk/cyberessentials/search
 - https://dir.texas.gov/resource-library-item/tx-ramp-certified-cloud-products
+- https://ifttt.com/explore/services
+- https://ifttt.com/hootsuite
+- https://ifttt.com/sitemap_services.xml
+- adobe-analytics/integrations/adobe-analytics-integration-edges.yml
+- adobe-experience-manager/integrations/adobe-experience-manager-integration-edges.yml
 source:
 - okta/integrations/okta-integration-edges.yml
 edges:
@@ -186,6 +191,100 @@ edges:
     detected: '2026-10-21'
   detected_by: sweep-salesforce-appexchange.py
   first_seen: '2026-10-21'
+- partner_name: UK G-Cloud 14 (Digital Marketplace)
+  partner: null
+  partner_match: register
+  type: marketplace
+  marketplace: g-cloud
+  channel: distribution
+  relationship: distribution-channel
+  direction: third-party
+  evidence: https://www.applytosupply.digitalmarketplace.service.gov.uk/g-cloud-14/supplier/92281
+  category: UK public-sector procurement framework
+  contract_reference:
+    register: UK G-Cloud 14 supplier list (Digital Marketplace)
+    spec_file: null
+    role: g-cloud-supplier
+    registered_name: Hootsuite Inc
+    register_id: '92281'
+    matched_domain: hootsuite.com
+    matched_by: domain
+    domain_source: contact-email
+    signal_note: a framework award is distribution (selling to the public sector), not an integration; kept out
+      of position shares
+    detected_by: sweep-uk-g-cloud-suppliers.py
+    detected: '2026-10-21'
+  detected_by: sweep-uk-g-cloud-suppliers.py
+  first_seen: '2026-10-21'
+- partner_name: TX-RAMP
+  partner: null
+  partner_match: register
+  partner_tier: Level 1
+  type: contract
+  channel: regulator-register
+  relationship: standard-participant
+  direction: partner-built
+  evidence: https://dir.texas.gov/resource-library-item/tx-ramp-certified-cloud-products
+  category: Texas state cloud security certification (TX-RAMP)
+  contract_reference:
+    register: TX-RAMP Certified Cloud Products (Texas DIR)
+    standard: TX-RAMP
+    spec_file: null
+    role: tx-ramp-certified
+    register_file: https://dir.texas.gov/sites/default/files/2026-10/Copy%20of%20TX-RAMP%20Certified%20Cloud%20Products_1.xlsx
+    registrations:
+    - certification_id: TX1218583
+      product: Hootsuite Enterprise
+      registered_vendor: Hootsuite
+      certification_level: Level 1
+      cloud_categories:
+      - SaaS
+      certification_path: Certification Due to Existing Other RAMP-Certification
+      expires: null
+      lapsed: false
+      matched_domain: hootsuite.com
+      matched_by: domain
+    identity: wikidata Q2749075 'Hootsuite' P856 http://hootsuite.com
+    identity_source: wikidata P856 (labelled provenance step; Kin 2026-10-15 decision 1)
+    signal_note: 'certified_products = one entry per cloud category (SaaS / PaaS / IaaS) the vendor holds a TX-RAMP
+      certification in, never per product; products are context, never counted. certification_level = the highest
+      level in that category; lapsed: true when every product in the category is past its expiry date. partner_tier
+      = the highest CURRENT level'
+    certified_products:
+    - product: SaaS
+      product_type: SaaS
+      standard: TX-RAMP
+      certification_level: Level 1
+      lapsed: false
+    detected_by: sweep-tx-ramp-certified-cloud.py
+    detected: '2026-10-22'
+  detected_by: sweep-tx-ramp-certified-cloud.py
+  first_seen: '2026-10-22'
+- partner_name: IFTTT
+  partner: ifttt
+  partner_match: aggregator
+  type: marketplace
+  marketplace: ifttt-services
+  channel: ipaas-listing
+  relationship: ipaas-bridge
+  direction: third-party
+  evidence: https://ifttt.com/hootsuite
+  category: null
+  contract_reference:
+    register: IFTTT service directory (ifttt.com/explore/services; ifttt.com/<service>)
+    spec_file: null
+    role: ipaas-connector:ifttt
+    registered_name: Hootsuite
+    matched_domain: hootsuite.com
+    matched_by: domain
+    app_slug: hootsuite
+    ifttt_category: Business tools
+    builder: unknown (the service page does not say who built it)
+    detected_by: sweep-ifttt-services.py
+    detected: '2026-10-23'
+    signal_note: one edge per (provider, platform); triggers, actions and applet counts are context, never read
+  detected_by: sweep-ifttt-services.py
+  first_seen: '2026-10-23'
 - partner_name: Okta (own)
   partner: okta
   partner_match: mirror
@@ -303,72 +402,37 @@ edges:
   detected: '2026-10-21'
   detected_by: mirror-platform-listings.py
   category: LEAD_SCORING_ROUTING
-- partner_name: UK G-Cloud 14 (Digital Marketplace)
-  partner: null
-  partner_match: register
+- partner_name: Adobe Analytics (own)
+  partner: adobe-analytics
+  partner_match: mirror
+  mirror_match: domain
   type: marketplace
-  marketplace: g-cloud
-  channel: distribution
-  relationship: distribution-channel
+  relationship: platform-app
   direction: third-party
-  evidence: https://www.applytosupply.digitalmarketplace.service.gov.uk/g-cloud-14/supplier/92281
-  category: UK public-sector procurement framework
-  contract_reference:
-    register: UK G-Cloud 14 supplier list (Digital Marketplace)
-    spec_file: null
-    role: g-cloud-supplier
-    registered_name: Hootsuite Inc
-    register_id: '92281'
-    matched_domain: hootsuite.com
-    matched_by: domain
-    domain_source: contact-email
-    signal_note: a framework award is distribution (selling to the public sector), not an integration; kept out
-      of position shares
-    detected_by: sweep-uk-g-cloud-suppliers.py
-    detected: '2026-10-21'
-  detected_by: sweep-uk-g-cloud-suppliers.py
-  first_seen: '2026-10-21'
-- partner_name: TX-RAMP
-  partner: null
-  partner_match: register
-  partner_tier: Level 1
-  type: contract
-  channel: regulator-register
-  relationship: standard-participant
-  direction: partner-built
-  evidence: https://dir.texas.gov/resource-library-item/tx-ramp-certified-cloud-products
-  category: Texas state cloud security certification (TX-RAMP)
-  contract_reference:
-    register: TX-RAMP Certified Cloud Products (Texas DIR)
-    standard: TX-RAMP
-    spec_file: null
-    role: tx-ramp-certified
-    register_file: https://dir.texas.gov/sites/default/files/2026-10/Copy%20of%20TX-RAMP%20Certified%20Cloud%20Products_1.xlsx
-    registrations:
-    - certification_id: TX1218583
-      product: Hootsuite Enterprise
-      registered_vendor: Hootsuite
-      certification_level: Level 1
-      cloud_categories:
-      - SaaS
-      certification_path: Certification Due to Existing Other RAMP-Certification
-      expires: null
-      lapsed: false
-      matched_domain: hootsuite.com
-      matched_by: domain
-    identity: wikidata Q2749075 'Hootsuite' P856 http://hootsuite.com
-    identity_source: wikidata P856 (labelled provenance step; Kin 2026-10-15 decision 1)
-    signal_note: 'certified_products = one entry per cloud category (SaaS / PaaS / IaaS) the vendor holds a TX-RAMP
-      certification in, never per product; products are context, never counted. certification_level = the highest
-      level in that category; lapsed: true when every product in the category is past its expiry date. partner_tier
-      = the highest CURRENT level'
-    certified_products:
-    - product: SaaS
-      product_type: SaaS
-      standard: TX-RAMP
-      certification_level: Level 1
-      lapsed: false
-    detected_by: sweep-tx-ramp-certified-cloud.py
-    detected: '2026-10-22'
-  detected_by: sweep-tx-ramp-certified-cloud.py
-  first_seen: '2026-10-22'
+  channel: partner-built
+  marketplace: own
+  evidence: https://exchange.adobe.com/apps/ec/100066
+  mirror_of: adobe-analytics/integrations/adobe-analytics-integration-edges.yml
+  apps:
+  - Adobe Analytics for Hootsuite Impact
+  listing_count: 1
+  detected: '2026-10-23'
+  detected_by: mirror-platform-listings.py
+  category: Adobe Exchange Experience Cloud listing (Analytics)
+- partner_name: Adobe Experience Manager (own)
+  partner: adobe-experience-manager
+  partner_match: mirror
+  mirror_match: domain
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: own
+  evidence: https://exchange.adobe.com/apps/ec/100065
+  mirror_of: adobe-experience-manager/integrations/adobe-experience-manager-integration-edges.yml
+  apps:
+  - Adobe Experience Manager Assets for Hootsuite
+  listing_count: 1
+  detected: '2026-10-23'
+  detected_by: mirror-platform-listings.py
+  category: Adobe Exchange Experience Cloud listing (Experience Manager)
